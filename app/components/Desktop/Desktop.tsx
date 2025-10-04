@@ -23,8 +23,14 @@ export default function Desktop({
 	} | null>(null);
 	const [isDragOver, setIsDragOver] = useState(false);
 
-	const { desktopIcons, deselectAllIcons, createFolder, createFile, createDesktopIcon, getItemByPath } =
-		useFileSystemContext();
+	const {
+		desktopIcons,
+		deselectAllIcons,
+		createFolder,
+		createFile,
+		createDesktopIcon,
+		getItemByPath,
+	} = useFileSystemContext();
 	const { openWindow } = useWindowContext();
 
 	const handleDesktopClick = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -106,25 +112,30 @@ export default function Desktop({
 			}
 
 			const fileData = JSON.parse(fileDataString);
-			
+
 			if (fileData && fileData.id && fileData.path) {
 				// Get the actual file item from the file system
 				const fileItem = getItemByPath(fileData.path);
-				
+
 				if (fileItem) {
 					// Calculate drop position (convert to grid coordinates)
 					const pixelX = event.clientX - 25; // Offset for icon size
 					const pixelY = event.clientY - 25;
-					
+
 					const gridPosition = {
 						x: Math.round(pixelX / DESKTOP_GRID.ICON_WIDTH),
 						y: Math.round(pixelY / DESKTOP_GRID.ICON_HEIGHT),
 					};
 
 					// Ensure position is within bounds (grid coordinates)
-					const maxGridX = Math.floor((window.innerWidth - DESKTOP_GRID.ICON_WIDTH) / DESKTOP_GRID.ICON_WIDTH);
-					const maxGridY = Math.floor((window.innerHeight - 160) / DESKTOP_GRID.ICON_HEIGHT); // Account for taskbar
-					
+					const maxGridX = Math.floor(
+						(window.innerWidth - DESKTOP_GRID.ICON_WIDTH) /
+							DESKTOP_GRID.ICON_WIDTH
+					);
+					const maxGridY = Math.floor(
+						(window.innerHeight - 160) / DESKTOP_GRID.ICON_HEIGHT
+					); // Account for taskbar
+
 					const boundedGridPosition = {
 						x: Math.max(0, Math.min(gridPosition.x, maxGridX)),
 						y: Math.max(0, Math.min(gridPosition.y, maxGridY)),

@@ -21,7 +21,7 @@ interface DesktopIconProps {
 
 interface LaunchConfig {
 	title: string;
-	appType: 'notepad' | 'paint' | 'minesweeper' | 'explorer';
+	appType: 'notepad' | 'paint' | 'minesweeper' | 'explorer' | 'snake';
 	position: { x: number; y: number };
 	size: { width: number; height: number };
 	icon?: string;
@@ -138,6 +138,17 @@ function getLaunchConfigForFile(item: FileSystemItem): LaunchConfig | null {
 			});
 		}
 
+		if (exeName.includes('snake')) {
+			return {
+				title: 'Snake.exe',
+				appType: 'snake' as const,
+				position: { x: 200, y: 140 },
+				size: { width: 850, height: 580 },
+				icon: 'SN',
+				content: {},
+			};
+		}
+
 		return createUnsupportedFileLaunch(
 			item,
 			`No application handler is defined for ${item.name}.`
@@ -184,7 +195,10 @@ export default function DesktopIcon({
 
 	// Get the file system item data for this icon
 	// First try direct ID match in all items (recursive search), then path-based search
-	const findItemById = (items: FileSystemItem[], targetId: string): FileSystemItem | null => {
+	const findItemById = (
+		items: FileSystemItem[],
+		targetId: string
+	): FileSystemItem | null => {
 		for (const item of items) {
 			if (item.id === targetId) return item;
 			if (item.children) {
@@ -323,6 +337,9 @@ export default function DesktopIcon({
 			}
 			if (exeName.includes('notepad')) {
 				return { symbol: '📝', color: '#C0C0C0' };
+			}
+			if (exeName.includes('snake')) {
+				return { symbol: '🐍', color: '#C0C0C0' };
 			}
 			return { symbol: 'EXE', color: '#C0C0C0' };
 		}

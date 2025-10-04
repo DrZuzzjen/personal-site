@@ -320,6 +320,18 @@ export const APP_EXECUTABLES: FileSystemItem[] = [
     createdAt: Date.now(),
     modifiedAt: Date.now(),
   },
+  {
+    id: 'snake-exe',
+    name: 'Snake.exe',
+    type: 'file',
+    extension: 'exe',
+    path: '/Desktop/Snake.exe',
+    isProtected: true,
+    isSystem: true,
+    icon: 'snake',
+    createdAt: Date.now(),
+    modifiedAt: Date.now(),
+  },
 ];
 
 // Desktop icons for executables
@@ -340,6 +352,12 @@ export const APP_DESKTOP_ICONS: DesktopIcon[] = [
     id: 'desktop-icon-notepad',
     fileSystemId: 'notepad-exe',
     position: { x: 0, y: 4 },
+    isSelected: false,
+  },
+  {
+    id: 'desktop-icon-snake',
+    fileSystemId: 'snake-exe',
+    position: { x: 0, y: 5 },
     isSelected: false,
   },
 ];

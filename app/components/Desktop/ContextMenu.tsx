@@ -52,7 +52,7 @@ export default function ContextMenu({
 		const timer = setTimeout(() => {
 			setShowSubmenu(label);
 		}, 150);
-		
+
 		setSubmenuTimer(timer);
 	};
 
@@ -136,7 +136,7 @@ export default function ContextMenu({
 							>
 								{item.label}
 								<span style={{ float: 'right' }}>▶</span>
-								
+
 								{/* Submenu */}
 								{showSubmenu === item.label && (
 									<div
@@ -174,11 +174,13 @@ export default function ContextMenu({
 													}}
 													onClick={() => handleMenuClick(subItem.action)}
 													onMouseEnter={(e) => {
-														e.currentTarget.style.backgroundColor = COLORS.WIN_BLUE;
+														e.currentTarget.style.backgroundColor =
+															COLORS.WIN_BLUE;
 														e.currentTarget.style.color = COLORS.TEXT_WHITE;
 													}}
 													onMouseLeave={(e) => {
-														e.currentTarget.style.backgroundColor = 'transparent';
+														e.currentTarget.style.backgroundColor =
+															'transparent';
 														e.currentTarget.style.color = COLORS.TEXT_BLACK;
 													}}
 												>

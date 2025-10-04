@@ -8,6 +8,7 @@ import FileExplorer from '@/app/components/Apps/FileExplorer/FileExplorer';
 import Notepad from '@/app/components/Apps/Notepad/Notepad';
 import Minesweeper from '@/app/components/Apps/Minesweeper/Minesweeper';
 import Paint from '@/app/components/Apps/Paint/Paint';
+import Snake from '@/app/components/Apps/Snake/Snake';
 import { BootSequence } from '@/app/components/BootSequence';
 import { ErrorDialog, BSOD } from '@/app/components/Dialogs';
 import { ShutDownScreen } from '@/app/components/StartMenu';
@@ -267,6 +268,9 @@ function renderWindowContent(
 			const config = resolvePaintContent(windowData.content);
 			return <Paint {...config} />;
 		}
+		case 'snake': {
+			return <Snake />;
+		}
 		default:
 			return (
 				<div style={{ color: COLORS.TEXT_BLACK }}>
@@ -417,6 +421,17 @@ export default function MainPage() {
 						body: content?.content || DEFAULT_NOTEPAD_MESSAGE,
 						readOnly: content?.readOnly || false,
 					} as NotepadWindowContent,
+				});
+				break;
+
+			case 'snake':
+				openWindow({
+					title: 'Snake.exe',
+					appType: 'snake',
+					position,
+					size: { width: 850, height: 580 },
+					icon: 'SN',
+					content: {},
 				});
 				break;
 

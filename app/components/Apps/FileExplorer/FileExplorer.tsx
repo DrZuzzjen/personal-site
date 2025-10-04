@@ -263,13 +263,16 @@ export default function FileExplorer({
 									onContextMenu={(e) => handleContextMenu(e, item)}
 									onDragStart={(e) => {
 										if (item.type === 'file') {
-											e.dataTransfer.setData('application/file', JSON.stringify({
-												id: item.id,
-												name: item.name,
-												type: item.type,
-												path: item.path,
-												extension: item.extension,
-											}));
+											e.dataTransfer.setData(
+												'application/file',
+												JSON.stringify({
+													id: item.id,
+													name: item.name,
+													type: item.type,
+													path: item.path,
+													extension: item.extension,
+												})
+											);
 											e.dataTransfer.effectAllowed = 'copy';
 										}
 									}}
