@@ -247,7 +247,7 @@ function renderWindowContent(
 	switch (windowData.appType) {
 		case 'notepad': {
 			const notepadProps = resolveNotepadContent(windowData.content);
-			return <Notepad {...notepadProps} />;
+			return <Notepad {...notepadProps} windowId={windowData.id} />;
 		}
 		case 'explorer': {
 			const initialPath = resolveExplorerPath(windowData.content);
@@ -387,8 +387,10 @@ export default function MainPage() {
 				break;
 
 			case 'notepad':
+				const fileName = content?.fileName || 'Untitled';
+				const title = fileName.endsWith('.txt') ? fileName : `${fileName}.txt`;
 				openWindow({
-					title: `${content?.fileName || 'Untitled'}.txt - Notepad`,
+					title: `${title} - Notepad`,
 					appType: 'notepad',
 					position,
 					size: { width: 440, height: 320 },

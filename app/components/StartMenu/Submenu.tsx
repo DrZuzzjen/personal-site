@@ -88,7 +88,21 @@ export default function Submenu({
 				onHover={() => {}}
 				onClick={() =>
 					handleItemClick(() =>
-						onLaunchApp('notepad', { content: 'Project 1 content...' })
+						onLaunchApp('notepad', { 
+							fileName: 'Project_1.txt',
+							filePath: '/My Computer/My Documents/Project_1.txt',
+							content: `Project Name: [Your Project]
+Tech Stack: Next.js, TypeScript, Tailwind
+GitHub: [repo-url]
+
+Description:
+[Your project description here]
+
+Key Features:
+- Feature 1
+- Feature 2
+- Feature 3`
+						})
 					)
 				}
 			/>
@@ -99,7 +113,11 @@ export default function Submenu({
 				onHover={() => {}}
 				onClick={() =>
 					handleItemClick(() =>
-						onLaunchApp('notepad', { content: 'Project 2 content...' })
+						onLaunchApp('notepad', { 
+							fileName: 'Project_2.txt',
+							filePath: '/My Computer/My Documents/Project_2.txt',
+							content: 'Project 2 details... (to be filled in Phase 6)'
+						})
 					)
 				}
 			/>
@@ -110,7 +128,11 @@ export default function Submenu({
 				onHover={() => {}}
 				onClick={() =>
 					handleItemClick(() =>
-						onLaunchApp('notepad', { content: 'Project 3 content...' })
+						onLaunchApp('notepad', { 
+							fileName: 'Project_3.txt',
+							filePath: '/My Computer/My Documents/Project_3.txt',
+							content: 'Project 3 details... (to be filled in Phase 6)'
+						})
 					)
 				}
 			/>
@@ -121,7 +143,11 @@ export default function Submenu({
 				onHover={() => {}}
 				onClick={() =>
 					handleItemClick(() =>
-						onLaunchApp('notepad', { content: 'Project 4 content...' })
+						onLaunchApp('notepad', { 
+							fileName: 'Project_4.txt',
+							filePath: '/My Computer/My Documents/Project_4.txt',
+							content: 'Project 4 details... (to be filled in Phase 6)'
+						})
 					)
 				}
 			/>
@@ -132,7 +158,11 @@ export default function Submenu({
 				onHover={() => {}}
 				onClick={() =>
 					handleItemClick(() =>
-						onLaunchApp('notepad', { content: 'Project 5 content...' })
+						onLaunchApp('notepad', { 
+							fileName: 'Project_5.txt',
+							filePath: '/My Computer/My Documents/Project_5.txt',
+							content: 'Project 5 details... (to be filled in Phase 6)'
+						})
 					)
 				}
 			/>
@@ -151,8 +181,10 @@ export default function Submenu({
 				onClick={() =>
 					handleItemClick(() =>
 						onLaunchApp('notepad', {
-							content:
-								'Windows 3.1 Portfolio Prototype\n\nBuilt with Next.js and TypeScript\nMade by Steve (AI Assistant)\n\nFeatures:\n- Window Management\n- File System\n- Classic Applications\n- Boot Sequence\n- Easter Eggs',
+							fileName: 'About.txt',
+							filePath: '/My Computer/My Documents/About.txt',
+							content: 'Windows 3.1 Portfolio Prototype\n\nBuilt with Next.js and TypeScript\nMade by Steve (AI Assistant)\n\nFeatures:\n- Window Management\n- File System\n- Classic Applications\n- Boot Sequence\n- Easter Eggs',
+							readOnly: true,
 						})
 					)
 				}

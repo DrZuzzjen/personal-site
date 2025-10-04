@@ -7,7 +7,9 @@ import { useFileSystemContext } from '@/app/lib/FileSystemContext';
 import { useWindowContext } from '@/app/lib/WindowContext';
 import type { NotepadWindowContent } from '@/app/lib/types';
 
-export type NotepadProps = NotepadWindowContent;
+export type NotepadProps = NotepadWindowContent & {
+	windowId?: string;
+};
 
 const MENU_ITEMS = ['File', 'Edit', 'Search', 'Help'] as const;
 
@@ -111,7 +113,7 @@ function calculateCursorPosition(text: string, offset: number) {
 	};
 }
 
-export default function Notepad({ fileName, filePath, body, readOnly }: NotepadProps) {
+export default function Notepad({ fileName, filePath, body, readOnly, windowId }: NotepadProps) {
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 	const [isWrapped, setIsWrapped] = useState(true);
 	const [cursorPosition, setCursorPosition] = useState({ line: 1, column: 1 });
@@ -119,13 +121,14 @@ export default function Notepad({ fileName, filePath, body, readOnly }: NotepadP
 	
 	// State for editing
 	const [editedText, setEditedText] = useState(body);
+	const [savedText, setSavedText] = useState(body); // Track the last saved version
 	
 	// File system and window context
 	const { updateFileContent, createFile } = useFileSystemContext();
-	const { openWindow } = useWindowContext();
+	const { openWindow, updateWindowContent, updateWindowTitle } = useWindowContext();
 
 	const text = editedText; // Use edited text instead of original body
-	const hasChanges = editedText !== body; // Track if user made changes
+	const hasChanges = editedText !== savedText; // Compare with saved text, not original body
 	const displayName = fileName ?? 'Untitled.txt';
 	const displayTitle = hasChanges ? `${displayName}*` : displayName; // Show asterisk for unsaved changes
 	const displayPath = filePath ?? '(unsaved document)';
@@ -153,6 +156,7 @@ export default function Notepad({ fileName, filePath, body, readOnly }: NotepadP
 	// Reset edited text when body prop changes (new file loaded)
 	useEffect(() => {
 		setEditedText(body);
+		setSavedText(body); // Also update saved text when new file loads
 	}, [body]);
 
 	const updateCursorPosition = () => {
@@ -190,6 +194,8 @@ export default function Notepad({ fileName, filePath, body, readOnly }: NotepadP
 
 		const success = updateFileContent(filePath, editedText);
 		if (success) {
+			// Update the saved text to match what we just saved
+			setSavedText(editedText);
 			console.log('File saved!');
 			// Could show a toast notification here
 		} else {
@@ -223,11 +229,26 @@ export default function Notepad({ fileName, filePath, body, readOnly }: NotepadP
 		const finalName = filename.endsWith('.txt') ? filename : filename + '.txt';
 		
 		// Create file in My Documents
+		const newFilePath = `/My Documents/${finalName}`;
 		const newFile = createFile('/My Documents', finalName, editedText);
 
 		if (newFile) {
+			// Update current window to point to the new file
+			if (windowId) {
+				updateWindowContent(windowId, {
+					fileName: finalName,
+					filePath: newFilePath,
+					body: editedText,
+					readOnly: false,
+				} as NotepadWindowContent);
+				
+				updateWindowTitle(windowId, `${finalName} - Notepad`);
+			}
+			
+			// Update our local state
+			setSavedText(editedText);
+			
 			alert(`File saved as ${finalName}`);
-			// Could close current window and open the new file here
 		} else {
 			alert('Failed to create file - maybe it already exists?');
 		}
