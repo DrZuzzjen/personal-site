@@ -50,6 +50,8 @@ export interface TerminalRuntime {
   printLines: (lines: TerminalLineInput[]) => void;
   clear: () => void;
   setEffect: (effect: TerminalEffect | null) => void;
+  history: string[];
+  clearHistory: () => void;
 }
 
 export interface CommandContext {

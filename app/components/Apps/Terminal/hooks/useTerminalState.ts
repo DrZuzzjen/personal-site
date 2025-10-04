@@ -59,6 +59,11 @@ export function useTerminalState(options: UseTerminalStateOptions = {}) {
     setHistoryPointer(-1);
   }, []);
 
+  const clearHistory = useCallback(() => {
+    setHistory([]);
+    setHistoryPointer(-1);
+  }, []);
+
   const recallHistory = useCallback((direction: HistoryDirection): string => {
     if (history.length === 0) {
       return '';
@@ -82,7 +87,8 @@ export function useTerminalState(options: UseTerminalStateOptions = {}) {
   const stateSummary = useMemo(() => ({
     lineCount: lines.length,
     lastLine: lines.length ? lines[lines.length - 1] : null,
-  }), [lines]);
+    historyCount: history.length,
+  }), [history.length, lines]);
 
   return {
     lines,
@@ -96,7 +102,9 @@ export function useTerminalState(options: UseTerminalStateOptions = {}) {
     isBusy,
     setIsBusy,
     addToHistory,
+    clearHistory,
     recallHistory,
+    history,
     historyPointer,
     activeEffect,
     setActiveEffect,

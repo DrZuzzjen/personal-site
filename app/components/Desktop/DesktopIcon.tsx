@@ -23,7 +23,15 @@ interface DesktopIconProps {
 
 interface LaunchConfig {
 	title: string;
-	appType: 'notepad' | 'paint' | 'minesweeper' | 'explorer' | 'snake' | 'camera' | 'tv' | 'chatbot';
+	appType:
+		| 'notepad'
+		| 'paint'
+		| 'minesweeper'
+		| 'explorer'
+		| 'snake'
+		| 'camera'
+		| 'tv'
+		| 'chatbot';
 	position: { x: number; y: number };
 	size: { width: number; height: number };
 	icon?: string;
@@ -168,7 +176,6 @@ function createChatbotLaunch(): LaunchConfig {
 		content: {},
 	};
 }
-
 
 function getLaunchConfigForFile(item: FileSystemItem): LaunchConfig | null {
 	if (item.extension === 'txt') {

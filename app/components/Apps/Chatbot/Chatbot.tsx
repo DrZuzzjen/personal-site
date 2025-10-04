@@ -62,15 +62,18 @@ const MSN_SOUNDS = {
 };
 
 const playSound = (soundKey: keyof typeof MSN_SOUNDS) => {
-	try {
-		const audio = new Audio(MSN_SOUNDS[soundKey]);
-		audio.volume = 0.3;
-		audio.play().catch(() => {
-			// Ignore if sound fails (user hasn't interacted yet)
-		});
-	} catch (error) {
-		// Sound files don't exist yet - ignore silently
-	}
+	// For now, we'll skip sounds to avoid 404 errors
+	// Sounds can be added later by placing mp3 files in public/sounds/
+	// 
+	// try {
+	//   const audio = new Audio(MSN_SOUNDS[soundKey]);
+	//   audio.volume = 0.3;
+	//   audio.play().catch(() => {
+	//     // Ignore if sound fails (user hasn't interacted yet)
+	//   });
+	// } catch (error) {
+	//   // Sound files don't exist yet - ignore silently
+	// }
 };
 
 export default function Chatbot({}: ChatbotProps) {

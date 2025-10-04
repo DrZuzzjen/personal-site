@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'mixtral-8x7b-32768',  // Fast and good quality
+        model: 'meta-llama/llama-4-maverick-17b-128e-instruct',  // Updated model
         messages: [
           { role: 'system', content: SYSTEM_PROMPT },
           ...messages,
