@@ -341,6 +341,27 @@ Press any key to continue your portfolio exploration...`,
 				message: 'Error: Access denied. This is a critical system file.',
 				title: 'Error',
 			});
+		} else if (fileName === 'Recycle Bin') {
+			// Funny message for Recycle Bin
+			setErrorDialog({
+				visible: true,
+				message: 'Cannot delete the Recycle Bin. Where would deleted files go? Into the void? 🗑️',
+				title: 'Error',
+			});
+		} else if (fileName === 'Resume.pdf') {
+			// Special message for Resume
+			setErrorDialog({
+				visible: true,
+				message: 'Hey! That\'s my resume! You should be downloading it, not deleting it! 📄✨',
+				title: 'Resume Protection',
+			});
+		} else if (fileName.includes('.exe')) {
+			// Protected executable files
+			setErrorDialog({
+				visible: true,
+				message: `Cannot delete system executable "${fileName}". These apps are part of the portfolio experience! 🎮`,
+				title: 'System Protection',
+			});
 		} else {
 			// Default protected file error
 			setErrorDialog({
