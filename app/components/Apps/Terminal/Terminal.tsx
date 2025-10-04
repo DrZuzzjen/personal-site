@@ -83,6 +83,7 @@ export default function Terminal({ isMobile = false, className }: TerminalProps)
     boxShadow: isMobile ? 'none' : '0 0 30px rgba(0, 255, 0, 0.2)',
     overflow: 'hidden',
     position: 'relative',
+    textShadow: '0 0 6px rgba(0, 255, 0, 0.45)',
   }), [isMobile]);
 
   const promptPrefix = useMemo(() => `${currentPath}>`, [currentPath]);
