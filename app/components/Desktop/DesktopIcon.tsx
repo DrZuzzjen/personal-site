@@ -230,11 +230,15 @@ export default function DesktopIcon({
 	// First try direct ID match, then search recursively through the entire tree
 	const findFileSystemItem = (): FileSystemItem | null => {
 		// First try direct ID match in top-level items
-		const directMatch = rootItems.find((item: FileSystemItem) => item.id === icon.fileSystemId);
+		const directMatch = rootItems.find(
+			(item: FileSystemItem) => item.id === icon.fileSystemId
+		);
 		if (directMatch) return directMatch;
 
 		// Then search recursively through all items
-		const searchRecursively = (items: FileSystemItem[]): FileSystemItem | null => {
+		const searchRecursively = (
+			items: FileSystemItem[]
+		): FileSystemItem | null => {
 			for (const item of items) {
 				if (item.id === icon.fileSystemId) return item;
 				if (item.children) {

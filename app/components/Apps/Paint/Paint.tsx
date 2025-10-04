@@ -258,7 +258,7 @@ export default function Paint({
 		canvas.style.width = `${width}px`;
 		canvas.style.height = `${height}px`;
 		ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-		
+
 		// Fill background color first
 		ctx.fillStyle = effectiveBackground;
 		ctx.fillRect(0, 0, width, height);
@@ -270,7 +270,7 @@ export default function Paint({
 				// Calculate dimensions to fit the image properly
 				const imgAspect = img.width / img.height;
 				const canvasAspect = width / height;
-				
+
 				let drawWidth = width;
 				let drawHeight = height;
 				let offsetX = 0;
@@ -409,7 +409,7 @@ export default function Paint({
 			// Calculate dimensions to fit the image properly
 			const imgAspect = img.width / img.height;
 			const canvasAspect = width / height;
-			
+
 			let drawWidth = width;
 			let drawHeight = height;
 			let offsetX = 0;
@@ -434,15 +434,16 @@ export default function Paint({
 
 	// Get all PNG files from the file system
 	const getAllPngFiles = () => {
-		const pngFiles: Array<{ name: string; path: string; imageData: string }> = [];
-		
+		const pngFiles: Array<{ name: string; path: string; imageData: string }> =
+			[];
+
 		const searchItems = (items: typeof rootItems) => {
-			items.forEach(item => {
+			items.forEach((item) => {
 				if (item.extension === 'png' && item.imageData) {
 					pngFiles.push({
 						name: item.name,
 						path: item.path,
-						imageData: item.imageData
+						imageData: item.imageData,
 					});
 				}
 				if (item.children) {
@@ -450,7 +451,7 @@ export default function Paint({
 				}
 			});
 		};
-		
+
 		searchItems(rootItems);
 		return pngFiles;
 	};
@@ -628,57 +629,68 @@ export default function Paint({
 
 			{/* Open Image Dialog */}
 			{showOpenDialog && (
-				<div style={{
-					position: 'fixed',
-					top: 0,
-					left: 0,
-					right: 0,
-					bottom: 0,
-					backgroundColor: 'rgba(0, 0, 0, 0.5)',
-					display: 'flex',
-					alignItems: 'center',
-					justifyContent: 'center',
-					zIndex: 1000,
-				}}>
-					<div style={{
-						backgroundColor: COLORS.WIN_GRAY,
-						border: `3px solid ${COLORS.BORDER_LIGHT}`,
-						borderTopColor: COLORS.BORDER_LIGHT,
-						borderLeftColor: COLORS.BORDER_LIGHT,
-						borderBottomColor: COLORS.BORDER_SHADOW,
-						borderRightColor: COLORS.BORDER_SHADOW,
-						padding: 16,
-						minWidth: 300,
-						maxWidth: 500,
-						maxHeight: 400,
-						overflow: 'auto',
-					}}>
-						<h3 style={{ 
-							margin: '0 0 16px 0', 
-							color: COLORS.TEXT_BLACK,
-							fontSize: 14,
-							fontWeight: 'bold'
-						}}>
+				<div
+					style={{
+						position: 'fixed',
+						top: 0,
+						left: 0,
+						right: 0,
+						bottom: 0,
+						backgroundColor: 'rgba(0, 0, 0, 0.5)',
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'center',
+						zIndex: 1000,
+					}}
+				>
+					<div
+						style={{
+							backgroundColor: COLORS.WIN_GRAY,
+							border: `3px solid ${COLORS.BORDER_LIGHT}`,
+							borderTopColor: COLORS.BORDER_LIGHT,
+							borderLeftColor: COLORS.BORDER_LIGHT,
+							borderBottomColor: COLORS.BORDER_SHADOW,
+							borderRightColor: COLORS.BORDER_SHADOW,
+							padding: 16,
+							minWidth: 300,
+							maxWidth: 500,
+							maxHeight: 400,
+							overflow: 'auto',
+						}}
+					>
+						<h3
+							style={{
+								margin: '0 0 16px 0',
+								color: COLORS.TEXT_BLACK,
+								fontSize: 14,
+								fontWeight: 'bold',
+							}}
+						>
 							📂 Open PNG Image
 						</h3>
-						
+
 						<div style={{ marginBottom: 16 }}>
 							{getAllPngFiles().length === 0 ? (
-								<p style={{ 
-									color: COLORS.TEXT_BLACK, 
-									fontSize: 12,
-									margin: 0,
-									fontStyle: 'italic'
-								}}>
-									No PNG files found. Take a screenshot with the Camera app first!
+								<p
+									style={{
+										color: COLORS.TEXT_BLACK,
+										fontSize: 12,
+										margin: 0,
+										fontStyle: 'italic',
+									}}
+								>
+									No PNG files found. Take a screenshot with the Camera app
+									first!
 								</p>
 							) : (
 								<div>
-									<p style={{ 
-										color: COLORS.TEXT_BLACK, 
-										fontSize: 12,
-										margin: '0 0 8px 0'
-									}}>
+									<p
+										style={{
+											color: COLORS.TEXT_BLACK,
+											fontSize: 12,
+											margin: '0 0 8px 0',
+										}}
+									>
 										Select an image to open:
 									</p>
 									{getAllPngFiles().map((file, index) => (
@@ -700,7 +712,8 @@ export default function Paint({
 												e.currentTarget.style.color = COLORS.WIN_WHITE;
 											}}
 											onMouseOut={(e) => {
-												e.currentTarget.style.backgroundColor = COLORS.WIN_WHITE;
+												e.currentTarget.style.backgroundColor =
+													COLORS.WIN_WHITE;
 												e.currentTarget.style.color = COLORS.TEXT_BLACK;
 											}}
 										>
@@ -710,7 +723,7 @@ export default function Paint({
 								</div>
 							)}
 						</div>
-						
+
 						<div style={{ textAlign: 'right' }}>
 							<button
 								onClick={() => setShowOpenDialog(false)}

@@ -236,7 +236,7 @@ export function useFileSystem() {
       const existingPositions = desktopIcons.map(icon => `${icon.position.x},${icon.position.y}`);
       let positionY = 0;
       const positionX = 1; // Second column for user files
-      
+
       while (existingPositions.includes(`${positionX},${positionY}`)) {
         positionY++;
       }
