@@ -76,6 +76,14 @@ export const LOADING_MESSAGES = [
   'Almost there...',
 ] as const;
 
+export const BOOT_SEQUENCE = {
+  TIMINGS: {
+    POST_SCREEN: 3000,      // 3 seconds
+    MEMORY_CHECK: 3000,     // 3 seconds  
+    LOADING_SCREEN: 2000,   // 2 seconds
+  },
+} as const;
+
 // ============================================
 // INITIAL FILE SYSTEM
 // ============================================
