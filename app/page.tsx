@@ -56,7 +56,11 @@ function renderWindowContent(windowData: WindowType) {
 
 		if (typeof content === 'string') {
 			initialPath = content;
-		} else if (content && typeof content === 'object' && 'folderPath' in content) {
+		} else if (
+			content &&
+			typeof content === 'object' &&
+			'folderPath' in content
+		) {
 			const folderPath = (content as { folderPath?: unknown }).folderPath;
 			if (typeof folderPath === 'string' || folderPath === null) {
 				initialPath = folderPath;
@@ -175,10 +179,7 @@ export default function MainPage() {
 				</div>
 			) : null}
 
-		<Taskbar />
+			<Taskbar />
 		</>
 	);
 }
-
-
-
