@@ -9,6 +9,7 @@ import Notepad from '@/app/components/Apps/Notepad/Notepad';
 import Minesweeper from '@/app/components/Apps/Minesweeper/Minesweeper';
 import Paint from '@/app/components/Apps/Paint/Paint';
 import Camera from '@/app/components/Apps/Camera/Camera';
+import TV from '@/app/components/Apps/TV/TV';
 import { BootSequence } from '@/app/components/BootSequence';
 import { ErrorDialog, BSOD } from '@/app/components/Dialogs';
 import { ShutDownScreen } from '@/app/components/StartMenu';
@@ -271,6 +272,9 @@ function renderWindowContent(
 		}
 		case 'camera': {
 			return <Camera />;
+		}
+		case 'tv': {
+			return <TV />;
 		}
 		default:
 			return (

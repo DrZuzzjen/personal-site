@@ -22,7 +22,7 @@ interface DesktopIconProps {
 
 interface LaunchConfig {
 	title: string;
-	appType: 'notepad' | 'paint' | 'minesweeper' | 'explorer' | 'camera';
+	appType: 'notepad' | 'paint' | 'minesweeper' | 'explorer' | 'camera' | 'tv';
 	position: { x: number; y: number };
 	size: { width: number; height: number };
 	icon?: string;
@@ -34,6 +34,7 @@ const NOTEPAD_WINDOW_SIZE = { width: 520, height: 380 };
 const MINESWEEPER_WINDOW_SIZE = { width: 360, height: 440 };
 const PAINT_WINDOW_SIZE = { width: 800, height: 600 }; // Compact but roomy for new sidebar layout
 const CAMERA_WINDOW_SIZE = { width: 720, height: 580 }; // Good size for camera interface
+const TV_WINDOW_SIZE = { width: 880, height: 720 }; // Good size for retro TV with controls
 const PAINT_PALETTE = [
 	'#000000',
 	'#FFFFFF',
@@ -135,6 +136,16 @@ function createCameraLaunch(): LaunchConfig {
 	};
 }
 
+function createTVLaunch(): LaunchConfig {
+	return {
+		title: 'TV',
+		appType: 'tv',
+		position: { x: 120, y: 60 },
+		size: TV_WINDOW_SIZE,
+		icon: '📺',
+	};
+}
+
 function getLaunchConfigForFile(item: FileSystemItem): LaunchConfig | null {
 	if (item.extension === 'txt') {
 		return createNotepadLaunch(item);
@@ -159,6 +170,10 @@ function getLaunchConfigForFile(item: FileSystemItem): LaunchConfig | null {
 
 		if (exeName.includes('camera')) {
 			return createCameraLaunch();
+		}
+
+		if (exeName.includes('tv')) {
+			return createTVLaunch();
 		}
 
 		return createUnsupportedFileLaunch(
@@ -376,6 +391,12 @@ export default function DesktopIcon({
 			}
 			if (exeName.includes('notepad')) {
 				return { symbol: '📝', color: '#C0C0C0' };
+			}
+			if (exeName.includes('camera')) {
+				return { symbol: '📷', color: '#C0C0C0' };
+			}
+			if (exeName.includes('tv')) {
+				return { symbol: '📺', color: '#C0C0C0' };
 			}
 			return { symbol: 'EXE', color: '#C0C0C0' };
 		}

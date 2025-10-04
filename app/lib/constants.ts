@@ -345,6 +345,18 @@ export const APP_EXECUTABLES: FileSystemItem[] = [
     createdAt: Date.now(),
     modifiedAt: Date.now(),
   },
+  {
+    id: 'tv-exe',
+    name: 'TV.exe',
+    type: 'file',
+    extension: 'exe',
+    path: '/Desktop/TV.exe',
+    isProtected: true,
+    isSystem: true,
+    icon: 'tv',
+    createdAt: Date.now(),
+    modifiedAt: Date.now(),
+  },
 ];
 
 // Desktop icons for executables
@@ -371,6 +383,12 @@ export const APP_DESKTOP_ICONS: DesktopIcon[] = [
     id: 'desktop-icon-camera',
     fileSystemId: 'camera-exe',
     position: { x: 0, y: 5 },
+    isSelected: false,
+  },
+  {
+    id: 'desktop-icon-tv',
+    fileSystemId: 'tv-exe',
+    position: { x: 0, y: 6 },
     isSelected: false,
   },
 ];
