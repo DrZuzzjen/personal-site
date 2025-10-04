@@ -1,37 +1,39 @@
 # Bugs & Enhancements Tracker
 
+## 🚧 IN PROGRESS (develop branch)
+
+### 🐍 Snake Game App - Codex
+**Status**: Building classic Snake with retro Nokia/MS-DOS aesthetic
+**Folder**: `app/components/Apps/Snake/`
+**Mission**: `.missions/MISSION-CODEX-SNAKE-GAME.md`
+
+### 🖱️ Context Menu + File Dragging - Steve
+**Status**: Fixing "New" submenu + drag files to Desktop
+**Folder**: `app/components/Desktop/`
+**Mission**: `.missions/MISSION-STEVE-CONTEXT-MENU-DRAG.md`
+
+### 📝 Real Portfolio Content - Claude (NEXT)
+**Status**: Pending (after Steve/Codex merge)
+**Tasks**: Add real CV, projects, SEO metadata, OG tags
+**Mission**: `.missions/MISSION-CLAUDE-REAL-CONTENT.md`
+
+---
+
 ## 🐛 Known Bugs
 
-### 1. No Notepad Icon on Desktop
-**Issue**: Paint.exe and Minesweeper.exe have desktop icons, but Notepad.exe doesn't
-**Impact**: Users can't launch Notepad directly from desktop (must use File Explorer or Start Menu)
-**Fix**: Add Notepad.exe icon to desktop initial items in constants.ts
+### 1. Desktop Right-Click "New" Submenu Not Showing
+**Status**: 🚧 IN PROGRESS (Steve on develop)
+**Issue**: Right-click desktop → "New" option exists but submenu doesn't appear
+**Expected**: Should show submenu with "Text Document", "Folder", maybe "Image"
+**Current State**: Folder/File CRUD functions exist, just UI not wired
+**Fix**: Wire up context menu to show submenu options
 
 ---
 
 ## 🚀 Enhancements Needed
 
-### 1. Window Resizing
-**Feature**: Users should be able to resize windows by dragging corners/edges
-**Current**: Windows are fixed size
-**Requirements**:
-- Drag from bottom-right corner to resize
-- Maintain minimum size (e.g., 200x150px)
-- Maximum size should be constrained to viewport
-- Window content should adjust/reflow to new size
-- Icons inside windows (if any) should rearrange
-
-**Technical Notes**:
-- Add resize handle component
-- Track mouse drag on resize handle
-- Update window size in WindowContext
-- May need different behavior per app (Paint canvas, FileExplorer grid, etc.)
-
-**Priority**: Medium (nice-to-have polish)
-
----
-
-### 2. Drag Files from FileExplorer to Desktop
+### 1. Drag Files from FileExplorer to Desktop
+**Status**: 🚧 IN PROGRESS (Steve on develop)
 **Feature**: Drag .txt files from My Documents to Desktop (like real Windows)
 **Current**: Files only exist in FileExplorer, can't drag to desktop
 **Requirements**:
@@ -50,7 +52,7 @@
 
 ---
 
-### 3. Start Menu Enhancements
+### 2. Start Menu Enhancements
 **Feature Ideas**:
 - Run... dialog (just for fun)
 - Recent documents list
@@ -61,7 +63,7 @@
 
 ---
 
-### 4. Mobile Support
+### 3. Mobile Support
 **Feature**: Graceful degradation or warning for mobile users
 **Current**: Probably broken on mobile/touch devices
 **Options**:
@@ -73,7 +75,7 @@
 
 ---
 
-### 5. App Enhancements
+### 4. App Enhancements
 
 #### Paint Improvements
 - Shape tools (rectangle, circle, line)
@@ -97,19 +99,13 @@
 
 ---
 
-## 📋 Future Ideas
+## 📋 New Apps to Build
 
-### Camera App
-**Description**: Access user's webcam/mic and show in retro CRT-style frame
-**Tech**: `navigator.mediaDevices.getUserMedia()`
-**UI**: Old webcam aesthetic with scan lines
-**Priority**: Bonus/v2
-
-### Video Playlist (Retro TV)
-**Description**: YouTube playlist embedded in old TV frame
-**UI**: Wooden TV borders, antenna, dials
-**Features**: Channel switching between videos
-**Priority**: Bonus/v2
+### 🐍 Snake Game (Codex - IN PROGRESS)
+**Description**: Classic Snake with retro aesthetic
+**Features**: Arrow key controls, score tracking, high scores (localStorage)
+**Visual**: Nokia green or MS-DOS colors, grid layout
+**Priority**: HIGH - Codex currently building
 
 ### Sound System
 **Feature**: Windows error beep, startup sound
@@ -150,7 +146,15 @@
 - ✅ Protected file system
 - ✅ Taskbar with live window buttons
 - ✅ Full window management (drag, minimize, maximize, focus)
+- ✅ Notepad CRUD editor (create, edit, save files)
+- ✅ Mobile warning dialog
+- ✅ Notepad desktop icon
+- ✅ Window resizing (drag corners to resize)
+- ✅ Paint UI redesign (larger canvas, sidebar, zoom controls)
+- ✅ Camera app with webcam and screenshot capture
+- ✅ Retro TV app with YouTube player
+- ✅ Production deployment to Vercel
 
 ---
 
-*Last Updated: Phase 7 - Start Menu & Polish*
+*Last Updated: Post-deployment - Snake + Context Menu/Drag in progress on develop*
