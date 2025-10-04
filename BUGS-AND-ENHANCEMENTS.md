@@ -2,18 +2,29 @@
 
 ## 🐛 Known Bugs
 
-### 1. No Notepad Icon on Desktop
-**Issue**: Paint.exe and Minesweeper.exe have desktop icons, but Notepad.exe doesn't
-**Impact**: Users can't launch Notepad directly from desktop (must use File Explorer or Start Menu)
-**Fix**: Add Notepad.exe icon to desktop initial items in constants.ts
+### 1. Desktop Right-Click "New" Submenu Not Showing
+**Issue**: Right-click desktop → "New" option exists but submenu doesn't appear
+**Expected**: Should show submenu with "Text Document", "Folder", maybe "Image"
+**Current State**: Folder/File CRUD functions exist, just UI not wired
+**Fix**: Wire up context menu to show submenu options
+
+### 2. Paint UI Needs Major Overhaul
+**Issue**: Paint looks rough - buttons cramped, canvas too small, poor spacing
+**Problems**:
+- Toolbar buttons too small and tight
+- Canvas size too small relative to window
+- Colors/tools hard to see
+- Overall layout feels amateur
+**Fix**: Redesign Paint UI with better spacing, larger canvas, clearer buttons
 
 ---
 
 ## 🚀 Enhancements Needed
 
-### 1. Window Resizing
+### 1. Window Resizing (IN PROGRESS - Steve)
 **Feature**: Users should be able to resize windows by dragging corners/edges
 **Current**: Windows are fixed size
+**Branch**: `feature/window-resizing`
 **Requirements**:
 - Drag from bottom-right corner to resize
 - Maintain minimum size (e.g., 200x150px)
@@ -150,7 +161,10 @@
 - ✅ Protected file system
 - ✅ Taskbar with live window buttons
 - ✅ Full window management (drag, minimize, maximize, focus)
+- ✅ Notepad CRUD editor (create, edit, save files)
+- ✅ Mobile warning dialog
+- ✅ Notepad desktop icon
 
 ---
 
-*Last Updated: Phase 7 - Start Menu & Polish*
+*Last Updated: Window Resizing Feature*
