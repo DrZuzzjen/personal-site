@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { COLORS } from '@/app/lib/constants';
 import type { PaintWindowContent } from '@/app/lib/types';
+import { useFileSystemContext } from '@/app/lib/FileSystemContext';
 
 export type PaintProps = PaintWindowContent;
 
@@ -222,6 +223,9 @@ export default function Paint({
 	);
 	const [tool, setTool] = useState<Tool>('brush');
 	const [zoom, setZoom] = useState(1); // 1 = 100%, 0.5 = 50%, 2 = 200%
+	const [showOpenDialog, setShowOpenDialog] = useState(false);
+
+	const { rootItems } = useFileSystemContext();
 
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
@@ -390,6 +394,67 @@ export default function Paint({
 		link.click();
 	};
 
+	const handleOpenImage = (imageData: string) => {
+		const canvas = canvasRef.current;
+		const ctx = ctxRef.current;
+		if (!canvas || !ctx) return;
+
+		// Clear canvas first
+		ctx.fillStyle = effectiveBackground;
+		ctx.fillRect(0, 0, width, height);
+
+		// Load and draw the image
+		const img = new Image();
+		img.onload = () => {
+			// Calculate dimensions to fit the image properly
+			const imgAspect = img.width / img.height;
+			const canvasAspect = width / height;
+			
+			let drawWidth = width;
+			let drawHeight = height;
+			let offsetX = 0;
+			let offsetY = 0;
+
+			// Scale to fit while maintaining aspect ratio
+			if (imgAspect > canvasAspect) {
+				// Image is wider than canvas
+				drawHeight = width / imgAspect;
+				offsetY = (height - drawHeight) / 2;
+			} else {
+				// Image is taller than canvas
+				drawWidth = height * imgAspect;
+				offsetX = (width - drawWidth) / 2;
+			}
+
+			ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+		};
+		img.src = imageData;
+		setShowOpenDialog(false);
+	};
+
+	// Get all PNG files from the file system
+	const getAllPngFiles = () => {
+		const pngFiles: Array<{ name: string; path: string; imageData: string }> = [];
+		
+		const searchItems = (items: typeof rootItems) => {
+			items.forEach(item => {
+				if (item.extension === 'png' && item.imageData) {
+					pngFiles.push({
+						name: item.name,
+						path: item.path,
+						imageData: item.imageData
+					});
+				}
+				if (item.children) {
+					searchItems(item.children);
+				}
+			});
+		};
+		
+		searchItems(rootItems);
+		return pngFiles;
+	};
+
 	return (
 		<div style={containerStyle}>
 			{/* Left Sidebar with Tools, Sizes, Colors */}
@@ -492,6 +557,13 @@ export default function Paint({
 					</button>
 					<button
 						type='button'
+						onClick={() => setShowOpenDialog(true)}
+						style={actionButtonStyle}
+					>
+						📂 Open PNG
+					</button>
+					<button
+						type='button'
 						onClick={handleDownload}
 						style={actionButtonStyle}
 					>
@@ -553,6 +625,107 @@ export default function Paint({
 					</span>
 				</div>
 			</div>
+
+			{/* Open Image Dialog */}
+			{showOpenDialog && (
+				<div style={{
+					position: 'fixed',
+					top: 0,
+					left: 0,
+					right: 0,
+					bottom: 0,
+					backgroundColor: 'rgba(0, 0, 0, 0.5)',
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'center',
+					zIndex: 1000,
+				}}>
+					<div style={{
+						backgroundColor: COLORS.WIN_GRAY,
+						border: `3px solid ${COLORS.BORDER_LIGHT}`,
+						borderTopColor: COLORS.BORDER_LIGHT,
+						borderLeftColor: COLORS.BORDER_LIGHT,
+						borderBottomColor: COLORS.BORDER_SHADOW,
+						borderRightColor: COLORS.BORDER_SHADOW,
+						padding: 16,
+						minWidth: 300,
+						maxWidth: 500,
+						maxHeight: 400,
+						overflow: 'auto',
+					}}>
+						<h3 style={{ 
+							margin: '0 0 16px 0', 
+							color: COLORS.TEXT_BLACK,
+							fontSize: 14,
+							fontWeight: 'bold'
+						}}>
+							📂 Open PNG Image
+						</h3>
+						
+						<div style={{ marginBottom: 16 }}>
+							{getAllPngFiles().length === 0 ? (
+								<p style={{ 
+									color: COLORS.TEXT_BLACK, 
+									fontSize: 12,
+									margin: 0,
+									fontStyle: 'italic'
+								}}>
+									No PNG files found. Take a screenshot with the Camera app first!
+								</p>
+							) : (
+								<div>
+									<p style={{ 
+										color: COLORS.TEXT_BLACK, 
+										fontSize: 12,
+										margin: '0 0 8px 0'
+									}}>
+										Select an image to open:
+									</p>
+									{getAllPngFiles().map((file, index) => (
+										<div
+											key={file.path}
+											style={{
+												display: 'flex',
+												alignItems: 'center',
+												padding: 8,
+												backgroundColor: COLORS.WIN_WHITE,
+												border: `1px solid ${COLORS.BORDER_SHADOW}`,
+												marginBottom: 4,
+												cursor: 'pointer',
+												fontSize: 12,
+											}}
+											onClick={() => handleOpenImage(file.imageData)}
+											onMouseOver={(e) => {
+												e.currentTarget.style.backgroundColor = COLORS.WIN_BLUE;
+												e.currentTarget.style.color = COLORS.WIN_WHITE;
+											}}
+											onMouseOut={(e) => {
+												e.currentTarget.style.backgroundColor = COLORS.WIN_WHITE;
+												e.currentTarget.style.color = COLORS.TEXT_BLACK;
+											}}
+										>
+											🖼️ {file.name}
+										</div>
+									))}
+								</div>
+							)}
+						</div>
+						
+						<div style={{ textAlign: 'right' }}>
+							<button
+								onClick={() => setShowOpenDialog(false)}
+								style={{
+									...actionButtonStyle,
+									fontSize: 12,
+									padding: '6px 12px',
+								}}
+							>
+								Cancel
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 }
