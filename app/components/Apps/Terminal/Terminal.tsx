@@ -1,7 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, type CSSProperties, type KeyboardEvent } from 'react';
+import { useFileSystemContext } from '@/app/lib/FileSystemContext';
+import { useWindowContext } from '@/app/lib/WindowContext';
 import { useTerminalState } from './hooks/useTerminalState';
+import { findCommand } from './commands';
+import { parseCommand } from './utils/commandParser';
 import type { TerminalProps, TerminalLineType } from './types';
 
 const TERMINAL_COLORS = {
@@ -25,14 +29,22 @@ const lineTypeToColor: Record<TerminalLineType, string> = {
 export default function Terminal({ isMobile = false, className }: TerminalProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
+  const fileSystem = useFileSystemContext();
+  const windowManager = useWindowContext();
+
   const {
     lines,
     appendLine,
+    pushLines,
+    clearLines,
     currentInput,
     setCurrentInput,
     currentPath,
+    setCurrentPath,
     addToHistory,
     recallHistory,
+    setIsBusy,
+    setActiveEffect,
   } = useTerminalState({ initialPath: '/Desktop' });
 
   useEffect(() => {
@@ -68,27 +80,91 @@ export default function Terminal({ isMobile = false, className }: TerminalProps)
     inputRef.current?.focus();
   }, []);
 
-  const handleSubmit = useCallback(() => {
-    const trimmed = currentInput.trim();
+  const handleSubmit = useCallback(async () => {
+    const inputValue = currentInput;
+    const displayedPrompt = `${promptPrefix}${inputValue ? ` ${inputValue}` : ''}`;
 
-    appendLine({ text: `${promptPrefix} ${currentInput}`, type: 'input' });
-    addToHistory(currentInput);
+    appendLine({ text: displayedPrompt, type: 'input' });
+    addToHistory(inputValue);
     setCurrentInput('');
 
-    if (!trimmed) {
+    const parsed = parseCommand(inputValue);
+    if (parsed.isEmpty) {
       return;
     }
 
-    appendLine({
-      text: 'Command processor not hooked up yet. Stay tuned...',
-      type: 'system',
-    });
-  }, [addToHistory, appendLine, currentInput, promptPrefix, setCurrentInput]);
+    const command = findCommand(parsed.command);
+    if (!command) {
+      appendLine({ text: `Command not found: ${parsed.command}`, type: 'error' });
+      return;
+    }
+
+    setIsBusy(true);
+    setActiveEffect(null);
+
+    try {
+      const result = await command.execute({
+        parsed,
+        runtime: {
+          currentPath,
+          setCurrentPath,
+          isMobile,
+          print: appendLine,
+          printLines: pushLines,
+          clear: clearLines,
+          setEffect: setActiveEffect,
+        },
+        fileSystem,
+        windows: windowManager,
+      });
+
+      if (!result) {
+        return;
+      }
+
+      if (result.clear) {
+        clearLines();
+      }
+
+      if (result.effect) {
+        setActiveEffect(result.effect);
+      }
+
+      if (result.error) {
+        appendLine({ text: result.error, type: 'error' });
+      }
+
+      if (result.lines?.length) {
+        pushLines(result.lines);
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      appendLine({ text: `Command failed: ${message}`, type: 'error' });
+      console.error(error);
+    } finally {
+      setIsBusy(false);
+    }
+  }, [
+    addToHistory,
+    appendLine,
+    clearLines,
+    currentInput,
+    currentPath,
+    fileSystem,
+    isMobile,
+    pushLines,
+    promptPrefix,
+    setActiveEffect,
+    setCurrentInput,
+    setCurrentPath,
+    setIsBusy,
+    windowManager,
+  ]);
 
   const handleKeyDown = useCallback((event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
       event.preventDefault();
-      handleSubmit();
+      void handleSubmit();
       return;
     }
 

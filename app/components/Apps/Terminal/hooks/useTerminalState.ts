@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from 'react';
-import type { TerminalLine, TerminalLineType } from '../types';
+import type { TerminalEffect, TerminalLine, TerminalLineType } from '../types';
 
 type HistoryDirection = 'previous' | 'next';
 
@@ -31,6 +31,7 @@ export function useTerminalState(options: UseTerminalStateOptions = {}) {
   const [historyPointer, setHistoryPointer] = useState(-1);
   const [currentPath, setCurrentPath] = useState(initialPath);
   const [isBusy, setIsBusy] = useState(false);
+  const [activeEffect, setActiveEffect] = useState<TerminalEffect>(null);
 
   const appendLine = useCallback((line: { text: string; type?: TerminalLineType }) => {
     setLines((prev) => [...prev, createLine(line.text, line.type ?? 'output')]);
@@ -97,6 +98,8 @@ export function useTerminalState(options: UseTerminalStateOptions = {}) {
     addToHistory,
     recallHistory,
     historyPointer,
+    activeEffect,
+    setActiveEffect,
     stateSummary,
   };
 }

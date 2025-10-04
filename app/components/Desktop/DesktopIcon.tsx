@@ -23,7 +23,7 @@ interface DesktopIconProps {
 
 interface LaunchConfig {
 	title: string;
-	appType: 'notepad' | 'paint' | 'minesweeper' | 'explorer' | 'snake' | 'camera' | 'tv';
+	appType: 'notepad' | 'paint' | 'minesweeper' | 'explorer' | 'snake' | 'camera' | 'tv' | 'chatbot';
 	position: { x: number; y: number };
 	size: { width: number; height: number };
 	icon?: string;
@@ -158,6 +158,17 @@ function createTVLaunch(): LaunchConfig {
 	};
 }
 
+function createChatbotLaunch(): LaunchConfig {
+	return {
+		title: 'MSN Messenger - Claude Bot',
+		appType: 'chatbot',
+		position: { x: 100, y: 80 },
+		size: { width: 480, height: 620 },
+		icon: '💬',
+		content: {},
+	};
+}
+
 
 function getLaunchConfigForFile(item: FileSystemItem): LaunchConfig | null {
 	if (item.extension === 'txt') {
@@ -191,6 +202,10 @@ function getLaunchConfigForFile(item: FileSystemItem): LaunchConfig | null {
 
 		if (exeName.includes('tv')) {
 			return createTVLaunch();
+		}
+
+		if (exeName.includes('msn') || exeName.includes('messenger')) {
+			return createChatbotLaunch();
 		}
 
 		return createUnsupportedFileLaunch(
