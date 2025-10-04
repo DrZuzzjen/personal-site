@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-	title: 'Windows 3.1 Portfolio',
+	title: 'Jean-François Gutierrez - Portfolio',
 	description: 'A fully functional Windows 3.1 OS simulation portfolio',
 };
 

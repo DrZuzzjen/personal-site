@@ -258,6 +258,19 @@ Key Features:
     modifiedAt: Date.now(),
     children: [],
   },
+  {
+    id: 'desktop',
+    name: 'Desktop',
+    type: 'folder',
+    extension: 'folder',
+    path: '/Desktop',
+    isProtected: true,
+    isSystem: true,
+    icon: 'folder',
+    createdAt: Date.now(),
+    modifiedAt: Date.now(),
+    children: [],
+  },
 ];
 
 // ============================================

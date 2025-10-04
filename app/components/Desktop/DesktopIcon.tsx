@@ -227,12 +227,28 @@ export default function DesktopIcon({
 	const { openWindow } = useWindowContext();
 
 	// Get the file system item data for this icon
-	// First try direct ID match, then path-based search
-	const fileSystemItem: FileSystemItem | null =
-		rootItems.find((item: FileSystemItem) => item.id === icon.fileSystemId) ||
-		getItemByPath(`/Desktop/${icon.fileSystemId}`) ||
-		getItemByPath(`/${icon.fileSystemId}`) ||
-		null;
+	// First try direct ID match, then search recursively through the entire tree
+	const findFileSystemItem = (): FileSystemItem | null => {
+		// First try direct ID match in top-level items
+		const directMatch = rootItems.find((item: FileSystemItem) => item.id === icon.fileSystemId);
+		if (directMatch) return directMatch;
+
+		// Then search recursively through all items
+		const searchRecursively = (items: FileSystemItem[]): FileSystemItem | null => {
+			for (const item of items) {
+				if (item.id === icon.fileSystemId) return item;
+				if (item.children) {
+					const found = searchRecursively(item.children);
+					if (found) return found;
+				}
+			}
+			return null;
+		};
+
+		return searchRecursively(rootItems);
+	};
+
+	const fileSystemItem: FileSystemItem | null = findFileSystemItem();
 
 	// Convert grid position to pixel position
 	const pixelPosition = {

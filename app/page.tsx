@@ -642,9 +642,9 @@ Press any key to continue your portfolio exploration...`,
 				}}
 			>
 				<div style={{ fontSize: 18, fontWeight: 700 }}>
-					Windows 3.1 Portfolio
+					Jean Francois Gutierrez Portfolio
 				</div>
-				<div style={{ fontSize: 13 }}>Phase 3 Desktop + Windows Demo</div>
+				<div style={{ fontSize: 13 }}>Windows 3.1 </div>
 			</div>
 
 			{windows.length === 0 ? (

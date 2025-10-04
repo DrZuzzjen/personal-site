@@ -230,8 +230,29 @@ export function useFileSystem() {
       return addToTree(prev);
     });
 
+    // If saving to Desktop, also create a desktop icon
+    if (parentPath === '/Desktop') {
+      // Find next available position
+      const existingPositions = desktopIcons.map(icon => `${icon.position.x},${icon.position.y}`);
+      let positionY = 0;
+      const positionX = 1; // Second column for user files
+      
+      while (existingPositions.includes(`${positionX},${positionY}`)) {
+        positionY++;
+      }
+
+      const newIcon: DesktopIcon = {
+        id: `desktop-icon-${newFile.id}`,
+        fileSystemId: newFile.id,
+        position: { x: positionX, y: positionY },
+        isSelected: false,
+      };
+
+      setDesktopIcons(prev => [...prev, newIcon]);
+    }
+
     return newFile;
-  }, [getItemByPath]);
+  }, [getItemByPath, desktopIcons]);
 
   return {
     rootItems,
