@@ -52,7 +52,7 @@ function buildIconLabel(item: FileSystemItem) {
   return 'FILE';
 }
 
-export default function FileExplorer() {
+export default function FileExplorer({ initialPath }: FileExplorerProps = {}) {
   const { rootItems, getItemByPath } = useFileSystemContext();
   const { openWindow } = useWindowContext();
 
