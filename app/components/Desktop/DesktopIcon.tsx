@@ -133,7 +133,7 @@ function createTerminalLaunch(): LaunchConfig {
 		title: 'Terminal',
 		appType: 'terminal',
 		position: { x: 180, y: 120 },
-		size: { width: 820, height: 540 },
+		size: { width: 800, height: 600 },
 		icon: 'CMD',
 		content: {},
 	};

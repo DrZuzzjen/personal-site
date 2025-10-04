@@ -70,7 +70,7 @@ const APP_LAUNCHERS: LaunchDefinition[] = [  {
     build: () => ({
       title: 'Terminal',
       appType: 'terminal',
-      size: { width: 820, height: 540 },
+      size: { width: 800, height: 600 },
       icon: 'CMD',
       content: {},
     }),
