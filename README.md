@@ -1,36 +1,107 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Windows 3.1 Portfolio/CV 🖥️
 
-## Getting Started
+A fully functional Windows 3.1 operating system simulation built as a portfolio website. Not just a theme - a complete OS experience with draggable windows, a file system, MS Paint, Minesweeper, and more.
 
-First, run the development server:
+## 🎯 Concept
+
+Instead of a traditional portfolio site, this project simulates a complete Windows 3.1 desktop environment where:
+- Your CV lives in `My Computer/About.txt`
+- Projects are files in `My Documents/`
+- Visitors can play Minesweeper while reading your resume
+- A functional MS Paint clone lets users doodle
+- Easter eggs and protected system files add personality
+- Users can create their own files and folders (persisted to localStorage)
+
+**This is a technical flex** - showcasing complex state management, canvas manipulation, window systems, and retro UI/UX.
+
+## ✨ Features
+
+### Core Desktop Environment
+- 🪟 **Full Window Manager** - Drag, minimize, maximize, z-index stacking
+- 📁 **File System Simulation** - Hierarchical folders, create/delete/move files
+- 🎨 **MS Paint Clone** - Canvas-based drawing with tools
+- 💣 **Minesweeper** - Classic game implementation
+- 🚀 **Boot Sequence** - Authentic POST screen with funny messages
+- 🗑️ **Easter Eggs** - Protected files, fake BSOD, fun error dialogs
+
+### Portfolio Content
+- **About.txt** - CV card with links (LinkedIn, X, GitHub)
+- **My Documents/** - 5 project descriptions with tech stacks
+- **Resume.pdf** - Downloadable from Floppy drive
+- All accessed through authentic Windows 3.1 UI
+
+## 🛠️ Tech Stack
+
+- **Framework**: Next.js 15 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS (for retro Windows 3.1 aesthetic)
+- **State**: React Context/Zustand (for window management)
+- **Storage**: localStorage (user-created files persist)
+- **Deployment**: Vercel
+
+## 🚀 Getting Started
 
 ```bash
+# Install dependencies
+npm install
+
+# Run development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) and watch the boot sequence!
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📋 Development Phases
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+See [PHASES.md](./PHASES.md) for detailed development roadmap.
 
-## Learn More
+**Current Status**: Phase 2 - Window System (In Progress)
 
-To learn more about Next.js, take a look at the following resources:
+- ✅ Phase 0: Planning & Concept
+- ✅ Phase 1: Foundation & Architecture (Steve - Completed)
+- 🟢 Phase 2: Window System Core (Codex - In Progress)
+- ⏳ Phase 3: Desktop & File System
+- ⏳ Phase 4: Boot Sequence
+- ⏳ Phase 5: Applications (Notepad, Minesweeper, Paint)
+- ⏳ Phase 6: Content & Easter Eggs
+- ⏳ Phase 7: Polish & Deployment
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🎨 Design Decisions
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Drag Behavior**: Outline dragging (authentic to Win3.1, more performant)
+- **Color Palette**: 32-bit color depth with classic Windows gray (#C0C0C0)
+- **Rendering**: Hybrid HTML/Canvas approach
+- **Mobile**: Desktop-only experience (show warning dialog on mobile)
 
-## Deploy on Vercel
+## 📂 Project Structure
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+app/
+├── components/
+│   ├── Desktop/
+│   ├── Window/
+│   ├── FileSystem/
+│   ├── BootSequence/
+│   └── Apps/
+│       ├── Paint/
+│       ├── Minesweeper/
+│       └── Notepad/
+├── hooks/
+│   ├── useWindowManager
+│   └── useFileSystem
+└── lib/
+    ├── types.ts
+    └── constants.ts
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🤝 Contributing
+
+This is a collaborative project between human and AI. See [PHASES.md](./PHASES.md) for task breakdown and who's working on what.
+
+## 📄 License
+
+MIT
+
+---
+
+**Built with Next.js** | Powered by nostalgia and TypeScript
