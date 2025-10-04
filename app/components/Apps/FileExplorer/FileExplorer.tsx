@@ -6,6 +6,17 @@ import { useWindowContext } from '@/app/lib/WindowContext';
 import { COLORS } from '@/app/lib/constants';
 import type { FileSystemItem } from '@/app/lib/types';
 
+interface FileExplorerProps {
+  initialPath?: string | null;
+}
+
+const DEFAULT_START_PATH = '/My Computer';
+
+function resolveInitialPath(path?: string | null) {
+  return path === undefined ? DEFAULT_START_PATH : path;
+}
+
+
 function getParentPath(path: string | null): string | null {
   if (!path) {
     return null;
