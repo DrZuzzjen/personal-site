@@ -6,6 +6,8 @@ import { useWindowContext } from '@/app/lib/WindowContext';
 import { useTerminalState } from './hooks/useTerminalState';
 import { findCommand } from './commands';
 import { parseCommand } from './utils/commandParser';
+import MatrixRain from './effects/MatrixRain';
+import CRTEffect from './effects/CRTEffect';
 import type { TerminalProps, TerminalLineType } from './types';
 
 const TERMINAL_COLORS = {
@@ -46,6 +48,7 @@ export default function Terminal({ isMobile = false, className }: TerminalProps)
     recallHistory,
     history,
     setIsBusy,
+    activeEffect,
     setActiveEffect,
     mode,
     setMode,
@@ -79,6 +82,7 @@ export default function Terminal({ isMobile = false, className }: TerminalProps)
     borderRadius: isMobile ? 0 : '8px',
     boxShadow: isMobile ? 'none' : '0 0 30px rgba(0, 255, 0, 0.2)',
     overflow: 'hidden',
+    position: 'relative',
   }), [isMobile]);
 
   const promptPrefix = useMemo(() => `${currentPath}>`, [currentPath]);
@@ -265,6 +269,9 @@ export default function Terminal({ isMobile = false, className }: TerminalProps)
           aria-label="Terminal command input"
         />
       </div>
+
+      <CRTEffect />
+      {activeEffect === 'matrix' && <MatrixRain />}
     </div>
   );
 }
