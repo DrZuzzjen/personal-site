@@ -2,7 +2,9 @@
 
 import React, { useState } from 'react';
 import { useFileSystemContext } from '@/app/lib/FileSystemContext';
+import { useWindowContext } from '@/app/lib/WindowContext';
 import { COLORS, Z_INDEX } from '@/app/lib/constants';
+import type { NotepadWindowContent } from '@/app/lib/types';
 import DesktopIcon from './DesktopIcon';
 import ContextMenu from './ContextMenu';
 
@@ -22,6 +24,7 @@ export default function Desktop({
 
 	const { desktopIcons, deselectAllIcons, createFolder, createFile } =
 		useFileSystemContext();
+	const { openWindow } = useWindowContext();
 
 	const handleDesktopClick = (event: React.MouseEvent<HTMLDivElement>) => {
 		// Only deselect if clicking on the desktop background itself
@@ -46,19 +49,43 @@ export default function Desktop({
 
 	const handleNewFolder = () => {
 		createFolder('/Desktop', `New Folder ${Date.now()}`);
+		setContextMenu(null);
 	};
 
 	const handleNewTextFile = () => {
-		createFile(
-			'/Desktop',
-			`New File ${Date.now()}.txt`,
-			'This is a new text file.'
-		);
+		const fileName = 'New Text Document.txt';
+		const filePath = `/Desktop/${fileName}`;
+
+		// Create the file on desktop with empty content
+		const newFile = createFile('/Desktop', fileName, '');
+
+		if (newFile) {
+			// Open the new file in Notepad automatically
+			openWindow({
+				title: `${fileName} - Notepad`,
+				appType: 'notepad',
+				position: {
+					x: 120 + Math.random() * 100,
+					y: 100 + Math.random() * 100,
+				},
+				size: { width: 440, height: 320 },
+				icon: 'NP',
+				content: {
+					fileName: fileName,
+					filePath: filePath,
+					body: '',
+					readOnly: false,
+				} as NotepadWindowContent,
+			});
+		}
+
+		setContextMenu(null);
 	};
 
 	const handleRefresh = () => {
 		// Simple refresh - could reload icons or refresh the desktop
 		console.log('Desktop refreshed');
+		setContextMenu(null);
 	};
 
 	const handleProperties = () => {
@@ -66,6 +93,7 @@ export default function Desktop({
 		alert(
 			'Desktop Properties\n\nThis is the Windows 3.1 desktop environment.\nBuilt with React and TypeScript.'
 		);
+		setContextMenu(null);
 	};
 
 	return (

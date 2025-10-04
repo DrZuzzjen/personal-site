@@ -308,6 +308,18 @@ export const APP_EXECUTABLES: FileSystemItem[] = [
     createdAt: Date.now(),
     modifiedAt: Date.now(),
   },
+  {
+    id: 'notepad-exe',
+    name: 'Notepad.exe',
+    type: 'file',
+    extension: 'exe',
+    path: '/Desktop/Notepad.exe',
+    isProtected: true,
+    isSystem: true,
+    icon: 'notepad',
+    createdAt: Date.now(),
+    modifiedAt: Date.now(),
+  },
 ];
 
 // Desktop icons for executables
@@ -322,6 +334,12 @@ export const APP_DESKTOP_ICONS: DesktopIcon[] = [
     id: 'desktop-icon-minesweeper',
     fileSystemId: 'minesweeper-exe',
     position: { x: 0, y: 3 },
+    isSelected: false,
+  },
+  {
+    id: 'desktop-icon-notepad',
+    fileSystemId: 'notepad-exe',
+    position: { x: 0, y: 4 },
     isSelected: false,
   },
 ];

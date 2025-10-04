@@ -37,7 +37,7 @@ export function useFileSystem() {
     }
 
     const newFile: FileSystemItem = {
-      id: `file-${Date.now()}` ,
+      id: `file-${Date.now()}`,
       name,
       type: 'file',
       extension: (name.split('.').pop() as FileExtension) || null,
@@ -72,6 +72,7 @@ export function useFileSystem() {
 
   const updateFileContent = useCallback((path: string, content: string): boolean => {
     const target = getItemByPath(path);
+
     if (!target || target.type !== 'file') {
       return false;
     }
