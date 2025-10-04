@@ -12,10 +12,10 @@ import Snake from '@/app/components/Apps/Snake/Snake';
 import Camera from '@/app/components/Apps/Camera/Camera';
 import TV from '@/app/components/Apps/TV/TV';
 import Chatbot from '@/app/components/Apps/Chatbot/Chatbot';
+import Terminal from '@/app/components/Apps/Terminal/Terminal';
 import { BootSequence } from '@/app/components/BootSequence';
 import { ErrorDialog, BSOD } from '@/app/components/Dialogs';
 import { ShutDownScreen } from '@/app/components/StartMenu';
-import MobileWarning from '@/app/components/MobileWarning';
 import { useWindowContext } from '@/app/lib/WindowContext';
 import { COLORS } from '@/app/lib/constants';
 import type {
@@ -342,6 +342,9 @@ function renderWindowContent(
 		case 'chatbot': {
 			return <Chatbot />;
 		}
+		case 'terminal': {
+			return <Terminal />;
+		}
 		default:
 			return (
 				<div style={{ color: COLORS.TEXT_BLACK }}>
@@ -455,6 +458,8 @@ export default function MainPage() {
 			y: 80 + Math.random() * 150,
 		};
 
+		
+
 		switch (appType) {
 			case 'paint':
 				openWindow({
@@ -513,7 +518,7 @@ export default function MainPage() {
 					appType: 'camera',
 					position,
 					size: { width: 720, height: 580 },
-					icon: '📹',
+					icon: '?Y"?',
 					content: {
 						isActive: false,
 						hasPermission: false,
@@ -528,7 +533,7 @@ export default function MainPage() {
 					appType: 'tv',
 					position,
 					size: { width: 880, height: 720 },
-					icon: '📺',
+					icon: '?Y"?',
 					content: {},
 				});
 				break;
@@ -539,7 +544,18 @@ export default function MainPage() {
 					appType: 'chatbot',
 					position,
 					size: { width: 480, height: 620 },
-					icon: '💬',
+					icon: '?Y'?',
+					content: {},
+				});
+				break;
+
+			case 'terminal':
+				openWindow({
+					title: 'Terminal',
+					appType: 'terminal',
+					position,
+					size: { width: 820, height: 540 },
+					icon: 'CMD',
 					content: {},
 				});
 				break;
@@ -555,6 +571,7 @@ export default function MainPage() {
 				});
 				break;
 		}
+	}
 	};
 
 	const handleRestart = () => {
@@ -718,6 +735,16 @@ Press any key to continue your portfolio exploration...`,
 		return <BootSequence onBootComplete={() => setBootComplete(true)} />;
 	}
 
+	if (isMobile) {
+		return (
+			<div
+				style={{ width: '100vw', height: '100vh', backgroundColor: '#000' }}
+			>
+				<Terminal isMobile />
+			</div>
+		);
+	}
+
 	return (
 		<>
 			<Desktop onProtectedDelete={handleProtectedDelete} />
@@ -791,8 +818,6 @@ Press any key to continue your portfolio exploration...`,
 
 			<ShutDownScreen isVisible={isShutDown} />
 
-			{/* Mobile Warning */}
-			{isMobile && <MobileWarning onProceed={() => setIsMobile(false)} />}
 		</>
 	);
 }

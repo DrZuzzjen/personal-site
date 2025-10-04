@@ -381,6 +381,18 @@ export const APP_EXECUTABLES: FileSystemItem[] = [
     createdAt: Date.now(),
     modifiedAt: Date.now(),
   },
+  {
+    id: 'terminal-exe',
+    name: 'Terminal.exe',
+    type: 'file',
+    extension: 'exe',
+    path: '/Desktop/Terminal.exe',
+    isProtected: true,
+    isSystem: true,
+    icon: 'terminal',
+    createdAt: Date.now(),
+    modifiedAt: Date.now(),
+  },
 ];
 
 // Desktop icons for executables
@@ -425,6 +437,12 @@ export const APP_DESKTOP_ICONS: DesktopIcon[] = [
     id: 'desktop-icon-chatbot',
     fileSystemId: 'chatbot-exe',
     position: { x: 0, y: 8 },
+    isSelected: false,
+  },
+  {
+    id: 'desktop-icon-terminal',
+    fileSystemId: 'terminal-exe',
+    position: { x: 0, y: 9 },
     isSelected: false,
   },
 ];

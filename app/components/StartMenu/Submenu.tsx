@@ -23,31 +23,39 @@ export default function Submenu({
 		const file = getItemByPath(filePath);
 		return file && file.type === 'file' ? file.content || '' : '';
 	};
+	
 	const renderProgramsSubmenu = () => (
 		<>
 			<StartMenuItem
-				icon='🖼️'
+				icon='?Y-????'
 				text='Paint.exe'
 				hasArrow={false}
 				onHover={() => {}}
 				onClick={() => handleItemClick(() => onLaunchApp('paint'))}
 			/>
 			<StartMenuItem
-				icon='💣'
+				icon='?Y'?'
 				text='Minesweeper.exe'
 				hasArrow={false}
 				onHover={() => {}}
 				onClick={() => handleItemClick(() => onLaunchApp('minesweeper'))}
 			/>
 			<StartMenuItem
-				icon='📝'
+				icon='?Y"?'
 				text='Notepad.exe'
 				hasArrow={false}
 				onHover={() => {}}
 				onClick={() => handleItemClick(() => onLaunchApp('notepad'))}
 			/>
 			<StartMenuItem
-				icon='🖥️'
+				icon='CMD'
+				text='Terminal.exe'
+				hasArrow={false}
+				onHover={() => {}}
+				onClick={() => handleItemClick(() => onLaunchApp('terminal'))}
+			/>
+			<StartMenuItem
+				icon='?Y-????'
 				text='My Computer'
 				hasArrow={false}
 				onHover={() => {}}
@@ -56,7 +64,7 @@ export default function Submenu({
 				}
 			/>
 			<StartMenuItem
-				icon='🗂️'
+				icon='?Y-'???'
 				text='File Explorer'
 				hasArrow={false}
 				onHover={() => {}}
@@ -68,8 +76,7 @@ export default function Submenu({
 			/>
 		</>
 	);
-
-	const renderDocumentsSubmenu = () => (
+const renderDocumentsSubmenu = () => (
 		<>
 			<StartMenuItem
 				icon='📁'

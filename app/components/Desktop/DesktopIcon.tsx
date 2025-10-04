@@ -128,6 +128,17 @@ function createMinesweeperLaunch(): LaunchConfig {
 	};
 }
 
+function createTerminalLaunch(): LaunchConfig {
+	return {
+		title: 'Terminal',
+		appType: 'terminal',
+		position: { x: 180, y: 120 },
+		size: { width: 820, height: 540 },
+		icon: 'CMD',
+		content: {},
+	};
+}
+
 function createSnakeLaunch(): LaunchConfig {
 	return {
 		title: 'Snake.exe',
@@ -201,6 +212,10 @@ function getLaunchConfigForFile(item: FileSystemItem): LaunchConfig | null {
 
 		if (exeName.includes('snake')) {
 			return createSnakeLaunch();
+		}
+
+		if (exeName.includes('terminal')) {
+			return createTerminalLaunch();
 		}
 
 		if (exeName.includes('camera')) {

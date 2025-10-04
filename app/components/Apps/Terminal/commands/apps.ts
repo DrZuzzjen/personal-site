@@ -20,8 +20,7 @@ interface LaunchDefinition {
   build: (context: LaunchContext) => LaunchConfig;
 }
 
-const APP_LAUNCHERS: LaunchDefinition[] = [
-  {
+const APP_LAUNCHERS: LaunchDefinition[] = [  {
     names: ['paint.exe', 'paint'],
     description: 'MS Paint clone',
     build: () => ({
@@ -63,6 +62,17 @@ const APP_LAUNCHERS: LaunchDefinition[] = [
         body: fileItem?.content ?? '',
         readOnly: fileItem?.isProtected ?? false,
       },
+    }),
+  },
+  {
+    names: ['terminal.exe', 'terminal', 'cmd'],
+    description: 'MS-DOS terminal',
+    build: () => ({
+      title: 'Terminal',
+      appType: 'terminal',
+      size: { width: 820, height: 540 },
+      icon: 'CMD',
+      content: {},
     }),
   },
   {
@@ -123,8 +133,7 @@ const APP_LAUNCHERS: LaunchDefinition[] = [
       icon: 'PM',
       content: { folderPath: fileItem?.path ?? null },
     }),
-  },
-];
+  },];
 
 function getRandomPosition() {
   const baseX = 120;
