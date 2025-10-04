@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useRef, useState } from 'react';
 import Window from '@/app/components/Window/Window';
@@ -22,6 +22,7 @@ import type {
 	MinesweeperWindowContent,
 	MinesweeperDifficulty,
 	PaintWindowContent,
+	SnakeWindowContent,
 } from '@/app/lib/types';
 
 const DEFAULT_NOTEPAD_MESSAGE =
@@ -57,6 +58,16 @@ const DEFAULT_PAINT_CONFIG: PaintWindowContent = {
 		'#FF00FF',
 		'#00FFFF',
 	],
+};
+
+const DEFAULT_SNAKE_CONFIG: SnakeWindowContent = {
+	columns: 30,
+	rows: 25,
+	initialLength: 4,
+	initialSpeedMs: 180,
+	speedIncrementMs: 12,
+	speedIncreaseEvery: 3,
+	minimumSpeedMs: 60,
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -534,7 +545,7 @@ export default function MainPage() {
 				'• Shut Down - End the portfolio session\n' +
 				'• Settings - Change background color\n\n' +
 				'Easter Eggs:\n' +
-				'Try deleting protected files for surprises! 😉\n\n' +
+				'Try deleting protected files for surprises! 😈\n\n' +
 				'Press any key during boot to skip the sequence.',
 			readOnly: true,
 		});
@@ -585,14 +596,14 @@ Press any key to continue your portfolio exploration...`,
 			setErrorDialog({
 				visible: true,
 				message:
-					"Hey! That's my resume! You should be downloading it, not deleting it! 📄✨",
+					"Hey! That's my resume! You should be downloading it, not deleting it! 📄",
 				title: 'Resume Protection',
 			});
 		} else if (fileName.includes('.exe')) {
 			// Protected executable files
 			setErrorDialog({
 				visible: true,
-				message: `Cannot delete system executable "${fileName}". These apps are part of the portfolio experience! 🎮`,
+				message: `Cannot delete system executable "${fileName}". These apps are part of the portfolio experience! 🚫`,
 				title: 'System Protection',
 			});
 		} else {
