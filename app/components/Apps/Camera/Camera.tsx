@@ -17,7 +17,26 @@ export default function Camera({ onClose }: CameraProps) {
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
   
-  const { createImageFile } = useFileSystemContext();
+  const { createImageFile, rootItems } = useFileSystemContext();
+
+  // Helper function to get existing PIC files for sequential naming
+  const getAllExistingPicFiles = useCallback(() => {
+    const picFiles: string[] = [];
+    
+    const searchItems = (items: typeof rootItems) => {
+      items.forEach(item => {
+        if (item.extension === 'png' && item.name.match(/^PIC\d+\.png$/)) {
+          picFiles.push(item.name);
+        }
+        if (item.children) {
+          searchItems(item.children);
+        }
+      });
+    };
+    
+    searchItems(rootItems);
+    return picFiles.sort();
+  }, [rootItems]);
 
   const setupAudioMonitoring = useCallback((mediaStream: MediaStream) => {
     try {
@@ -109,7 +128,11 @@ export default function Camera({ onClose }: CameraProps) {
 
     // Convert to data URL (base64)
     const imageData = canvas.toDataURL('image/png');
-    const fileName = `Screenshot_${new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)}.png`;
+    
+    // Generate sequential filename (PIC1, PIC2, etc.)
+    const existingFiles = getAllExistingPicFiles();
+    const nextNumber = existingFiles.length + 1;
+    const fileName = `PIC${nextNumber}.png`;
 
     // Save to virtual Desktop
     const savedFile = createImageFile('/Desktop', fileName, imageData);
@@ -132,7 +155,7 @@ export default function Camera({ onClose }: CameraProps) {
         alert(`📸 Screenshot downloaded as ${fileName}!`);
       }, 'image/png');
     }
-  }, [isActive, createImageFile]);
+  }, [isActive, createImageFile, getAllExistingPicFiles]);
 
   // Start camera on component mount
   useEffect(() => {
