@@ -28,17 +28,17 @@ const baseButtonStyle: CSSProperties = {
 };
 
 const raisedBorderStyle: CSSProperties = {
-  borderTop: 2px solid ,
-  borderLeft: 2px solid ,
-  borderBottom: 2px solid ,
-  borderRight: 2px solid ,
+  borderTop: `2px solid ${COLORS.BORDER_LIGHT}`,
+  borderLeft: `2px solid ${COLORS.BORDER_HIGHLIGHT}`,
+  borderBottom: `2px solid ${COLORS.BORDER_SHADOW}`,
+  borderRight: `2px solid ${COLORS.BORDER_DARK}`,
 };
 
 const sunkenBorderStyle: CSSProperties = {
-  borderTop: 2px solid ,
-  borderLeft: 2px solid ,
-  borderBottom: 2px solid ,
-  borderRight: 2px solid ,
+  borderTop: `2px solid ${COLORS.BORDER_SHADOW}`,
+  borderLeft: `2px solid ${COLORS.BORDER_DARK}`,
+  borderBottom: `2px solid ${COLORS.BORDER_LIGHT}`,
+  borderRight: `2px solid ${COLORS.BORDER_HIGHLIGHT}`,
 };
 
 const iconStyle: CSSProperties = {
@@ -49,7 +49,7 @@ const iconStyle: CSSProperties = {
   justifyContent: 'center',
   backgroundColor: COLORS.WIN_GRAY,
   color: COLORS.TEXT_BLACK,
-  border: 1px solid ,
+  border: `1px solid ${COLORS.BORDER_SHADOW}`,
   fontSize: 10,
   fontWeight: 700,
 };

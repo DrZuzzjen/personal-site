@@ -30,13 +30,13 @@ export default function Clock() {
         textAlign: 'center',
         backgroundColor: COLORS.WIN_GRAY,
         color: COLORS.TEXT_BLACK,
-        borderTop: 2px solid ,
-        borderLeft: 2px solid ,
-        borderBottom: 2px solid ,
-        borderRight: 2px solid ,
+        borderTop: `2px solid ${COLORS.BORDER_LIGHT}`,
+        borderLeft: `2px solid ${COLORS.BORDER_HIGHLIGHT}`,
+        borderBottom: `2px solid ${COLORS.BORDER_SHADOW}`,
+        borderRight: `2px solid ${COLORS.BORDER_DARK}`,
         fontFamily: 'var(--font-mono)',
       }}
-      aria-label={Current time }
+      aria-label="Current time"
     >
       {time}
     </div>
