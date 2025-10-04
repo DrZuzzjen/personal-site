@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import Window from '@/app/components/Window/Window';
 import Desktop from '@/app/components/Desktop/Desktop';
 import { useWindowContext } from '@/app/lib/WindowContext';
