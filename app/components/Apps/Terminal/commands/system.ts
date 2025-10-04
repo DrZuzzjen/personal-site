@@ -22,6 +22,7 @@ const SECRET_COMMANDS = [
   'konami',
   'rickroll',
   'vibe',
+  'credits',
 ];
 
 function formatHistoryLine(index: number, value: string) {

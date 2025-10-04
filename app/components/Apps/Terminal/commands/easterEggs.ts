@@ -56,12 +56,12 @@ async function runHackIntro(context: CommandContext) {
   const messages = [
     '[INITIALIZING CYBERDECK v2.3...]',
     '[SCANNING FOR VULNERABILITIES...]',
-    '   ========¦¦¦¦¦¦¦¦ 40%',
+    '   ======== 40%',
     '[FOUND: OPEN PORT 8080]',
     '[EXPLOITING BUFFER OVERFLOW...]',
-    '   ================¦¦¦¦ 80%',
+    '   ================ 80%',
     '[BYPASSING FIREWALL...]',
-    '   ====================¦¦ 95%',
+    '   ==================== 95%',
     '[INJECTING PAYLOAD...]',
     '   ====================== 100%',
     '[SUCCESS! ROOT ACCESS GRANTED]',
@@ -144,7 +144,7 @@ async function handleHackCommand(context: CommandContext): Promise<void | { erro
     if (target === 'easter_egg.exe') {
       runtime.printLines([
         { text: 'Executing easter_egg.exe...', type: 'system' },
-        { text: '¦¦¦ YOU ARE THE CHOSEN ONE ¦¦¦', type: 'success' },
+        { text: ' YOU ARE THE CHOSEN ONE ', type: 'success' },
         { text: 'Achievement unlocked: MAINFRAME MASTER', type: 'system' },
       ]);
       return;
@@ -308,6 +308,32 @@ export function createEasterEggCommands(): Command[] {
     }),
   };
 
+
+const credits: Command = {
+  name: 'credits',
+  description: 'Scroll portfolio credits roll',
+  usage: 'credits',
+  category: 'fun',
+  hidden: true,
+  execute: () => ({
+    lines: [
+      { text: '=== WINDOWS 3.1 PORTFOLIO ===' },
+      { text: 'Built with:' },
+      { text: '  - Next.js 15' },
+      { text: '  - TypeScript' },
+      { text: '  - React' },
+      { text: '  - A healthy dose of nostalgia' },
+      { text: '' },
+      { text: 'Special Thanks:' },
+      { text: '  - You, for exploring!' },
+      { text: '  - Coffee, for existing' },
+      { text: '  - Stack Overflow, for everything' },
+      { text: '' },
+      { text: '\u00a9 2025 Jean Francois Gutierrez' },
+    ],
+  }),
+};
+
   const vibe: Command = {
     name: 'vibe',
     description: 'Summon a synthwave vibe check',
@@ -317,12 +343,12 @@ export function createEasterEggCommands(): Command[] {
     execute: () => ({
       lines: [
         { text: '+----------------------------+' },
-        { text: '¦  Neon grids engaged.        ¦' },
-        { text: '¦  Synthwave levels: MAX.     ¦' },
-        { text: '¦  Enjoy the retro vibes! ??? ¦' },
+        { text: '  Neon grids engaged.        ' },
+        { text: '  Synthwave levels: MAX.     ' },
+        { text: '  Enjoy the retro vibes! ??? ' },
         { text: '+----------------------------+' },
       ],
     }),
   };
-\n  return [hack, matrix, cowsay, fortune, sudo, konami, rickroll, vibe];
+\n  return [hack, matrix, cowsay, fortune, sudo, konami, rickroll, vibe, credits];
 }
