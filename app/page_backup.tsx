@@ -299,6 +299,23 @@ function resolveSnakeContent(
 
 	return { ...DEFAULT_SNAKE_CONFIG };
 }
+		return {
+			canvasWidth,
+			canvasHeight,
+			backgroundColor,
+			brushSize,
+			palette: [...palette],
+		};
+	}
+
+	return {
+		canvasWidth: DEFAULT_PAINT_CONFIG.canvasWidth,
+		canvasHeight: DEFAULT_PAINT_CONFIG.canvasHeight,
+		backgroundColor: DEFAULT_PAINT_CONFIG.backgroundColor,
+		brushSize: DEFAULT_PAINT_CONFIG.brushSize,
+		palette: [...DEFAULT_PAINT_CONFIG.palette],
+	};
+}
 
 function renderWindowContent(
 	windowData: WindowType,
@@ -326,7 +343,7 @@ function renderWindowContent(
 			const config = resolvePaintContent(windowData.content);
 			return <Paint {...config} />;
 		}
-		case 'snake': {
+\t\tcase 'snake': {
 			const config = resolveSnakeContent(windowData.content);
 			return <Snake {...config} />;
 		}
@@ -578,22 +595,22 @@ export default function MainPage() {
 				'Windows 3.1 Portfolio Help\n\n' +
 				'Welcome to the Windows 3.1 Portfolio Experience!\n\n' +
 				'How to use:\n' +
-				'‚Ä¢ Double-click desktop icons to open apps\n' +
-				'‚Ä¢ Right-click icons or files for context menu\n' +
-				'‚Ä¢ Drag windows around by their title bar\n' +
-				'‚Ä¢ Use taskbar buttons to switch between windows\n' +
-				'‚Ä¢ Click Start button for system controls\n\n' +
+				'ï Double-click desktop icons to open apps\n' +
+				'ï Right-click icons or files for context menu\n' +
+				'ï Drag windows around by their title bar\n' +
+				'ï Use taskbar buttons to switch between windows\n' +
+				'ï Click Start button for system controls\n\n' +
 				'Applications:\n' +
-				'‚Ä¢ Paint.exe - Simple drawing program\n' +
-				'‚Ä¢ Minesweeper.exe - Classic puzzle game\n' +
-				'‚Ä¢ Notepad.exe - Text editor\n' +
-				'‚Ä¢ File Explorer - Browse files and folders\n\n' +
+				'ï Paint.exe - Simple drawing program\n' +
+				'ï Minesweeper.exe - Classic puzzle game\n' +
+				'ï Notepad.exe - Text editor\n' +
+				'ï File Explorer - Browse files and folders\n\n' +
 				'System Controls:\n' +
-				'‚Ä¢ Restart Windows - Replay boot sequence\n' +
-				'‚Ä¢ Shut Down - End the portfolio session\n' +
-				'‚Ä¢ Settings - Change background color\n\n' +
+				'ï Restart Windows - Replay boot sequence\n' +
+				'ï Shut Down - End the portfolio session\n' +
+				'ï Settings - Change background color\n\n' +
 				'Easter Eggs:\n' +
-				'Try deleting protected files for surprises! üòà\n\n' +
+				'Try deleting protected files for surprises! ??\n\n' +
 				'Press any key during boot to skip the sequence.',
 			readOnly: true,
 		});
@@ -621,7 +638,7 @@ Press any key to continue your portfolio exploration...`,
 			// Show error for My Documents
 			setErrorDialog({
 				visible: true,
-				message: 'Cannot delete critical system folder. Nice try! üòè',
+				message: 'Cannot delete critical system folder. Nice try! ??',
 				title: 'Error',
 			});
 		} else if (fileName === 'My Computer') {
@@ -636,7 +653,7 @@ Press any key to continue your portfolio exploration...`,
 			setErrorDialog({
 				visible: true,
 				message:
-					'Cannot delete the Recycle Bin. Where would deleted files go? Into the void? üóëÔ∏è',
+					'Cannot delete the Recycle Bin. Where would deleted files go? Into the void? ???',
 				title: 'Error',
 			});
 		} else if (fileName === 'Resume.pdf') {
@@ -644,14 +661,14 @@ Press any key to continue your portfolio exploration...`,
 			setErrorDialog({
 				visible: true,
 				message:
-					"Hey! That's my resume! You should be downloading it, not deleting it! üìÑ",
+					"Hey! That's my resume! You should be downloading it, not deleting it! ???",
 				title: 'Resume Protection',
 			});
 		} else if (fileName.includes('.exe')) {
 			// Protected executable files
 			setErrorDialog({
 				visible: true,
-				message: `Cannot delete system executable "${fileName}". These apps are part of the portfolio experience! üö´`,
+				message: `Cannot delete system executable "${fileName}". These apps are part of the portfolio experience! ??`,
 				title: 'System Protection',
 			});
 		} else {
@@ -748,3 +765,14 @@ Press any key to continue your portfolio exploration...`,
 		</>
 	);
 }
+
+
+
+
+
+
+
+
+
+
+

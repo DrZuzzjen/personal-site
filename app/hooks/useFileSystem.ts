@@ -13,16 +13,36 @@ export function useFileSystem() {
 
   // Initialize desktop icons from localStorage or default
   useEffect(() => {
+    const defaultDesktopIcons = [...INITIAL_DESKTOP_ICONS, ...APP_DESKTOP_ICONS];
+
+    const ensureDefaultIcons = (icons: DesktopIcon[]): DesktopIcon[] => {
+      const existing = new Set(icons.map((icon) => icon.fileSystemId));
+      const merged = [...icons];
+
+      for (const defaultIcon of defaultDesktopIcons) {
+        if (!existing.has(defaultIcon.fileSystemId)) {
+          merged.push(defaultIcon);
+        }
+      }
+
+      return merged;
+    };
+
     const savedIcons = localStorage.getItem('desktop-icons');
     if (savedIcons) {
       try {
-        setDesktopIcons(JSON.parse(savedIcons));
+        const parsed = JSON.parse(savedIcons) as DesktopIcon[];
+        if (Array.isArray(parsed)) {
+          setDesktopIcons(ensureDefaultIcons(parsed));
+        } else {
+          setDesktopIcons(defaultDesktopIcons);
+        }
       } catch (error) {
         console.error('Error loading desktop icons from localStorage:', error);
-        setDesktopIcons([...INITIAL_DESKTOP_ICONS, ...APP_DESKTOP_ICONS]);
+        setDesktopIcons(defaultDesktopIcons);
       }
     } else {
-      setDesktopIcons([...INITIAL_DESKTOP_ICONS, ...APP_DESKTOP_ICONS]);
+      setDesktopIcons(defaultDesktopIcons);
     }
   }, []);
 

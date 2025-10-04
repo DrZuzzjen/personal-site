@@ -2,7 +2,7 @@
 // WINDOW SYSTEM TYPES
 // ============================================
 
-export type AppType = 'notepad' | 'paint' | 'minesweeper' | 'mycomputer' | 'explorer';
+export type AppType = 'notepad' | 'paint' | 'minesweeper' | 'mycomputer' | 'explorer' | 'snake';
 
 export interface WindowPosition {
   x: number;
@@ -112,6 +112,17 @@ export interface MinesweeperWindowContent {
   firstClickSafe: boolean;
 }
 
+// Snake
+export interface SnakeWindowContent {
+  columns?: number;
+  rows?: number;
+  initialLength?: number;
+  initialSpeedMs?: number;
+  speedIncrementMs?: number;
+  speedIncreaseEvery?: number;
+  minimumSpeedMs?: number;
+}
+
 // File Explorer
 export interface ExplorerWindowContent {
   folderPath?: string | null;
@@ -121,6 +132,7 @@ export type WindowContent =
   | NotepadWindowContent
   | PaintWindowContent
   | MinesweeperWindowContent
+  | SnakeWindowContent
   | ExplorerWindowContent
   | string
   | null

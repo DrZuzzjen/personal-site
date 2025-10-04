@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useRef } from 'react';
 import { useFileSystemContext } from '@/app/lib/FileSystemContext';
@@ -11,6 +11,7 @@ import type {
 	NotepadWindowContent,
 	MinesweeperWindowContent,
 	PaintWindowContent,
+	SnakeWindowContent,
 	WindowContent,
 } from '@/app/lib/types';
 
@@ -116,6 +117,27 @@ function createMinesweeperLaunch(): LaunchConfig {
 	};
 }
 
+function createSnakeLaunch(): LaunchConfig {
+	const content: SnakeWindowContent = {
+		columns: 30,
+		rows: 25,
+		initialLength: 4,
+		initialSpeedMs: 180,
+		speedIncrementMs: 12,
+		speedIncreaseEvery: 3,
+		minimumSpeedMs: 60,
+	};
+
+	return {
+		title: 'Snake.exe',
+		appType: 'snake',
+		position: { x: 200, y: 140 },
+		size: { width: 850, height: 580 },
+		icon: 'SN',
+		content,
+	};
+}
+
 function getLaunchConfigForFile(item: FileSystemItem): LaunchConfig | null {
 	if (item.extension === 'txt') {
 		return createNotepadLaunch(item);
@@ -139,14 +161,7 @@ function getLaunchConfigForFile(item: FileSystemItem): LaunchConfig | null {
 		}
 
 		if (exeName.includes('snake')) {
-			return {
-				title: 'Snake.exe',
-				appType: 'snake' as const,
-				position: { x: 200, y: 140 },
-				size: { width: 850, height: 580 },
-				icon: 'SN',
-				content: {},
-			};
+			return createSnakeLaunch();
 		}
 
 		return createUnsupportedFileLaunch(
