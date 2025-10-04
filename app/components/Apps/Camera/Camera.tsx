@@ -86,9 +86,9 @@ export default function Camera({ onClose }: CameraProps) {
 				// Set up audio level monitoring
 				setupAudioMonitoring(mediaStream);
 			}
-		} catch (err: any) {
+		} catch (err: unknown) {
 			console.error('Camera access denied:', err);
-			if (err.name === 'NotAllowedError') {
+			if (err && typeof err === 'object' && 'name' in err && err.name === 'NotAllowedError') {
 				setError(
 					'Camera access denied. Please allow camera permission in your browser settings.'
 				);
