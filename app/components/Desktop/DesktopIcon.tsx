@@ -132,6 +132,12 @@ function getLaunchConfigForFile(item: FileSystemItem): LaunchConfig | null {
 			return createMinesweeperLaunch();
 		}
 
+		if (exeName.includes('notepad')) {
+			return createNotepadLaunch(item, {
+				body: 'Welcome to Notepad!\n\nThis is a simple text editor application.',
+			});
+		}
+
 		return createUnsupportedFileLaunch(
 			item,
 			`No application handler is defined for ${item.name}.`
@@ -283,20 +289,30 @@ export default function DesktopIcon({
 	): { symbol: string; color: string } => {
 		if (item.isSystem) {
 			if (item.name === 'My Computer')
-				return { symbol: 'PC', color: '#000080' };
+				return { symbol: '🖥️', color: '#000080' };
 			if (item.name === 'Recycle Bin')
-				return { symbol: 'RB', color: '#808080' };
+				return { symbol: '🗑️', color: '#808080' };
 		}
 
 		if (item.type === 'folder') {
-			return { symbol: 'DIR', color: '#FFD700' };
+			return { symbol: '📁', color: '#FFD700' };
 		}
 
 		if (item.extension === 'txt') {
-			return { symbol: 'TXT', color: '#FFFFFF' };
+			return { symbol: '📄', color: '#FFFFFF' };
 		}
 
 		if (item.extension === 'exe') {
+			const exeName = item.name.toLowerCase();
+			if (exeName.includes('paint')) {
+				return { symbol: '🎨', color: '#C0C0C0' };
+			}
+			if (exeName.includes('minesweeper')) {
+				return { symbol: '💣', color: '#C0C0C0' };
+			}
+			if (exeName.includes('notepad')) {
+				return { symbol: '📝', color: '#C0C0C0' };
+			}
 			return { symbol: 'EXE', color: '#C0C0C0' };
 		}
 

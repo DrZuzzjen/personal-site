@@ -11,6 +11,7 @@ import Paint from '@/app/components/Apps/Paint/Paint';
 import { BootSequence } from '@/app/components/BootSequence';
 import { ErrorDialog, BSOD } from '@/app/components/Dialogs';
 import { ShutDownScreen } from '@/app/components/StartMenu';
+import MobileWarning from '@/app/components/MobileWarning';
 import { useWindowContext } from '@/app/lib/WindowContext';
 import { COLORS } from '@/app/lib/constants';
 import type {
@@ -303,6 +304,21 @@ export default function MainPage() {
 		visible: false,
 		message: '',
 	});
+
+	// Mobile warning state
+	const [isMobile, setIsMobile] = useState(false);
+
+	useEffect(() => {
+		const checkMobile = () => {
+			const mobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || 
+				window.innerWidth < 768;
+			setIsMobile(mobile);
+		};
+
+		checkMobile();
+		window.addEventListener('resize', checkMobile);
+		return () => window.removeEventListener('resize', checkMobile);
+	}, []);
 
 	useEffect(() => {
 		if (bootComplete && typeof window !== 'undefined') {
@@ -597,10 +613,11 @@ Press any key to continue your portfolio exploration...`,
 				style={{
 					position: 'fixed',
 					top: 16,
-					left: 16,
+					right: 16,
 					color: COLORS.TEXT_WHITE,
-					textShadow: '1px 1px 0 rgba(0, 0, 0, 0.35)',
+					textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)',
 					zIndex: 1000,
+					textAlign: 'right',
 				}}
 			>
 				<div style={{ fontSize: 18, fontWeight: 700 }}>
@@ -649,6 +666,11 @@ Press any key to continue your portfolio exploration...`,
 			/>
 
 			<ShutDownScreen isVisible={isShutDown} />
+
+			{/* Mobile Warning */}
+			{isMobile && (
+				<MobileWarning onProceed={() => setIsMobile(false)} />
+			)}
 		</>
 	);
 }
