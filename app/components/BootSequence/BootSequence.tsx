@@ -93,6 +93,20 @@ export default function BootSequence({ onBootComplete, skipBoot = false }: BootS
       {currentStage === 'post' && <PostScreen />}
       {currentStage === 'memory' && <MemoryCheck />}
       {currentStage === 'loading' && <LoadingScreen />}
+      
+      {/* Skip button */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: '20px',
+          right: '20px',
+          color: '#808080',
+          fontSize: '12px',
+          opacity: 0.7,
+        }}
+      >
+        Press any key to skip...
+      </div>
     </div>
   );
 }
