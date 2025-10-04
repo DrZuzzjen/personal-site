@@ -21,8 +21,9 @@ export default function Desktop({
 		x: number;
 		y: number;
 	} | null>(null);
+	const [isDragOver, setIsDragOver] = useState(false);
 
-	const { desktopIcons, deselectAllIcons, createFolder, createFile } =
+	const { desktopIcons, deselectAllIcons, createFolder, createFile, createDesktopIcon, getItemByPath } =
 		useFileSystemContext();
 	const { openWindow } = useWindowContext();
 
@@ -48,7 +49,7 @@ export default function Desktop({
 	};
 
 	const handleNewFolder = () => {
-		createFolder('/Desktop', `New Folder ${Date.now()}`);
+		createFolder('/Desktop', `New Folder`);
 		setContextMenu(null);
 	};
 
@@ -82,6 +83,44 @@ export default function Desktop({
 		setContextMenu(null);
 	};
 
+	const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+		event.preventDefault();
+		event.dataTransfer.dropEffect = 'copy';
+		setIsDragOver(true);
+	};
+
+	const handleDragLeave = (event: React.DragEvent<HTMLDivElement>) => {
+		event.preventDefault();
+		setIsDragOver(false);
+	};
+
+	const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+		event.preventDefault();
+		setIsDragOver(false);
+
+		try {
+			const fileData = JSON.parse(event.dataTransfer.getData('application/file'));
+			
+			if (fileData && fileData.id) {
+				// Get the actual file item from the file system
+				const fileItem = getItemByPath(fileData.path);
+				
+				if (fileItem) {
+					// Calculate drop position
+					const dropPosition = {
+						x: event.clientX - 25, // Offset for icon size
+						y: event.clientY - 25,
+					};
+
+					// Create desktop icon
+					createDesktopIcon(fileItem, dropPosition);
+				}
+			}
+		} catch (error) {
+			console.error('Error handling file drop:', error);
+		}
+	};
+
 	const handleRefresh = () => {
 		// Simple refresh - could reload icons or refresh the desktop
 		console.log('Desktop refreshed');
@@ -101,17 +140,21 @@ export default function Desktop({
 			className={className}
 			onClick={handleDesktopClick}
 			onContextMenu={handleDesktopRightClick}
+			onDragOver={handleDragOver}
+			onDragLeave={handleDragLeave}
+			onDrop={handleDrop}
 			style={{
 				position: 'fixed',
 				top: 0,
 				left: 0,
 				width: '100vw',
 				height: '100vh',
-				backgroundColor: COLORS.DESKTOP_TEAL,
+				backgroundColor: isDragOver ? '#e6f3ff' : COLORS.DESKTOP_TEAL,
 				zIndex: Z_INDEX.DESKTOP,
 				overflow: 'hidden',
 				cursor: 'default',
 				userSelect: 'none',
+				transition: 'background-color 0.2s ease',
 			}}
 		>
 			{desktopIcons.map((icon) => (

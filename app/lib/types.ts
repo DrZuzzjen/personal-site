@@ -155,4 +155,5 @@ export interface FileSystemContext {
   updateIconPosition: (iconId: string, position: { x: number; y: number }) => void;
   selectIcon: (iconId: string) => void;
   deselectAllIcons: () => void;
+  createDesktopIcon: (fileItem: FileSystemItem, position: { x: number; y: number }) => DesktopIcon;
 }

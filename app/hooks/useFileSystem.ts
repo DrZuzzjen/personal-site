@@ -1,5 +1,5 @@
 'use client';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import type { FileSystemItem, DesktopIcon, FileExtension } from '../lib/types';
 import { INITIAL_FILE_SYSTEM, INITIAL_DESKTOP_ICONS, APP_EXECUTABLES, APP_DESKTOP_ICONS } from '../lib/constants';
 
@@ -9,10 +9,29 @@ export function useFileSystem() {
     ...APP_EXECUTABLES,
   ]);
 
-  const [desktopIcons, setDesktopIcons] = useState<DesktopIcon[]>([
-    ...INITIAL_DESKTOP_ICONS,
-    ...APP_DESKTOP_ICONS,
-  ]);
+  const [desktopIcons, setDesktopIcons] = useState<DesktopIcon[]>([]);
+
+  // Initialize desktop icons from localStorage or default
+  useEffect(() => {
+    const savedIcons = localStorage.getItem('desktop-icons');
+    if (savedIcons) {
+      try {
+        setDesktopIcons(JSON.parse(savedIcons));
+      } catch (error) {
+        console.error('Error loading desktop icons from localStorage:', error);
+        setDesktopIcons([...INITIAL_DESKTOP_ICONS, ...APP_DESKTOP_ICONS]);
+      }
+    } else {
+      setDesktopIcons([...INITIAL_DESKTOP_ICONS, ...APP_DESKTOP_ICONS]);
+    }
+  }, []);
+
+  // Save desktop icons to localStorage whenever they change
+  useEffect(() => {
+    if (desktopIcons.length > 0) {
+      localStorage.setItem('desktop-icons', JSON.stringify(desktopIcons));
+    }
+  }, [desktopIcons]);
 
   // Helper: Find item by path (recursive)
   const getItemByPath = useCallback((path: string): FileSystemItem | null => {
@@ -191,6 +210,26 @@ export function useFileSystem() {
     );
   }, []);
 
+  // Create a desktop icon for an existing file
+  const createDesktopIcon = useCallback((fileItem: FileSystemItem, position: { x: number; y: number }) => {
+    // Check if an icon for this file already exists
+    const existingIcon = desktopIcons.find(icon => icon.fileSystemId === fileItem.id);
+    if (existingIcon) {
+      console.log('Icon for this file already exists on desktop');
+      return existingIcon;
+    }
+
+    const newIcon: DesktopIcon = {
+      id: `icon-${Date.now()}`,
+      fileSystemId: fileItem.id,
+      position,
+      isSelected: false,
+    };
+
+    setDesktopIcons(prev => [...prev, newIcon]);
+    return newIcon;
+  }, [desktopIcons]);
+
   return {
     rootItems,
     desktopIcons,
@@ -203,5 +242,6 @@ export function useFileSystem() {
     updateIconPosition,
     selectIcon,
     deselectAllIcons,
+    createDesktopIcon,
   };
 }

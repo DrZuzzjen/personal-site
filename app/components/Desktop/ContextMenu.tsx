@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { COLORS } from '@/app/lib/constants';
 
 interface ContextMenuProps {
@@ -22,12 +22,15 @@ export default function ContextMenu({
 	onRefresh,
 	onProperties,
 }: ContextMenuProps) {
+	const [showSubmenu, setShowSubmenu] = useState<string | null>(null);
+	const [submenuTimer, setSubmenuTimer] = useState<NodeJS.Timeout | null>(null);
+
 	const menuItems = [
 		{
 			label: 'New',
 			submenu: [
-				{ label: 'Folder', action: onNewFolder },
-				{ label: 'Text File', action: onNewTextFile },
+				{ label: '📁 Folder', action: onNewFolder },
+				{ label: '📄 Text Document', action: onNewTextFile },
 			],
 		},
 		{ label: 'Refresh', action: onRefresh },
@@ -38,6 +41,38 @@ export default function ContextMenu({
 		action();
 		onClose();
 	};
+
+	const handleSubmenuHover = (label: string) => {
+		// Clear existing timer
+		if (submenuTimer) {
+			clearTimeout(submenuTimer);
+		}
+
+		// Set new timer for submenu delay (150ms for authentic feel)
+		const timer = setTimeout(() => {
+			setShowSubmenu(label);
+		}, 150);
+		
+		setSubmenuTimer(timer);
+	};
+
+	const handleSubmenuLeave = () => {
+		// Clear timer and hide submenu
+		if (submenuTimer) {
+			clearTimeout(submenuTimer);
+		}
+		setSubmenuTimer(null);
+		setShowSubmenu(null);
+	};
+
+	// Clean up timer on unmount
+	useEffect(() => {
+		return () => {
+			if (submenuTimer) {
+				clearTimeout(submenuTimer);
+			}
+		};
+	}, [submenuTimer]);
 
 	return (
 		<>
@@ -78,7 +113,7 @@ export default function ContextMenu({
 				}}
 			>
 				{menuItems.map((item, index) => (
-					<div key={index}>
+					<div key={index} style={{ position: 'relative' }}>
 						{item.submenu ? (
 							// Menu item with submenu
 							<div
@@ -91,15 +126,77 @@ export default function ContextMenu({
 								onMouseEnter={(e) => {
 									e.currentTarget.style.backgroundColor = COLORS.WIN_BLUE;
 									e.currentTarget.style.color = COLORS.TEXT_WHITE;
+									handleSubmenuHover(item.label);
 								}}
 								onMouseLeave={(e) => {
 									e.currentTarget.style.backgroundColor = 'transparent';
 									e.currentTarget.style.color = COLORS.TEXT_BLACK;
+									// Don't hide submenu immediately - let submenu handle it
 								}}
 							>
 								{item.label}
 								<span style={{ float: 'right' }}>▶</span>
-								{/* Submenu - could be implemented later for full functionality */}
+								
+								{/* Submenu */}
+								{showSubmenu === item.label && (
+									<div
+										style={{
+											position: 'absolute',
+											left: '100%',
+											top: 0,
+											marginLeft: 1,
+											backgroundColor: COLORS.WIN_GRAY,
+											border: `2px solid ${COLORS.BORDER_SHADOW}`,
+											borderTopColor: COLORS.BORDER_LIGHT,
+											borderLeftColor: COLORS.BORDER_LIGHT,
+											borderRightColor: COLORS.BORDER_DARK,
+											borderBottomColor: COLORS.BORDER_DARK,
+											minWidth: 140,
+											zIndex: 10003,
+											boxShadow: '2px 2px 4px rgba(0, 0, 0, 0.3)',
+										}}
+										onMouseEnter={() => {
+											// Keep submenu open when hovering over it
+											if (submenuTimer) {
+												clearTimeout(submenuTimer);
+												setSubmenuTimer(null);
+											}
+										}}
+										onMouseLeave={handleSubmenuLeave}
+									>
+										{item.submenu.map((subItem, subIndex) => (
+											<div key={subIndex}>
+												<div
+													style={{
+														padding: '4px 16px 4px 8px',
+														cursor: 'pointer',
+														color: COLORS.TEXT_BLACK,
+													}}
+													onClick={() => handleMenuClick(subItem.action)}
+													onMouseEnter={(e) => {
+														e.currentTarget.style.backgroundColor = COLORS.WIN_BLUE;
+														e.currentTarget.style.color = COLORS.TEXT_WHITE;
+													}}
+													onMouseLeave={(e) => {
+														e.currentTarget.style.backgroundColor = 'transparent';
+														e.currentTarget.style.color = COLORS.TEXT_BLACK;
+													}}
+												>
+													{subItem.label}
+												</div>
+												{subIndex < item.submenu!.length - 1 && (
+													<div
+														style={{
+															height: 1,
+															backgroundColor: COLORS.BORDER_SHADOW,
+															margin: '2px 4px',
+														}}
+													/>
+												)}
+											</div>
+										))}
+									</div>
+								)}
 							</div>
 						) : (
 							// Simple menu item

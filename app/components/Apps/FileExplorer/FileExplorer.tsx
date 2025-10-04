@@ -257,9 +257,22 @@ export default function FileExplorer({
 							return (
 								<li
 									key={item.id}
+									draggable={item.type === 'file'} // Only files can be dragged for now
 									onClick={() => setSelectedId(item.id)}
 									onDoubleClick={() => handleNavigate(item)}
 									onContextMenu={(e) => handleContextMenu(e, item)}
+									onDragStart={(e) => {
+										if (item.type === 'file') {
+											e.dataTransfer.setData('application/file', JSON.stringify({
+												id: item.id,
+												name: item.name,
+												type: item.type,
+												path: item.path,
+												extension: item.extension,
+											}));
+											e.dataTransfer.effectAllowed = 'copy';
+										}
+									}}
 									style={{
 										display: 'flex',
 										alignItems: 'center',
@@ -269,9 +282,19 @@ export default function FileExplorer({
 											? '1px dotted ' + COLORS.WIN_BLUE_LIGHT
 											: '1px solid transparent',
 										backgroundColor: isSelected ? '#dbe8ff' : 'transparent',
-										cursor: 'default',
+										cursor: item.type === 'file' ? 'grab' : 'default',
 										userSelect: 'none',
 										fontSize: 12,
+									}}
+									onMouseDown={(e) => {
+										if (item.type === 'file') {
+											e.currentTarget.style.cursor = 'grabbing';
+										}
+									}}
+									onMouseUp={(e) => {
+										if (item.type === 'file') {
+											e.currentTarget.style.cursor = 'grab';
+										}
 									}}
 								>
 									<span
