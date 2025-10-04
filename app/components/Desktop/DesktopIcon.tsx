@@ -31,7 +31,7 @@ interface LaunchConfig {
 const DEFAULT_LAUNCH_POSITION = { x: 140, y: 110 };
 const NOTEPAD_WINDOW_SIZE = { width: 520, height: 380 };
 const MINESWEEPER_WINDOW_SIZE = { width: 360, height: 440 };
-const PAINT_WINDOW_SIZE = { width: 560, height: 460 };
+const PAINT_WINDOW_SIZE = { width: 800, height: 600 }; // Compact but roomy for new sidebar layout
 const PAINT_PALETTE = [
 	'#000000',
 	'#FFFFFF',
@@ -80,10 +80,10 @@ function createUnsupportedFileLaunch(
 
 function createPaintLaunch(): LaunchConfig {
 	const content: PaintWindowContent = {
-		canvasWidth: 320,
-		canvasHeight: 200,
+		canvasWidth: 600, // Larger canvas for new design
+		canvasHeight: 400,
 		backgroundColor: '#FFFFFF',
-		brushSize: 4,
+		brushSize: 6, // Slightly larger default brush
 		palette: PAINT_PALETTE,
 	};
 

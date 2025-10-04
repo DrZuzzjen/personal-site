@@ -84,7 +84,7 @@ const sectionHeaderStyle: CSSProperties = {
 	textAlign: 'center',
 };
 
-// Tool buttons (large and professional)
+// Tool buttons (large and professional with proper Windows 3.1 styling)
 const toolButtonStyle = (active: boolean): CSSProperties => ({
 	width: '100%',
 	height: 42,
@@ -94,16 +94,24 @@ const toolButtonStyle = (active: boolean): CSSProperties => ({
 	gap: 6,
 	fontSize: 11,
 	fontWeight: active ? 'bold' : 'normal',
-	backgroundColor: active ? COLORS.WIN_BLUE : COLORS.WIN_GRAY,
-	color: active ? COLORS.WIN_WHITE : COLORS.TEXT_BLACK,
-	border: active 
+	backgroundColor: COLORS.WIN_GRAY,
+	color: COLORS.TEXT_BLACK,
+	// Windows 3.1 button effect - sunken when selected, raised when not
+	borderTop: active 
+		? `2px solid ${COLORS.BORDER_SHADOW}`     // SUNKEN
+		: `2px solid ${COLORS.BORDER_LIGHT}`,    // RAISED
+	borderLeft: active 
 		? `2px solid ${COLORS.BORDER_DARK}`
-		: `2px solid ${COLORS.BORDER_LIGHT}`,
-	borderTopColor: active ? COLORS.BORDER_SHADOW : COLORS.BORDER_LIGHT,
-	borderLeftColor: active ? COLORS.BORDER_SHADOW : COLORS.BORDER_HIGHLIGHT,
-	borderBottomColor: active ? COLORS.BORDER_LIGHT : COLORS.BORDER_SHADOW,
-	borderRightColor: active ? COLORS.BORDER_LIGHT : COLORS.BORDER_DARK,
+		: `2px solid ${COLORS.BORDER_HIGHLIGHT}`,
+	borderBottom: active 
+		? `2px solid ${COLORS.BORDER_LIGHT}`
+		: `2px solid ${COLORS.BORDER_SHADOW}`,
+	borderRight: active 
+		? `2px solid ${COLORS.BORDER_HIGHLIGHT}`
+		: `2px solid ${COLORS.BORDER_DARK}`,
 	cursor: 'pointer',
+	padding: '8px 12px',
+	marginBottom: 2,
 	transition: 'none',
 });
 
@@ -161,6 +169,31 @@ const actionButtonStyle: CSSProperties = {
 	marginBottom: 4,
 };
 
+// Zoom controls
+const zoomControlsStyle: CSSProperties = {
+	display: 'flex',
+	alignItems: 'center',
+	justifyContent: 'center',
+	gap: 4,
+	padding: '4px 0',
+	marginBottom: 8,
+};
+
+const zoomButtonStyle: CSSProperties = {
+	width: 28,
+	height: 24,
+	fontSize: 12,
+	fontWeight: 'bold',
+	backgroundColor: COLORS.WIN_GRAY,
+	color: COLORS.TEXT_BLACK,
+	border: `2px solid ${COLORS.BORDER_LIGHT}`,
+	borderTopColor: COLORS.BORDER_LIGHT,
+	borderLeftColor: COLORS.BORDER_HIGHLIGHT,
+	borderBottomColor: COLORS.BORDER_SHADOW,
+	borderRightColor: COLORS.BORDER_DARK,
+	cursor: 'pointer',
+};
+
 const brushSizes = [2, 4, 6, 10, 16, 20];
 
 export default function Paint({
@@ -182,6 +215,7 @@ export default function Paint({
 	const [currentColor, setCurrentColor] = useState(colors[0] ?? '#000000');
 	const [brushSizeState, setBrushSizeState] = useState(Math.max(1, Math.floor(brushSize)));
 	const [tool, setTool] = useState<Tool>('brush');
+	const [zoom, setZoom] = useState(1); // 1 = 100%, 0.5 = 50%, 2 = 200%
 
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
@@ -382,6 +416,32 @@ export default function Paint({
 
 				{/* Action Buttons */}
 				<div style={{ marginTop: 'auto' }}>
+					{/* Zoom Controls */}
+					<div>
+						<div style={sectionHeaderStyle}>ZOOM</div>
+						<div style={zoomControlsStyle}>
+							<button
+								type="button"
+								onClick={() => setZoom(z => Math.max(0.25, z - 0.25))}
+								style={zoomButtonStyle}
+								disabled={zoom <= 0.25}
+							>
+								-
+							</button>
+							<span style={{ fontSize: 10, minWidth: 40, textAlign: 'center' }}>
+								{Math.round(zoom * 100)}%
+							</span>
+							<button
+								type="button"
+								onClick={() => setZoom(z => Math.min(4, z + 0.25))}
+								style={zoomButtonStyle}
+								disabled={zoom >= 4}
+							>
+								+
+							</button>
+						</div>
+					</div>
+
 					<button
 						type="button"
 						onClick={handleClear}
@@ -402,27 +462,29 @@ export default function Paint({
 			{/* Main Canvas Area */}
 			<div style={canvasAreaStyle}>
 				<div style={canvasSectionStyle}>
-					<canvas
-						ref={canvasRef}
-						onPointerDown={handlePointerDown}
-						onPointerMove={handlePointerMove}
-						onPointerUp={stopDrawing}
-						onPointerCancel={stopDrawing}
-						onPointerLeave={stopDrawing}
-						style={{
-							width,
-							height,
-							cursor: tool === 'eraser' ? 'cell' : 'crosshair',
-							backgroundColor: effectiveBackground,
-							touchAction: 'none',
-							border: `3px solid ${COLORS.BORDER_SHADOW}`,
-							borderTopColor: COLORS.BORDER_SHADOW,
-							borderLeftColor: COLORS.BORDER_SHADOW,
-							borderBottomColor: COLORS.BORDER_LIGHT,
-							borderRightColor: COLORS.BORDER_LIGHT,
-							boxShadow: 'inset 1px 1px 2px rgba(0,0,0,0.1)',
-						}}
-					/>
+					<div style={{ transform: `scale(${zoom})`, transformOrigin: 'center' }}>
+						<canvas
+							ref={canvasRef}
+							onPointerDown={handlePointerDown}
+							onPointerMove={handlePointerMove}
+							onPointerUp={stopDrawing}
+							onPointerCancel={stopDrawing}
+							onPointerLeave={stopDrawing}
+							style={{
+								width,
+								height,
+								cursor: tool === 'eraser' ? 'cell' : 'crosshair',
+								backgroundColor: effectiveBackground,
+								touchAction: 'none',
+								border: `3px solid ${COLORS.BORDER_SHADOW}`,
+								borderTopColor: COLORS.BORDER_SHADOW,
+								borderLeftColor: COLORS.BORDER_SHADOW,
+								borderBottomColor: COLORS.BORDER_LIGHT,
+								borderRightColor: COLORS.BORDER_LIGHT,
+								boxShadow: 'inset 1px 1px 2px rgba(0,0,0,0.1)',
+							}}
+						/>
+					</div>
 				</div>
 
 				{/* Enhanced Status Bar */}
