@@ -27,11 +27,11 @@ export function useIconDrag({
   const snapToGrid = useCallback((x: number, y: number) => {
     const gridX = Math.round(x / DESKTOP_GRID.ICON_WIDTH) * DESKTOP_GRID.ICON_WIDTH;
     const gridY = Math.round(y / DESKTOP_GRID.ICON_HEIGHT) * DESKTOP_GRID.ICON_HEIGHT;
-    
+
     // Keep icons within screen bounds
     const maxX = Math.floor((window.innerWidth - DESKTOP_GRID.ICON_WIDTH) / DESKTOP_GRID.ICON_WIDTH) * DESKTOP_GRID.ICON_WIDTH;
     const maxY = Math.floor((window.innerHeight - DESKTOP_GRID.ICON_HEIGHT) / DESKTOP_GRID.ICON_HEIGHT) * DESKTOP_GRID.ICON_HEIGHT;
-    
+
     return {
       x: Math.max(0, Math.min(gridX, maxX)),
       y: Math.max(0, Math.min(gridY, maxY)),
@@ -42,10 +42,10 @@ export function useIconDrag({
   const handleMouseDown = useCallback((event: React.MouseEvent) => {
     // Only start drag on left mouse button
     if (event.button !== 0) return;
-    
+
     event.preventDefault();
     event.stopPropagation();
-    
+
     setIsDragging(true);
     setDragStart({ x: event.clientX, y: event.clientY });
     setInitialPosition(currentPosition);
@@ -54,13 +54,13 @@ export function useIconDrag({
   // Handle mouse move during drag
   const handleMouseMove = useCallback((event: MouseEvent) => {
     if (!isDragging) return;
-    
+
     const deltaX = event.clientX - dragStart.x;
     const deltaY = event.clientY - dragStart.y;
-    
+
     const newX = initialPosition.x + deltaX;
     const newY = initialPosition.y + deltaY;
-    
+
     // Update position in real-time (without snapping for smooth drag)
     onPositionChange(iconId, { x: newX, y: newY });
   }, [isDragging, dragStart, initialPosition, iconId, onPositionChange]);
@@ -68,17 +68,17 @@ export function useIconDrag({
   // Handle mouse up - end drag and snap to grid
   const handleMouseUp = useCallback((event: MouseEvent) => {
     if (!isDragging) return;
-    
+
     const deltaX = event.clientX - dragStart.x;
     const deltaY = event.clientY - dragStart.y;
-    
+
     const newX = initialPosition.x + deltaX;
     const newY = initialPosition.y + deltaY;
-    
+
     // Snap to grid on final position
     const snappedPosition = snapToGrid(newX, newY);
     onPositionChange(iconId, snappedPosition);
-    
+
     setIsDragging(false);
   }, [isDragging, dragStart, initialPosition, iconId, onPositionChange, snapToGrid]);
 
@@ -87,10 +87,10 @@ export function useIconDrag({
     if (isDragging) {
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
-      
+
       // Change cursor globally while dragging
       document.body.style.cursor = 'grabbing';
-      
+
       return () => {
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
