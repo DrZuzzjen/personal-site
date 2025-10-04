@@ -1,6 +1,7 @@
 import type { FileSystemContext, WindowManagerContext } from '@/app/lib/types';
 
 export type TerminalLineType = 'input' | 'output' | 'error' | 'system' | 'success' | 'warning';
+export type TerminalMode = 'normal' | 'hack';
 
 export interface TerminalLine {
   id: string;
@@ -42,6 +43,10 @@ export interface CommandResult {
   effect?: TerminalEffect;
 }
 
+export interface TerminalSessionStore {
+  [key: string]: unknown;
+}
+
 export interface TerminalRuntime {
   currentPath: string;
   setCurrentPath: (path: string) => void;
@@ -52,6 +57,11 @@ export interface TerminalRuntime {
   setEffect: (effect: TerminalEffect | null) => void;
   history: string[];
   clearHistory: () => void;
+  mode: TerminalMode;
+  setMode: (mode: TerminalMode) => void;
+  session: TerminalSessionStore;
+  setSessionValue: (key: string, value: unknown) => void;
+  clearSessionKey: (key: string) => void;
 }
 
 export interface CommandContext {

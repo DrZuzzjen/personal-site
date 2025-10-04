@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from 'react';
-import type { TerminalEffect, TerminalLine, TerminalLineType } from '../types';
+import type { TerminalEffect, TerminalLine, TerminalLineType, TerminalMode, TerminalSessionStore } from '../types';
 
 type HistoryDirection = 'previous' | 'next';
 
@@ -32,6 +32,8 @@ export function useTerminalState(options: UseTerminalStateOptions = {}) {
   const [currentPath, setCurrentPath] = useState(initialPath);
   const [isBusy, setIsBusy] = useState(false);
   const [activeEffect, setActiveEffect] = useState<TerminalEffect>(null);
+  const [mode, setMode] = useState<TerminalMode>('normal');
+  const [session, setSession] = useState<TerminalSessionStore>({});
 
   const appendLine = useCallback((line: { text: string; type?: TerminalLineType }) => {
     setLines((prev) => [...prev, createLine(line.text, line.type ?? 'output')]);
@@ -84,11 +86,29 @@ export function useTerminalState(options: UseTerminalStateOptions = {}) {
     return newPointer === -1 ? '' : history[newPointer];
   }, [history, historyPointer]);
 
+  const setSessionValue = useCallback((key: string, value: unknown) => {
+    setSession((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  }, []);
+
+  const clearSessionKey = useCallback((key: string) => {
+    setSession((prev) => {
+      if (!(key in prev)) {
+        return prev;
+      }
+      const { [key]: _removed, ...rest } = prev;
+      return rest;
+    });
+  }, []);
+
   const stateSummary = useMemo(() => ({
     lineCount: lines.length,
     lastLine: lines.length ? lines[lines.length - 1] : null,
     historyCount: history.length,
-  }), [history.length, lines]);
+    mode,
+  }), [history.length, lines, mode]);
 
   return {
     lines,
@@ -108,6 +128,11 @@ export function useTerminalState(options: UseTerminalStateOptions = {}) {
     historyPointer,
     activeEffect,
     setActiveEffect,
+    mode,
+    setMode,
+    session,
+    setSessionValue,
+    clearSessionKey,
     stateSummary,
   };
 }

@@ -47,6 +47,11 @@ export default function Terminal({ isMobile = false, className }: TerminalProps)
     history,
     setIsBusy,
     setActiveEffect,
+    mode,
+    setMode,
+    session,
+    setSessionValue,
+    clearSessionKey,
   } = useTerminalState({ initialPath: '/Desktop' });
 
   useEffect(() => {
@@ -117,6 +122,11 @@ export default function Terminal({ isMobile = false, className }: TerminalProps)
           setEffect: setActiveEffect,
           history,
           clearHistory,
+          mode,
+          setMode,
+          session,
+          setSessionValue,
+          clearSessionKey,
         },
         fileSystem,
         windows: windowManager,
@@ -158,12 +168,17 @@ export default function Terminal({ isMobile = false, className }: TerminalProps)
     fileSystem,
     history,
     isMobile,
+    mode,
     pushLines,
     promptPrefix,
+    session,
     setActiveEffect,
     setCurrentInput,
     setCurrentPath,
     setIsBusy,
+    setMode,
+    setSessionValue,
+    clearSessionKey,
     windowManager,
   ]);
 

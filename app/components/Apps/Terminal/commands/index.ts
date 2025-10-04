@@ -3,6 +3,7 @@ import { createFilesystemCommands } from './filesystem';
 import { createNavigationCommands } from './navigation';
 import { createSystemCommands } from './system';
 import { createAppCommands } from './apps';
+import { createEasterEggCommands } from './easterEggs';
 
 const registry: Command[] = [];
 
@@ -13,6 +14,7 @@ function register(commands: Command[]) {
 register(createNavigationCommands());
 register(createFilesystemCommands());
 register(createAppCommands());
+register(createEasterEggCommands());
 register(createSystemCommands(() => registry));
 
 export function getCommands(): Command[] {
