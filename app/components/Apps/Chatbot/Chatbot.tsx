@@ -268,22 +268,33 @@ Project details: ${context.projects.map(p => `${p.name}: ${p.content}`).join(' |
       >
         <div className="flex items-center gap-2">
           <div 
-            className="w-2 h-2 rounded-full" 
-            style={{ backgroundColor: MSN_COLORS.ONLINE_GREEN }}
+            className={`w-2 h-2 rounded-full transition-all ${isTyping ? 'bg-yellow-400 animate-pulse' : ''}`}
+            style={{ backgroundColor: isTyping ? '#fbbf24' : MSN_COLORS.ONLINE_GREEN }}
           />
           <span className="font-semibold text-sm">Claude Bot</span>
         </div>
         <div className="text-xs opacity-90">
-          Online - "Ask me anything! 💻"
+          {isTyping ? 'Typing...' : 'Online - "Ask me anything! 💻"'}
         </div>
       </div>
 
       {/* Chat Messages */}
       <div 
         ref={chatContainerRef}
-        className="flex-1 p-3 overflow-y-auto"
+        className="flex-1 p-3 overflow-y-auto relative"
         style={{ backgroundColor: MSN_COLORS.BACKGROUND }}
       >
+        {/* Scroll to bottom indicator */}
+        {chatContainerRef.current && 
+         chatContainerRef.current.scrollTop < chatContainerRef.current.scrollHeight - chatContainerRef.current.clientHeight - 50 && (
+          <button
+            onClick={() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })}
+            className="fixed bottom-20 right-4 bg-blue-500 text-white p-2 rounded-full shadow-lg hover:bg-blue-600 z-10"
+            style={{ position: 'absolute', bottom: '80px', right: '10px' }}
+          >
+            ↓
+          </button>
+        )}
         {messages.length === 0 && (
           <div className="text-center text-gray-500 mt-8">
             <div className="mb-4">
@@ -382,11 +393,16 @@ Project details: ${context.projects.map(p => `${p.name}: ${p.content}`).join(' |
           <button
             onClick={() => sendMessage(inputValue)}
             disabled={!inputValue.trim() || isTyping}
-            className="px-4 py-2 bg-blue-500 text-white rounded text-sm font-medium hover:bg-blue-600 disabled:opacity-50"
+            className="px-4 py-2 bg-blue-500 text-white rounded text-sm font-medium hover:bg-blue-600 disabled:opacity-50 transition-colors"
             style={{ backgroundColor: MSN_COLORS.HEADER_GRADIENT_END }}
           >
             Send
           </button>
+        </div>
+
+        {/* Character counter */}
+        <div className="text-xs text-gray-400 mb-2 text-right">
+          {inputValue.length}/500
         </div>
 
         {/* Action Buttons */}
@@ -394,29 +410,38 @@ Project details: ${context.projects.map(p => `${p.name}: ${p.content}`).join(' |
           <button
             onClick={sendNudge}
             disabled={isTyping}
-            className="px-3 py-1 bg-yellow-400 text-black rounded hover:bg-yellow-500 disabled:opacity-50"
-            title="Send a nudge!"
+            className="px-3 py-1 bg-yellow-400 text-black rounded hover:bg-yellow-500 disabled:opacity-50 transition-colors"
+            title="Send a nudge! (shakes the window)"
           >
             🔔 Nudge
           </button>
           <button
             onClick={sendWink}
             disabled={isTyping}
-            className="px-3 py-1 bg-gray-200 text-black rounded hover:bg-gray-300 disabled:opacity-50"
+            className="px-3 py-1 bg-gray-200 text-black rounded hover:bg-gray-300 disabled:opacity-50 transition-colors"
           >
             😉 Wink
           </button>
           <button
             onClick={clearChat}
-            className="px-3 py-1 bg-red-200 text-red-800 rounded hover:bg-red-300"
+            className="px-3 py-1 bg-red-200 text-red-800 rounded hover:bg-red-300 transition-colors"
           >
             🗑️ Clear
           </button>
           <button
             onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-            className="px-3 py-1 bg-gray-200 text-black rounded hover:bg-gray-300"
+            className="px-3 py-1 bg-gray-200 text-black rounded hover:bg-gray-300 transition-colors"
           >
             😊
+          </button>
+          <button
+            onClick={() => addMessage({ 
+              role: 'system', 
+              content: '💬 MSN Messenger Clone v1.0 - Built with Next.js & Groq AI - Features authentic Windows 3.1 styling, real-time chat, NUDGE window shaking, emoticon parsing, and portfolio context awareness!' 
+            })}
+            className="px-3 py-1 bg-blue-200 text-blue-800 rounded hover:bg-blue-300 transition-colors text-xs"
+          >
+            ℹ️ About
           </button>
         </div>
 
