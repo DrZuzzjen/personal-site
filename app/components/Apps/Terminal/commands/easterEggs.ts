@@ -308,5 +308,21 @@ export function createEasterEggCommands(): Command[] {
     }),
   };
 
-  return [hack, matrix, cowsay, fortune, sudo, konami, rickroll];
+  const vibe: Command = {
+    name: 'vibe',
+    description: 'Summon a synthwave vibe check',
+    usage: 'vibe',
+    category: 'fun',
+    hidden: true,
+    execute: () => ({
+      lines: [
+        { text: '+----------------------------+' },
+        { text: '¦  Neon grids engaged.        ¦' },
+        { text: '¦  Synthwave levels: MAX.     ¦' },
+        { text: '¦  Enjoy the retro vibes! ??? ¦' },
+        { text: '+----------------------------+' },
+      ],
+    }),
+  };
+\n  return [hack, matrix, cowsay, fortune, sudo, konami, rickroll, vibe];
 }

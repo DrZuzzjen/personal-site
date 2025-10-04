@@ -20,6 +20,8 @@ const SECRET_COMMANDS = [
   'sudo rm -rf /',
   'sudo make me a sandwich',
   'konami',
+  'rickroll',
+  'vibe',
 ];
 
 function formatHistoryLine(index: number, value: string) {
