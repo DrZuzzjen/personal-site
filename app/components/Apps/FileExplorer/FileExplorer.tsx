@@ -145,7 +145,7 @@ export default function FileExplorer() {
             }
             setCurrentPath(parentPath);
           }}
-          disabled={!currentPath}
+          disabled={!parentPath}
           style={{
             minWidth: 32,
             height: 24,
@@ -155,7 +155,7 @@ export default function FileExplorer() {
             borderRight: '2px solid ' + COLORS.BORDER_DARK,
             backgroundColor: COLORS.WIN_GRAY,
             color: COLORS.TEXT_BLACK,
-            cursor: currentPath ? 'pointer' : 'default',
+            cursor: parentPath ? 'pointer' : 'default',
           }}
           aria-label="Go up one level"
         >
