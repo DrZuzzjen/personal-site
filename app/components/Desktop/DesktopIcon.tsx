@@ -18,19 +18,38 @@ export default function DesktopIcon({ icon }: DesktopIconProps) {
   const {
     selectIcon,
     getItemByPath,
-    updateIconPosition
+    updateIconPosition,
+    rootItems
   } = useFileSystemContext();
   
   const { openWindow } = useWindowContext();
   
   // Get the file system item data for this icon
-  const fileSystemItem: FileSystemItem | null = getItemByPath(`/Desktop/${icon.fileSystemId}`);
+  // First try direct ID match, then path-based search
+  const fileSystemItem: FileSystemItem | null = 
+    rootItems.find((item: FileSystemItem) => item.id === icon.fileSystemId) ||
+    getItemByPath(`/Desktop/${icon.fileSystemId}`) ||
+    getItemByPath(`/${icon.fileSystemId}`) ||
+    null;
+  
+  // Convert grid position to pixel position
+  const pixelPosition = {
+    x: icon.position.x * DESKTOP_GRID.ICON_WIDTH,
+    y: icon.position.y * DESKTOP_GRID.ICON_HEIGHT,
+  };
   
   // Use the drag hook for icon repositioning
   const { isDragging, handleMouseDown } = useIconDrag({
     iconId: icon.id,
-    currentPosition: icon.position,
-    onPositionChange: updateIconPosition,
+    currentPosition: pixelPosition,
+    onPositionChange: (iconId: string, newPixelPos: { x: number; y: number }) => {
+      // Convert pixel position back to grid position for storage
+      const gridPos = {
+        x: Math.round(newPixelPos.x / DESKTOP_GRID.ICON_WIDTH),
+        y: Math.round(newPixelPos.y / DESKTOP_GRID.ICON_HEIGHT),
+      };
+      updateIconPosition(iconId, gridPos);
+    },
   });
 
   if (!fileSystemItem) {
@@ -110,8 +129,8 @@ export default function DesktopIcon({ icon }: DesktopIconProps) {
       onMouseDown={handleMouseDown}
       style={{
         position: 'absolute',
-        left: icon.position.x,
-        top: icon.position.y,
+        left: pixelPosition.x,
+        top: pixelPosition.y,
         width: DESKTOP_GRID.ICON_WIDTH,
         height: DESKTOP_GRID.ICON_HEIGHT,
         display: 'flex',
