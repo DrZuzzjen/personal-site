@@ -340,7 +340,7 @@ function renderWindowContent(
 			return <TV />;
 		}
 		case 'chatbot': {
-			return <Chatbot windowRef={undefined} />;
+			return <Chatbot />;
 		}
 		default:
 			return (

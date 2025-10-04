@@ -1,3 +1,5 @@
+import type { FileSystemContext, WindowManagerContext } from '@/app/lib/types';
+
 export type TerminalLineType = 'input' | 'output' | 'error' | 'system' | 'success' | 'warning';
 
 export interface TerminalLine {
@@ -19,26 +21,50 @@ export interface TerminalHistoryState {
 
 export interface ParsedCommand {
   input: string;
+  tokens: string[];
   command: string;
   args: string[];
   flags: Record<string, string | boolean>;
+  isEmpty: boolean;
 }
 
 export type TerminalEffect = 'hack' | 'matrix' | 'bsod' | 'boot' | null;
 
+export interface TerminalLineInput {
+  text: string;
+  type?: TerminalLineType;
+}
+
 export interface CommandResult {
-  lines?: Array<{ text: string; type?: TerminalLineType }>;
+  lines?: TerminalLineInput[];
   error?: string;
   clear?: boolean;
   effect?: TerminalEffect;
-  prompt?: string;
 }
 
-export interface TerminalExecutionContext {
+export interface TerminalRuntime {
   currentPath: string;
   setCurrentPath: (path: string) => void;
-  appendLine: (line: { text: string; type?: TerminalLineType }) => void;
-  pushLines: (lines: Array<{ text: string; type?: TerminalLineType }>) => void;
-  setBusy: (busy: boolean) => void;
   isMobile: boolean;
+  print: (line: TerminalLineInput) => void;
+  printLines: (lines: TerminalLineInput[]) => void;
+  clear: () => void;
+  setEffect: (effect: TerminalEffect | null) => void;
+}
+
+export interface CommandContext {
+  parsed: ParsedCommand;
+  runtime: TerminalRuntime;
+  fileSystem: FileSystemContext;
+  windows: WindowManagerContext | null;
+}
+
+export interface Command {
+  name: string;
+  aliases?: string[];
+  description: string;
+  usage: string;
+  category: 'navigation' | 'filesystem' | 'system' | 'fun' | 'hidden' | string;
+  hidden?: boolean;
+  execute: (context: CommandContext) => Promise<CommandResult | void> | CommandResult | void;
 }

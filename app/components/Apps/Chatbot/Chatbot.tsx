@@ -40,7 +40,7 @@ interface Message {
 }
 
 interface ChatbotProps {
-  windowRef?: React.RefObject<HTMLDivElement>;
+  // No props needed for now
 }
 
 const parseEmoticons = (text: string): string => {
@@ -73,7 +73,7 @@ const playSound = (soundKey: keyof typeof MSN_SOUNDS) => {
   }
 };
 
-export default function Chatbot({ windowRef }: ChatbotProps) {
+export default function Chatbot({}: ChatbotProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -203,9 +203,14 @@ Project details: ${context.projects.map(p => `${p.name}: ${p.content}`).join(' |
 
   // NUDGE Feature - The star of the show!
   const sendNudge = () => {
-    if (!windowRef?.current) return;
+    // Find the window element by traversing up the DOM
+    let windowElement: HTMLElement | null = chatContainerRef.current;
+    while (windowElement && !windowElement.style.position?.includes('absolute')) {
+      windowElement = windowElement.parentElement;
+    }
+    
+    if (!windowElement) return;
 
-    const windowElement = windowRef.current;
     const originalTransform = windowElement.style.transform;
 
     // Shake sequence - make it REALLY shake!
@@ -223,9 +228,11 @@ Project details: ${context.projects.map(p => `${p.name}: ${p.content}`).join(' |
 
     shakes.forEach((transform, i) => {
       setTimeout(() => {
-        windowElement.style.transform = transform;
-        if (i === shakes.length - 1) {
-          windowElement.style.transform = originalTransform;
+        if (windowElement) {
+          windowElement.style.transform = transform;
+          if (i === shakes.length - 1) {
+            windowElement.style.transform = originalTransform;
+          }
         }
       }, i * 80);
     });
