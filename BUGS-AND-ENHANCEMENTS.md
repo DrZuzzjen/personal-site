@@ -106,6 +106,74 @@
 **Features**: Arrow key controls, score tracking, high scores (localStorage)
 **Visual**: Nokia green or MS-DOS colors, grid layout
 **Priority**: HIGH - Codex currently building
+**Status**: 🚧 Active mission on develop branch
+
+---
+
+### 🖥️ Terminal App (PLANNED - Ultra Deep Think)
+**Description**: MS-DOS Command Prompt with functional commands + hidden games
+**Features**:
+- Virtual file system commands (cd, dir, type, mkdir, etc.)
+- Hidden easter eggs and games (text adventure? ASCII Snake? hack simulator?)
+- Classic terminal aesthetic (green/amber/white phosphor text)
+- Command history (up/down arrows)
+- Integration with existing file system
+
+**Technical Challenges**:
+- Command parser and interpreter
+- Game state management (if text adventure)
+- Keyboard event handling
+- ASCII art rendering
+
+**Easter Egg Ideas**:
+- Text adventure game (portfolio-themed Zork)
+- `hack` - fake hacking simulator
+- `cowsay`, `fortune`, `matrix` - classic Unix fun
+- `sudo rm -rf /` - funny error message
+
+**Questions to Answer** (see `.missions/FUTURE-APPS-PLANNING.md`):
+- Which hidden game(s)?
+- Commands functional or cosmetic?
+- Default terminal color?
+- Easter egg density?
+
+**Priority**: HIGH - Next after Snake/Desktop features
+**Status**: 📋 Planning phase - needs user input
+
+---
+
+### 💬 Chatbot App (PLANNED - Ultra Deep Think)
+**Description**: MSN Messenger clone with AI chatbot (Groq API)
+**Features**:
+- Classic MSN Messenger UI (circa 2003-2005)
+- Real-time AI chat via Groq API
+- MSN features: Nudge (shake window!), emoticons, typing indicator
+- Chat history persistence
+- Sound effects (message ding, nudge buzz)
+- Personal message/status
+
+**Technical Challenges**:
+- Groq API integration (streaming responses)
+- Server-side API route (hide API key)
+- Rate limiting strategy
+- MSN-accurate UI/UX
+- Sound effect integration
+
+**Bot Personality Options**:
+- Portfolio Q&A assistant
+- Conversational friend (early 2000s vibe)
+- Multiple bot "contacts" with different personalities
+
+**Questions to Answer** (see `.missions/FUTURE-APPS-PLANNING.md`):
+- API key handling (env var vs user-provided)?
+- Bot personality/scope?
+- Chat history persistence?
+- Integration with file system/apps?
+
+**Priority**: HIGH - After Terminal (or flip order?)
+**Status**: 📋 Planning phase - needs user input
+
+---
 
 ### Sound System
 **Feature**: Windows error beep, startup sound
