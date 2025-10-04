@@ -97,16 +97,16 @@ const toolButtonStyle = (active: boolean): CSSProperties => ({
 	backgroundColor: COLORS.WIN_GRAY,
 	color: COLORS.TEXT_BLACK,
 	// Windows 3.1 button effect - sunken when selected, raised when not
-	borderTop: active 
-		? `2px solid ${COLORS.BORDER_SHADOW}`     // SUNKEN
-		: `2px solid ${COLORS.BORDER_LIGHT}`,    // RAISED
-	borderLeft: active 
+	borderTop: active
+		? `2px solid ${COLORS.BORDER_SHADOW}` // SUNKEN
+		: `2px solid ${COLORS.BORDER_LIGHT}`, // RAISED
+	borderLeft: active
 		? `2px solid ${COLORS.BORDER_DARK}`
 		: `2px solid ${COLORS.BORDER_HIGHLIGHT}`,
-	borderBottom: active 
+	borderBottom: active
 		? `2px solid ${COLORS.BORDER_LIGHT}`
 		: `2px solid ${COLORS.BORDER_SHADOW}`,
-	borderRight: active 
+	borderRight: active
 		? `2px solid ${COLORS.BORDER_HIGHLIGHT}`
 		: `2px solid ${COLORS.BORDER_DARK}`,
 	cursor: 'pointer',
@@ -116,7 +116,10 @@ const toolButtonStyle = (active: boolean): CSSProperties => ({
 });
 
 // Brush size buttons with visual preview
-const brushSizeButtonStyle = (size: number, active: boolean): CSSProperties => ({
+const brushSizeButtonStyle = (
+	size: number,
+	active: boolean
+): CSSProperties => ({
 	width: '100%',
 	height: 36,
 	display: 'flex',
@@ -126,7 +129,7 @@ const brushSizeButtonStyle = (size: number, active: boolean): CSSProperties => (
 	fontSize: 11,
 	backgroundColor: active ? COLORS.WIN_BLUE : COLORS.WIN_GRAY,
 	color: active ? COLORS.WIN_WHITE : COLORS.TEXT_BLACK,
-	border: active 
+	border: active
 		? `2px solid ${COLORS.BORDER_DARK}`
 		: `1px solid ${COLORS.BORDER_SHADOW}`,
 	cursor: 'pointer',
@@ -146,8 +149,8 @@ const colorSwatchStyle = (color: string, active: boolean): CSSProperties => ({
 	width: 28,
 	height: 28,
 	backgroundColor: color,
-	border: active 
-		? `3px solid ${COLORS.WIN_BLUE}` 
+	border: active
+		? `3px solid ${COLORS.WIN_BLUE}`
 		: `2px solid ${COLORS.BORDER_DARK}`,
 	cursor: 'pointer',
 	borderRadius: 2,
@@ -209,11 +212,13 @@ export default function Paint({
 	const effectiveBackground = backgroundColor ?? COLORS.WIN_WHITE;
 	const colors = useMemo(
 		() => (palette.length > 0 ? palette : DEFAULT_PALETTE),
-		[palette],
+		[palette]
 	);
 
 	const [currentColor, setCurrentColor] = useState(colors[0] ?? '#000000');
-	const [brushSizeState, setBrushSizeState] = useState(Math.max(1, Math.floor(brushSize)));
+	const [brushSizeState, setBrushSizeState] = useState(
+		Math.max(1, Math.floor(brushSize))
+	);
 	const [tool, setTool] = useState<Tool>('brush');
 	const [zoom, setZoom] = useState(1); // 1 = 100%, 0.5 = 50%, 2 = 200%
 
@@ -223,7 +228,9 @@ export default function Paint({
 	const lastPointRef = useRef<Point | null>(null);
 
 	useEffect(() => {
-		setCurrentColor((previous) => (colors.includes(previous) ? previous : colors[0] ?? '#000000'));
+		setCurrentColor((previous) =>
+			colors.includes(previous) ? previous : colors[0] ?? '#000000'
+		);
 	}, [colors]);
 
 	useEffect(() => {
@@ -255,7 +262,9 @@ export default function Paint({
 		lastPointRef.current = null;
 	}, [width, height, effectiveBackground]);
 
-	const toCanvasPoint = (event: React.PointerEvent<HTMLCanvasElement>): Point | null => {
+	const toCanvasPoint = (
+		event: React.PointerEvent<HTMLCanvasElement>
+	): Point | null => {
 		const canvas = canvasRef.current;
 		if (!canvas) {
 			return null;
@@ -356,14 +365,14 @@ export default function Paint({
 				<div>
 					<div style={sectionHeaderStyle}>TOOLS</div>
 					<button
-						type="button"
+						type='button'
 						onClick={() => setTool('brush')}
 						style={toolButtonStyle(tool === 'brush')}
 					>
 						🖌️ Brush
 					</button>
 					<button
-						type="button"
+						type='button'
 						onClick={() => setTool('eraser')}
 						style={toolButtonStyle(tool === 'eraser')}
 					>
@@ -377,7 +386,7 @@ export default function Paint({
 					{brushSizes.map((size) => (
 						<button
 							key={size}
-							type="button"
+							type='button'
 							onClick={() => setBrushSizeState(size)}
 							style={brushSizeButtonStyle(size, brushSizeState === size)}
 						>
@@ -401,12 +410,15 @@ export default function Paint({
 						{colors.map((color) => (
 							<button
 								key={color}
-								type="button"
+								type='button'
 								onClick={() => {
 									setCurrentColor(color);
 									setTool('brush');
 								}}
-								style={colorSwatchStyle(color, tool === 'brush' && currentColor === color)}
+								style={colorSwatchStyle(
+									color,
+									tool === 'brush' && currentColor === color
+								)}
 								aria-label={`Select color ${color}`}
 								title={color}
 							/>
@@ -421,8 +433,8 @@ export default function Paint({
 						<div style={sectionHeaderStyle}>ZOOM</div>
 						<div style={zoomControlsStyle}>
 							<button
-								type="button"
-								onClick={() => setZoom(z => Math.max(0.25, z - 0.25))}
+								type='button'
+								onClick={() => setZoom((z) => Math.max(0.25, z - 0.25))}
 								style={zoomButtonStyle}
 								disabled={zoom <= 0.25}
 							>
@@ -432,8 +444,8 @@ export default function Paint({
 								{Math.round(zoom * 100)}%
 							</span>
 							<button
-								type="button"
-								onClick={() => setZoom(z => Math.min(4, z + 0.25))}
+								type='button'
+								onClick={() => setZoom((z) => Math.min(4, z + 0.25))}
 								style={zoomButtonStyle}
 								disabled={zoom >= 4}
 							>
@@ -442,15 +454,11 @@ export default function Paint({
 						</div>
 					</div>
 
-					<button
-						type="button"
-						onClick={handleClear}
-						style={actionButtonStyle}
-					>
+					<button type='button' onClick={handleClear} style={actionButtonStyle}>
 						Clear Canvas
 					</button>
 					<button
-						type="button"
+						type='button'
 						onClick={handleDownload}
 						style={actionButtonStyle}
 					>
@@ -462,7 +470,9 @@ export default function Paint({
 			{/* Main Canvas Area */}
 			<div style={canvasAreaStyle}>
 				<div style={canvasSectionStyle}>
-					<div style={{ transform: `scale(${zoom})`, transformOrigin: 'center' }}>
+					<div
+						style={{ transform: `scale(${zoom})`, transformOrigin: 'center' }}
+					>
 						<canvas
 							ref={canvasRef}
 							onPointerDown={handlePointerDown}
@@ -497,17 +507,19 @@ export default function Paint({
 							style={{
 								width: 16,
 								height: 16,
-								backgroundColor: tool === 'eraser' ? effectiveBackground : currentColor,
+								backgroundColor:
+									tool === 'eraser' ? effectiveBackground : currentColor,
 								border: `1px solid ${COLORS.BORDER_DARK}`,
 								borderRadius: 2,
 							}}
 						/>
 						{tool === 'eraser' ? 'Background' : currentColor}
 					</span>
-					<span>Canvas: {width} × {height}</span>
+					<span>
+						Canvas: {width} × {height}
+					</span>
 				</div>
 			</div>
 		</div>
 	);
 }
-
