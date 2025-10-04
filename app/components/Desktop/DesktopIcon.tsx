@@ -11,6 +11,7 @@ import type {
 	NotepadWindowContent,
 	MinesweeperWindowContent,
 	PaintWindowContent,
+	CameraWindowContent,
 	WindowContent,
 } from '@/app/lib/types';
 
@@ -21,7 +22,7 @@ interface DesktopIconProps {
 
 interface LaunchConfig {
 	title: string;
-	appType: 'notepad' | 'paint' | 'minesweeper' | 'explorer';
+	appType: 'notepad' | 'paint' | 'minesweeper' | 'explorer' | 'camera';
 	position: { x: number; y: number };
 	size: { width: number; height: number };
 	icon?: string;
@@ -32,6 +33,7 @@ const DEFAULT_LAUNCH_POSITION = { x: 140, y: 110 };
 const NOTEPAD_WINDOW_SIZE = { width: 520, height: 380 };
 const MINESWEEPER_WINDOW_SIZE = { width: 360, height: 440 };
 const PAINT_WINDOW_SIZE = { width: 800, height: 600 }; // Compact but roomy for new sidebar layout
+const CAMERA_WINDOW_SIZE = { width: 720, height: 580 }; // Good size for camera interface
 const PAINT_PALETTE = [
 	'#000000',
 	'#FFFFFF',
@@ -116,6 +118,23 @@ function createMinesweeperLaunch(): LaunchConfig {
 	};
 }
 
+function createCameraLaunch(): LaunchConfig {
+	const content: CameraWindowContent = {
+		isActive: false,
+		hasPermission: false,
+		error: null,
+	};
+
+	return {
+		title: 'Camera',
+		appType: 'camera',
+		position: { x: 160, y: 80 },
+		size: CAMERA_WINDOW_SIZE,
+		icon: '📹',
+		content,
+	};
+}
+
 function getLaunchConfigForFile(item: FileSystemItem): LaunchConfig | null {
 	if (item.extension === 'txt') {
 		return createNotepadLaunch(item);
@@ -136,6 +155,10 @@ function getLaunchConfigForFile(item: FileSystemItem): LaunchConfig | null {
 			return createNotepadLaunch(item, {
 				body: 'Welcome to Notepad!\n\nThis is a simple text editor application.',
 			});
+		}
+
+		if (exeName.includes('camera')) {
+			return createCameraLaunch();
 		}
 
 		return createUnsupportedFileLaunch(

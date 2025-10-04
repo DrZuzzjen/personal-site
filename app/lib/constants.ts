@@ -320,6 +320,18 @@ export const APP_EXECUTABLES: FileSystemItem[] = [
     createdAt: Date.now(),
     modifiedAt: Date.now(),
   },
+  {
+    id: 'camera-exe',
+    name: 'Camera.exe',
+    type: 'file',
+    extension: 'exe',
+    path: '/Desktop/Camera.exe',
+    isProtected: true,
+    isSystem: true,
+    icon: 'camera',
+    createdAt: Date.now(),
+    modifiedAt: Date.now(),
+  },
 ];
 
 // Desktop icons for executables
@@ -340,6 +352,12 @@ export const APP_DESKTOP_ICONS: DesktopIcon[] = [
     id: 'desktop-icon-notepad',
     fileSystemId: 'notepad-exe',
     position: { x: 0, y: 4 },
+    isSelected: false,
+  },
+  {
+    id: 'desktop-icon-camera',
+    fileSystemId: 'camera-exe',
+    position: { x: 0, y: 5 },
     isSelected: false,
   },
 ];

@@ -2,7 +2,7 @@
 // WINDOW SYSTEM TYPES
 // ============================================
 
-export type AppType = 'notepad' | 'paint' | 'minesweeper' | 'mycomputer' | 'explorer';
+export type AppType = 'notepad' | 'paint' | 'minesweeper' | 'mycomputer' | 'explorer' | 'camera';
 
 export interface WindowPosition {
   x: number;
@@ -117,11 +117,19 @@ export interface ExplorerWindowContent {
   folderPath?: string | null;
 }
 
+// Camera App
+export interface CameraWindowContent {
+  isActive?: boolean;
+  hasPermission?: boolean;
+  error?: string | null;
+}
+
 export type WindowContent =
   | NotepadWindowContent
   | PaintWindowContent
   | MinesweeperWindowContent
   | ExplorerWindowContent
+  | CameraWindowContent
   | string
   | null
   | undefined;
