@@ -1,6 +1,7 @@
 'use client';
 
 import { COLORS } from '@/app/lib/constants';
+import { useFileSystemContext } from '@/app/lib/FileSystemContext';
 import StartMenuItem from './StartMenuItem';
 import type { SubmenuProps } from './types';
 
@@ -10,11 +11,18 @@ export default function Submenu({
 	onShowSettings,
 	onClose,
 }: SubmenuProps) {
+	const { getItemByPath } = useFileSystemContext();
+
 	const handleItemClick = (action: () => void) => {
 		action();
 		onClose();
 	};
 
+	// Helper function to get current file content from file system
+	const getFileContent = (filePath: string): string => {
+		const file = getItemByPath(filePath);
+		return file && file.type === 'file' ? file.content || '' : '';
+	};
 	const renderProgramsSubmenu = () => (
 		<>
 			<StartMenuItem
@@ -87,23 +95,15 @@ export default function Submenu({
 				hasArrow={false}
 				onHover={() => {}}
 				onClick={() =>
-					handleItemClick(() =>
-						onLaunchApp('notepad', { 
+					handleItemClick(() => {
+						const filePath = '/My Computer/My Documents/Project_1.txt';
+						const currentContent = getFileContent(filePath);
+						onLaunchApp('notepad', {
 							fileName: 'Project_1.txt',
-							filePath: '/My Computer/My Documents/Project_1.txt',
-							content: `Project Name: [Your Project]
-Tech Stack: Next.js, TypeScript, Tailwind
-GitHub: [repo-url]
-
-Description:
-[Your project description here]
-
-Key Features:
-- Feature 1
-- Feature 2
-- Feature 3`
-						})
-					)
+							filePath: filePath,
+							content: currentContent,
+						});
+					})
 				}
 			/>
 			<StartMenuItem
@@ -112,13 +112,15 @@ Key Features:
 				hasArrow={false}
 				onHover={() => {}}
 				onClick={() =>
-					handleItemClick(() =>
-						onLaunchApp('notepad', { 
+					handleItemClick(() => {
+						const filePath = '/My Computer/My Documents/Project_2.txt';
+						const currentContent = getFileContent(filePath);
+						onLaunchApp('notepad', {
 							fileName: 'Project_2.txt',
-							filePath: '/My Computer/My Documents/Project_2.txt',
-							content: 'Project 2 details... (to be filled in Phase 6)'
-						})
-					)
+							filePath: filePath,
+							content: currentContent,
+						});
+					})
 				}
 			/>
 			<StartMenuItem
@@ -127,13 +129,15 @@ Key Features:
 				hasArrow={false}
 				onHover={() => {}}
 				onClick={() =>
-					handleItemClick(() =>
-						onLaunchApp('notepad', { 
+					handleItemClick(() => {
+						const filePath = '/My Computer/My Documents/Project_3.txt';
+						const currentContent = getFileContent(filePath);
+						onLaunchApp('notepad', {
 							fileName: 'Project_3.txt',
-							filePath: '/My Computer/My Documents/Project_3.txt',
-							content: 'Project 3 details... (to be filled in Phase 6)'
-						})
-					)
+							filePath: filePath,
+							content: currentContent,
+						});
+					})
 				}
 			/>
 			<StartMenuItem
@@ -142,13 +146,15 @@ Key Features:
 				hasArrow={false}
 				onHover={() => {}}
 				onClick={() =>
-					handleItemClick(() =>
-						onLaunchApp('notepad', { 
+					handleItemClick(() => {
+						const filePath = '/My Computer/My Documents/Project_4.txt';
+						const currentContent = getFileContent(filePath);
+						onLaunchApp('notepad', {
 							fileName: 'Project_4.txt',
-							filePath: '/My Computer/My Documents/Project_4.txt',
-							content: 'Project 4 details... (to be filled in Phase 6)'
-						})
-					)
+							filePath: filePath,
+							content: currentContent,
+						});
+					})
 				}
 			/>
 			<StartMenuItem
@@ -157,13 +163,15 @@ Key Features:
 				hasArrow={false}
 				onHover={() => {}}
 				onClick={() =>
-					handleItemClick(() =>
-						onLaunchApp('notepad', { 
+					handleItemClick(() => {
+						const filePath = '/My Computer/My Documents/Project_5.txt';
+						const currentContent = getFileContent(filePath);
+						onLaunchApp('notepad', {
 							fileName: 'Project_5.txt',
-							filePath: '/My Computer/My Documents/Project_5.txt',
-							content: 'Project 5 details... (to be filled in Phase 6)'
-						})
-					)
+							filePath: filePath,
+							content: currentContent,
+						});
+					})
 				}
 			/>
 			<div
@@ -179,14 +187,18 @@ Key Features:
 				hasArrow={false}
 				onHover={() => {}}
 				onClick={() =>
-					handleItemClick(() =>
+					handleItemClick(() => {
+						const filePath = '/My Computer/My Documents/About.txt';
+						const currentContent =
+							getFileContent(filePath) ||
+							'Windows 3.1 Portfolio Prototype\n\nBuilt with Next.js and TypeScript\nMade by Steve (AI Assistant)\n\nFeatures:\n- Window Management\n- File System\n- Classic Applications\n- Boot Sequence\n- Easter Eggs';
 						onLaunchApp('notepad', {
 							fileName: 'About.txt',
-							filePath: '/My Computer/My Documents/About.txt',
-							content: 'Windows 3.1 Portfolio Prototype\n\nBuilt with Next.js and TypeScript\nMade by Steve (AI Assistant)\n\nFeatures:\n- Window Management\n- File System\n- Classic Applications\n- Boot Sequence\n- Easter Eggs',
+							filePath: filePath,
+							content: currentContent,
 							readOnly: true,
-						})
-					)
+						});
+					})
 				}
 			/>
 		</>

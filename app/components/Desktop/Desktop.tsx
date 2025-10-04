@@ -55,16 +55,19 @@ export default function Desktop({
 	const handleNewTextFile = () => {
 		const fileName = 'New Text Document.txt';
 		const filePath = `/Desktop/${fileName}`;
-		
+
 		// Create the file on desktop with empty content
 		const newFile = createFile('/Desktop', fileName, '');
-		
+
 		if (newFile) {
 			// Open the new file in Notepad automatically
 			openWindow({
 				title: `${fileName} - Notepad`,
 				appType: 'notepad',
-				position: { x: 120 + Math.random() * 100, y: 100 + Math.random() * 100 },
+				position: {
+					x: 120 + Math.random() * 100,
+					y: 100 + Math.random() * 100,
+				},
 				size: { width: 440, height: 320 },
 				icon: 'NP',
 				content: {
@@ -75,7 +78,7 @@ export default function Desktop({
 				} as NotepadWindowContent,
 			});
 		}
-		
+
 		setContextMenu(null);
 	};
 

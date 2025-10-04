@@ -113,19 +113,27 @@ function calculateCursorPosition(text: string, offset: number) {
 	};
 }
 
-export default function Notepad({ fileName, filePath, body, readOnly, windowId }: NotepadProps) {
+export default function Notepad({
+	fileName,
+	filePath,
+	body,
+	readOnly,
+	windowId,
+}: NotepadProps) {
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 	const [isWrapped, setIsWrapped] = useState(true);
 	const [cursorPosition, setCursorPosition] = useState({ line: 1, column: 1 });
 	const [showFileMenu, setShowFileMenu] = useState(false);
-	
+
 	// State for editing
 	const [editedText, setEditedText] = useState(body);
 	const [savedText, setSavedText] = useState(body); // Track the last saved version
-	
+
 	// File system and window context
-	const { updateFileContent, createFile } = useFileSystemContext();
-	const { openWindow, updateWindowContent, updateWindowTitle } = useWindowContext();
+	const { updateFileContent, createFile, getItemByPath } =
+		useFileSystemContext();
+	const { openWindow, updateWindowContent, updateWindowTitle } =
+		useWindowContext();
 
 	const text = editedText; // Use edited text instead of original body
 	const hasChanges = editedText !== savedText; // Compare with saved text, not original body
@@ -166,7 +174,7 @@ export default function Notepad({ fileName, filePath, body, readOnly, windowId }
 		}
 
 		setCursorPosition(
-			calculateCursorPosition(element.value, element.selectionStart ?? 0),
+			calculateCursorPosition(element.value, element.selectionStart ?? 0)
 		);
 	};
 
@@ -193,13 +201,12 @@ export default function Notepad({ fileName, filePath, body, readOnly, windowId }
 		}
 
 		const success = updateFileContent(filePath, editedText);
+
 		if (success) {
 			// Update the saved text to match what we just saved
 			setSavedText(editedText);
-			console.log('File saved!');
-			// Could show a toast notification here
 		} else {
-			alert('Failed to save file');
+			alert('Failed to save file - file not found at path: ' + filePath);
 		}
 	};
 
@@ -227,10 +234,21 @@ export default function Notepad({ fileName, filePath, body, readOnly, windowId }
 
 		// Make sure it ends with .txt
 		const finalName = filename.endsWith('.txt') ? filename : filename + '.txt';
-		
-		// Create file in My Documents
-		const newFilePath = `/My Documents/${finalName}`;
-		const newFile = createFile('/My Documents', finalName, editedText);
+
+		// Create file in My Documents - use the correct path structure
+		const parentPath = '/My Computer/My Documents';
+		const newFilePath = `${parentPath}/${finalName}`;
+
+		// Check if file already exists
+		const existingFile = getItemByPath(newFilePath);
+		if (
+			existingFile &&
+			!confirm(`File ${finalName} already exists. Overwrite?`)
+		) {
+			return;
+		}
+
+		const newFile = createFile(parentPath, finalName, editedText);
 
 		if (newFile) {
 			// Update current window to point to the new file
@@ -241,16 +259,14 @@ export default function Notepad({ fileName, filePath, body, readOnly, windowId }
 					body: editedText,
 					readOnly: false,
 				} as NotepadWindowContent);
-				
+
 				updateWindowTitle(windowId, `${finalName} - Notepad`);
 			}
-			
+
 			// Update our local state
 			setSavedText(editedText);
-			
-			alert(`File saved as ${finalName}`);
 		} else {
-			alert('Failed to create file - maybe it already exists?');
+			alert('Failed to create file. Please try again.');
 		}
 	};
 
@@ -288,34 +304,64 @@ export default function Notepad({ fileName, filePath, body, readOnly, windowId }
 	return (
 		<div style={containerStyle}>
 			<div style={menuBarStyle}>
-				<span 
+				<span
 					style={menuItemStyle}
 					onClick={() => setShowFileMenu(!showFileMenu)}
 				>
 					File
 					{showFileMenu && (
 						<div style={fileMenuDropdownStyle}>
-							<div 
+							<div
 								style={fileMenuItemStyle}
-								onClick={(e) => { e.stopPropagation(); handleNew(); setShowFileMenu(false); }}
-								onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = COLORS.WIN_BLUE; e.currentTarget.style.color = COLORS.TEXT_WHITE; }}
-								onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = COLORS.TEXT_BLACK; }}
+								onClick={(e) => {
+									e.stopPropagation();
+									handleNew();
+									setShowFileMenu(false);
+								}}
+								onMouseEnter={(e) => {
+									e.currentTarget.style.backgroundColor = COLORS.WIN_BLUE;
+									e.currentTarget.style.color = COLORS.TEXT_WHITE;
+								}}
+								onMouseLeave={(e) => {
+									e.currentTarget.style.backgroundColor = 'transparent';
+									e.currentTarget.style.color = COLORS.TEXT_BLACK;
+								}}
 							>
-								New    Ctrl+N
+								New Ctrl+N
 							</div>
-							<div 
+							<div
 								style={fileMenuItemStyle}
-								onClick={(e) => { e.stopPropagation(); handleSave(); setShowFileMenu(false); }}
-								onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = COLORS.WIN_BLUE; e.currentTarget.style.color = COLORS.TEXT_WHITE; }}
-								onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = COLORS.TEXT_BLACK; }}
+								onClick={(e) => {
+									e.stopPropagation();
+									handleSave();
+									setShowFileMenu(false);
+								}}
+								onMouseEnter={(e) => {
+									e.currentTarget.style.backgroundColor = COLORS.WIN_BLUE;
+									e.currentTarget.style.color = COLORS.TEXT_WHITE;
+								}}
+								onMouseLeave={(e) => {
+									e.currentTarget.style.backgroundColor = 'transparent';
+									e.currentTarget.style.color = COLORS.TEXT_BLACK;
+								}}
 							>
-								Save   Ctrl+S
+								Save Ctrl+S
 							</div>
-							<div 
+							<div
 								style={fileMenuItemStyle}
-								onClick={(e) => { e.stopPropagation(); handleSaveAs(); setShowFileMenu(false); }}
-								onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = COLORS.WIN_BLUE; e.currentTarget.style.color = COLORS.TEXT_WHITE; }}
-								onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = COLORS.TEXT_BLACK; }}
+								onClick={(e) => {
+									e.stopPropagation();
+									handleSaveAs();
+									setShowFileMenu(false);
+								}}
+								onMouseEnter={(e) => {
+									e.currentTarget.style.backgroundColor = COLORS.WIN_BLUE;
+									e.currentTarget.style.color = COLORS.TEXT_WHITE;
+								}}
+								onMouseLeave={(e) => {
+									e.currentTarget.style.backgroundColor = 'transparent';
+									e.currentTarget.style.color = COLORS.TEXT_BLACK;
+								}}
 							>
 								Save As...
 							</div>
@@ -364,7 +410,7 @@ export default function Notepad({ fileName, filePath, body, readOnly, windowId }
 					overflowX: isWrapped ? 'hidden' : 'auto',
 					overflowY: 'auto',
 				}}
-				aria-label="Notepad text viewer"
+				aria-label='Notepad text viewer'
 			/>
 
 			<div style={statusBarStyle}>
@@ -377,15 +423,11 @@ export default function Notepad({ fileName, filePath, body, readOnly, windowId }
 					<span>{wordCount} words</span>
 				</div>
 				<div style={statusGroupStyle}>
-					<button
-						type="button"
-						onClick={handleNew}
-						style={statusButtonStyle}
-					>
+					<button type='button' onClick={handleNew} style={statusButtonStyle}>
 						New
 					</button>
 					<button
-						type="button"
+						type='button'
 						onClick={handleSave}
 						disabled={!hasChanges || !filePath}
 						style={{
@@ -397,23 +439,24 @@ export default function Notepad({ fileName, filePath, body, readOnly, windowId }
 						Save
 					</button>
 					<button
-						type="button"
+						type='button'
 						onClick={handleSaveAs}
 						style={statusButtonStyle}
 					>
 						Save As
 					</button>
 					<button
-						type="button"
+						type='button'
 						onClick={handleToggleWrap}
 						style={statusButtonStyle}
 					>
 						Word Wrap: {isWrapped ? 'On' : 'Off'}
 					</button>
-					<span>{isReadOnly ? 'Read-only' : hasChanges ? 'Modified' : 'Saved'}</span>
+					<span>
+						{isReadOnly ? 'Read-only' : hasChanges ? 'Modified' : 'Saved'}
+					</span>
 				</div>
 			</div>
 		</div>
 	);
 }
-
