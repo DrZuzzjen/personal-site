@@ -87,19 +87,29 @@
 
 ---
 
-## 📋 Future Ideas
+## 📋 New Apps to Build
 
-### Camera App
+### Camera App 📹
 **Description**: Access user's webcam/mic and show in retro CRT-style frame
 **Tech**: `navigator.mediaDevices.getUserMedia()`
-**UI**: Old webcam aesthetic with scan lines
-**Priority**: Bonus/v2
+**UI Features**:
+- Old webcam aesthetic with scan lines
+- CRT monitor frame
+- Show live video feed
+- Mic level indicator
+- Record/snapshot buttons (optional)
+**Priority**: HIGH - User requested
 
-### Video Playlist (Retro TV)
+### Video Playlist (Retro TV) 📺
 **Description**: YouTube playlist embedded in old TV frame
-**UI**: Wooden TV borders, antenna, dials
-**Features**: Channel switching between videos
-**Priority**: Bonus/v2
+**Tech**: YouTube iframe embed API
+**UI Features**:
+- Wooden TV borders, rabbit ear antenna
+- Channel knobs/dials
+- Channel switching between playlist videos
+- Static/noise effect between channels (optional)
+- Volume control
+**Priority**: HIGH - User requested
 
 ### Sound System
 **Feature**: Windows error beep, startup sound
