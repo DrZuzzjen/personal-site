@@ -1,6 +1,6 @@
 'use client';
 import { useState, useCallback } from 'react';
-import type { FileSystemItem, DesktopIcon } from '../lib/types';
+import type { FileSystemItem, DesktopIcon, FileExtension } from '../lib/types';
 import { INITIAL_FILE_SYSTEM, INITIAL_DESKTOP_ICONS, APP_EXECUTABLES, APP_DESKTOP_ICONS } from '../lib/constants';
 
 export function useFileSystem() {
@@ -38,7 +38,7 @@ export function useFileSystem() {
       id: `file-${Date.now()}`,
       name,
       type: 'file',
-      extension: name.split('.').pop() as any || null,
+      extension: (name.split('.').pop() as FileExtension) || null,
       path: `${parentPath}/${name}`,
       content,
       isProtected: false,
@@ -124,7 +124,8 @@ export function useFileSystem() {
   }, [getItemByPath]);
 
   // Move an item (simple version - Phase 7 feature)
-  const moveItem = useCallback((fromPath: string, toPath: string): boolean => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const moveItem = useCallback((_fromPath: string, _toPath: string): boolean => {
     // TODO: Implement in Phase 7 if needed
     console.warn('moveItem not yet implemented');
     return false;

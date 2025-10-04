@@ -24,7 +24,7 @@ export interface Window {
   isMinimized: boolean;
   isMaximized: boolean;
   icon?: string;
-  content?: any; // App-specific content (file data, paint canvas state, etc.)
+  content?: unknown; // App-specific content (file data, paint canvas state, etc.)
 }
 
 // ============================================
@@ -99,7 +99,7 @@ export interface WindowManagerContext {
   focusWindow: (id: string) => void;
   updateWindowPosition: (id: string, position: WindowPosition) => void;
   updateWindowSize: (id: string, size: WindowSize) => void;
-  updateWindowContent: (id: string, content: any) => void;
+  updateWindowContent: (id: string, content: unknown) => void;
 }
 
 export interface FileSystemContext {
