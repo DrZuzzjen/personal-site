@@ -2,6 +2,8 @@
 
 A fully functional Windows 3.1 operating system simulation built as a portfolio website. Not just a theme - a complete OS experience with draggable windows, a file system, MS Paint, Minesweeper, and more.
 
+**🚀 Live Demo**: [https://web-b3nosxc4i-drzuzzjens-projects.vercel.app](https://web-b3nosxc4i-drzuzzjens-projects.vercel.app)
+
 ## 🎯 Concept
 
 Instead of a traditional portfolio site, this project simulates a complete Windows 3.1 desktop environment where:
@@ -17,12 +19,16 @@ Instead of a traditional portfolio site, this project simulates a complete Windo
 ## ✨ Features
 
 ### Core Desktop Environment
-- 🪟 **Full Window Manager** - Drag, minimize, maximize, z-index stacking
-- 📁 **File System Simulation** - Hierarchical folders, create/delete/move files
-- 🎨 **MS Paint Clone** - Canvas-based drawing with tools
+- 🪟 **Full Window Manager** - Drag, minimize, maximize, resize, z-index stacking
+- 📁 **File System Simulation** - Hierarchical folders, create/delete/save files
+- 🎨 **MS Paint Clone** - Professional canvas drawing with zoom, colors, brush sizes
 - 💣 **Minesweeper** - Classic game implementation
-- 🚀 **Boot Sequence** - Authentic POST screen with funny messages
+- 📝 **Notepad** - Full CRUD text editor with save/load functionality
+- 📹 **Camera App** - Webcam with screenshot capture (saves to desktop!)
+- 📺 **TV App** - Retro YouTube player in wooden TV frame
+- 🚀 **Boot Sequence** - Authentic POST screen with skip functionality
 - 🗑️ **Easter Eggs** - Protected files, fake BSOD, fun error dialogs
+- ⚙️ **Start Menu** - Programs, Documents, Settings, Restart, Shut Down
 
 ### Portfolio Content
 - **About.txt** - CV card with links (LinkedIn, X, GitHub)
@@ -92,7 +98,7 @@ Open [http://localhost:3000](http://localhost:3000) and watch the boot sequence!
 
 See [PHASES.md](./PHASES.md) for detailed development roadmap.
 
-**Current Status**: Phase 7 - Start Menu & Final Polish (In Progress)
+**Current Status**: 🚀 DEPLOYED TO PRODUCTION!
 
 - ✅ Phase 0: Planning & Concept
 - ✅ Phase 1: Foundation & Architecture (Steve)
@@ -101,7 +107,11 @@ See [PHASES.md](./PHASES.md) for detailed development roadmap.
 - ✅ Phase 4: Boot Sequence (Steve)
 - ✅ Phase 5: Applications - Notepad, Minesweeper, Paint (Codex)
 - ✅ Phase 6: Easter Eggs & Dialogs (Steve)
-- 🟢 Phase 7: Start Menu & System Controls (Steve - In Progress)
+- ✅ Phase 7: Start Menu & System Controls (Steve)
+- ✅ Phase 8: Window Resizing (Steve)
+- ✅ Phase 9: Paint UI Redesign (Steve)
+- ✅ Phase 10: Camera & TV Apps (Steve)
+- ✅ **DEPLOYED**: Vercel Production
 
 ## 🎨 Design Decisions
 
