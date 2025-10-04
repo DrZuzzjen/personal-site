@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useFileSystemContext } from '@/app/lib/FileSystemContext';
 import { useWindowContext } from '@/app/lib/WindowContext';
-import { COLORS, Z_INDEX } from '@/app/lib/constants';
+import { COLORS, Z_INDEX, DESKTOP_GRID } from '@/app/lib/constants';
 import type { NotepadWindowContent } from '@/app/lib/types';
 import DesktopIcon from './DesktopIcon';
 import ContextMenu from './ContextMenu';
@@ -99,22 +99,45 @@ export default function Desktop({
 		setIsDragOver(false);
 
 		try {
-			const fileData = JSON.parse(event.dataTransfer.getData('application/file'));
+			const fileDataString = event.dataTransfer.getData('application/file');
+			if (!fileDataString) {
+				console.log('No file data found in drop event');
+				return;
+			}
+
+			const fileData = JSON.parse(fileDataString);
 			
-			if (fileData && fileData.id) {
+			if (fileData && fileData.id && fileData.path) {
 				// Get the actual file item from the file system
 				const fileItem = getItemByPath(fileData.path);
 				
 				if (fileItem) {
-					// Calculate drop position
-					const dropPosition = {
-						x: event.clientX - 25, // Offset for icon size
-						y: event.clientY - 25,
+					// Calculate drop position (convert to grid coordinates)
+					const pixelX = event.clientX - 25; // Offset for icon size
+					const pixelY = event.clientY - 25;
+					
+					const gridPosition = {
+						x: Math.round(pixelX / DESKTOP_GRID.ICON_WIDTH),
+						y: Math.round(pixelY / DESKTOP_GRID.ICON_HEIGHT),
+					};
+
+					// Ensure position is within bounds (grid coordinates)
+					const maxGridX = Math.floor((window.innerWidth - DESKTOP_GRID.ICON_WIDTH) / DESKTOP_GRID.ICON_WIDTH);
+					const maxGridY = Math.floor((window.innerHeight - 160) / DESKTOP_GRID.ICON_HEIGHT); // Account for taskbar
+					
+					const boundedGridPosition = {
+						x: Math.max(0, Math.min(gridPosition.x, maxGridX)),
+						y: Math.max(0, Math.min(gridPosition.y, maxGridY)),
 					};
 
 					// Create desktop icon
-					createDesktopIcon(fileItem, dropPosition);
+					const newIcon = createDesktopIcon(fileItem, boundedGridPosition);
+					console.log('Created desktop icon:', newIcon);
+				} else {
+					console.warn('File not found:', fileData.path);
 				}
+			} else {
+				console.warn('Invalid file data:', fileData);
 			}
 		} catch (error) {
 			console.error('Error handling file drop:', error);

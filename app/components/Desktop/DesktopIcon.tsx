@@ -183,9 +183,20 @@ export default function DesktopIcon({
 	const { openWindow } = useWindowContext();
 
 	// Get the file system item data for this icon
-	// First try direct ID match, then path-based search
+	// First try direct ID match in all items (recursive search), then path-based search
+	const findItemById = (items: FileSystemItem[], targetId: string): FileSystemItem | null => {
+		for (const item of items) {
+			if (item.id === targetId) return item;
+			if (item.children) {
+				const found = findItemById(item.children, targetId);
+				if (found) return found;
+			}
+		}
+		return null;
+	};
+
 	const fileSystemItem: FileSystemItem | null =
-		rootItems.find((item: FileSystemItem) => item.id === icon.fileSystemId) ||
+		findItemById(rootItems, icon.fileSystemId) ||
 		getItemByPath(`/Desktop/${icon.fileSystemId}`) ||
 		getItemByPath(`/${icon.fileSystemId}`) ||
 		null;
