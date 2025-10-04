@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useMemo, useState } from 'react';
 import { useFileSystemContext } from '@/app/lib/FileSystemContext';
@@ -51,12 +51,22 @@ function buildIconLabel(item: FileSystemItem) {
   return 'FILE';
 }
 
-export default function FileExplorer({ initialPath }: FileExplorerProps = {}) {
-  const { rootItems, getItemByPath } = useFileSystemContext();
+export default function FileExplorer({ 
+  initialPath,
+  onProtectedDelete
+}: FileExplorerProps & {
+  onProtectedDelete?: (filePath: string, fileName: string) => void;
+} = {}) {
+  const { rootItems, getItemByPath, deleteItem } = useFileSystemContext();
   const { openWindow } = useWindowContext();
 
   const [currentPath, setCurrentPath] = useState<string | null>(() => resolveInitialPath(initialPath));
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [contextMenu, setContextMenu] = useState<{
+    x: number;
+    y: number;
+    item: FileSystemItem;
+  } | null>(null);
 
   useEffect(() => {
     setCurrentPath(resolveInitialPath(initialPath));
@@ -98,7 +108,40 @@ export default function FileExplorer({ initialPath }: FileExplorerProps = {}) {
       position: { x: 180, y: 140 },
       size: { width: 460, height: 320 },
       icon: 'NP',
-      content: item.content ?? '',
+      content: {
+        filePath: item.path,
+        fileName: item.name,
+        body: item.content ?? '',
+        readOnly: true,
+      },
+    });
+  };
+
+  const handleDeleteItem = (item: FileSystemItem) => {
+    if (item.isProtected) {
+      // Trigger easter egg for protected items
+      if (onProtectedDelete) {
+        onProtectedDelete(item.path, item.name);
+      }
+      return;
+    }
+
+    // Delete non-protected items normally
+    const success = deleteItem(item.path);
+    if (!success) {
+      // This shouldn't happen for non-protected items, but just in case
+      if (onProtectedDelete) {
+        onProtectedDelete(item.path, item.name);
+      }
+    }
+  };
+
+  const handleContextMenu = (event: React.MouseEvent, item: FileSystemItem) => {
+    event.preventDefault();
+    setContextMenu({
+      x: event.clientX,
+      y: event.clientY,
+      item,
     });
   };
 
@@ -214,6 +257,7 @@ export default function FileExplorer({ initialPath }: FileExplorerProps = {}) {
                   key={item.id}
                   onClick={() => setSelectedId(item.id)}
                   onDoubleClick={() => handleNavigate(item)}
+                  onContextMenu={(e) => handleContextMenu(e, item)}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -251,6 +295,89 @@ export default function FileExplorer({ initialPath }: FileExplorerProps = {}) {
           </ul>
         )}
       </div>
+
+      {/* Context Menu */}
+      {contextMenu && (
+        <>
+          {/* Invisible overlay to catch clicks outside menu */}
+          <div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: 10001,
+            }}
+            onClick={() => setContextMenu(null)}
+            onContextMenu={(e) => {
+              e.preventDefault();
+              setContextMenu(null);
+            }}
+          />
+
+          {/* Context menu */}
+          <div
+            style={{
+              position: 'fixed',
+              left: contextMenu.x,
+              top: contextMenu.y,
+              backgroundColor: COLORS.WIN_GRAY,
+              border: `2px outset ${COLORS.WIN_GRAY}`,
+              boxShadow: '2px 2px 4px rgba(0,0,0,0.3)',
+              zIndex: 10002,
+              minWidth: '120px',
+              fontFamily: 'MS Sans Serif, sans-serif',
+              fontSize: '11px',
+            }}
+          >
+            <div
+              style={{
+                padding: '4px 12px',
+                cursor: 'pointer',
+                backgroundColor: 'transparent',
+              }}
+              onClick={() => {
+                handleNavigate(contextMenu.item);
+                setContextMenu(null);
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = COLORS.WIN_BLUE;
+                e.currentTarget.style.color = COLORS.WIN_WHITE;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.color = COLORS.TEXT_BLACK;
+              }}
+            >
+              Open
+            </div>
+            <div
+              style={{
+                padding: '4px 12px',
+                cursor: 'pointer',
+                backgroundColor: 'transparent',
+                borderTop: '1px solid ' + COLORS.BORDER_SHADOW,
+              }}
+              onClick={() => {
+                handleDeleteItem(contextMenu.item);
+                setContextMenu(null);
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = COLORS.WIN_BLUE;
+                e.currentTarget.style.color = COLORS.WIN_WHITE;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.color = COLORS.TEXT_BLACK;
+              }}
+            >
+              Delete
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
+
