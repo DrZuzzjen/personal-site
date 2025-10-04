@@ -21,28 +21,7 @@
 
 ## 🚀 Enhancements Needed
 
-### 1. Window Resizing (IN PROGRESS - Steve)
-**Feature**: Users should be able to resize windows by dragging corners/edges
-**Current**: Windows are fixed size
-**Branch**: `feature/window-resizing`
-**Requirements**:
-- Drag from bottom-right corner to resize
-- Maintain minimum size (e.g., 200x150px)
-- Maximum size should be constrained to viewport
-- Window content should adjust/reflow to new size
-- Icons inside windows (if any) should rearrange
-
-**Technical Notes**:
-- Add resize handle component
-- Track mouse drag on resize handle
-- Update window size in WindowContext
-- May need different behavior per app (Paint canvas, FileExplorer grid, etc.)
-
-**Priority**: Medium (nice-to-have polish)
-
----
-
-### 2. Drag Files from FileExplorer to Desktop
+### 1. Drag Files from FileExplorer to Desktop
 **Feature**: Drag .txt files from My Documents to Desktop (like real Windows)
 **Current**: Files only exist in FileExplorer, can't drag to desktop
 **Requirements**:
@@ -61,7 +40,7 @@
 
 ---
 
-### 3. Start Menu Enhancements
+### 2. Start Menu Enhancements
 **Feature Ideas**:
 - Run... dialog (just for fun)
 - Recent documents list
@@ -164,7 +143,8 @@
 - ✅ Notepad CRUD editor (create, edit, save files)
 - ✅ Mobile warning dialog
 - ✅ Notepad desktop icon
+- ✅ Window resizing (drag corners to resize)
 
 ---
 
-*Last Updated: Window Resizing Feature*
+*Last Updated: Post Window Resizing - Ready for Paint UI & Context Menu fixes*
