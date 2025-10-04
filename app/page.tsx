@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef } from 'react';
 import Window from '@/app/components/Window/Window';
+import Desktop from '@/app/components/Desktop/Desktop';
 import { useWindowContext } from '@/app/lib/WindowContext';
 import { COLORS } from '@/app/lib/constants';
 import type { Window as WindowType } from '@/app/lib/types';
@@ -65,7 +66,7 @@ function renderWindowContent(windowData: WindowType) {
   );
 }
 
-export default function Desktop() {
+export default function MainPage() {
   const { windows, openWindow } = useWindowContext();
   const bootRef = useRef(false);
 
@@ -101,49 +102,12 @@ export default function Desktop() {
     });
   }, [openWindow, windows.length]);
 
-  const desktopStyle = useMemo(
-    () => ({
-      position: 'relative' as const,
-      backgroundColor: COLORS.DESKTOP_TEAL,
-      minHeight: '100vh',
-      width: '100%',
-      overflow: 'hidden',
-      padding: 24,
-      boxSizing: 'border-box' as const,
-      color: COLORS.TEXT_WHITE,
-      fontFamily: 'var(--font-sans)',
-    }),
-    [],
-  );
-
-  const wallpaperOverlayStyle = useMemo(
-    () => ({
-      position: 'absolute' as const,
-      inset: 0,
-      backgroundImage:
-        'linear-gradient(135deg, rgba(0, 0, 0, 0.12) 0%, rgba(255, 255, 255, 0.08) 100%)',
-      pointerEvents: 'none' as const,
-    }),
-    [],
-  );
-
   return (
-    <main style={desktopStyle}>
-      <div style={wallpaperOverlayStyle} aria-hidden />
-
-      <div
-        style={{
-          position: 'absolute',
-          top: 16,
-          left: 16,
-          color: COLORS.TEXT_WHITE,
-          textShadow: '1px 1px 0 rgba(0, 0, 0, 0.35)',
-        }}
-      >
-        <div style={{ fontSize: 18, fontWeight: 700 }}>Windows 3.1 Portfolio</div>
-        <div style={{ fontSize: 13 }}>Phase 2 Window Manager Demo</div>
-      </div>
-
+    <>
+      {/* Desktop background with icons */}
+      <Desktop />
+      
+      {/* Windows rendered on top of desktop */}
       {windows.map((windowData) => (
         <Window
           key={windowData.id}
@@ -155,18 +119,34 @@ export default function Desktop() {
         </Window>
       ))}
 
+      {/* Debug info */}
+      <div
+        style={{
+          position: 'fixed',
+          top: 16,
+          left: 16,
+          color: COLORS.TEXT_WHITE,
+          textShadow: '1px 1px 0 rgba(0, 0, 0, 0.35)',
+          zIndex: 1000,
+        }}
+      >
+        <div style={{ fontSize: 18, fontWeight: 700 }}>Windows 3.1 Portfolio</div>
+        <div style={{ fontSize: 13 }}>Phase 3 Desktop + Windows Demo</div>
+      </div>
+
       {windows.length === 0 ? (
         <div
           style={{
-            position: 'absolute',
+            position: 'fixed',
             bottom: 16,
             left: 16,
             color: COLORS.TEXT_WHITE,
+            zIndex: 1000,
           }}
         >
-          No windows open. Use the window manager to launch an app.
+          No windows open. Double-click desktop icons to launch apps.
         </div>
       ) : null}
-    </main>
+    </>
   );
 }
