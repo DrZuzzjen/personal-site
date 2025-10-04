@@ -12,47 +12,48 @@ type Tool = 'brush' | 'eraser';
 type Point = { x: number; y: number };
 
 const DEFAULT_PALETTE = [
-	'#000000',
-	'#FFFFFF',
-	'#FF0000',
-	'#00FF00',
-	'#0000FF',
-	'#FFFF00',
-	'#FF00FF',
-	'#00FFFF',
+	'#000000', // Black
+	'#FFFFFF', // White
+	'#FF0000', // Red
+	'#00FF00', // Green
+	'#0000FF', // Blue
+	'#FFFF00', // Yellow
+	'#FF00FF', // Magenta
+	'#00FFFF', // Cyan
+	'#FFA500', // Orange
+	'#800080', // Purple
+	'#A52A2A', // Brown
+	'#808080', // Gray
+	'#FFC0CB', // Pink
+	'#90EE90', // Light Green
+	'#87CEEB', // Sky Blue
+	'#F0E68C', // Khaki
 ];
 
 const containerStyle: CSSProperties = {
 	display: 'flex',
-	flexDirection: 'column',
 	height: '100%',
 	backgroundColor: COLORS.WIN_GRAY,
 	color: COLORS.TEXT_BLACK,
-	borderTop: `2px solid ${COLORS.BORDER_LIGHT}`,
-	borderLeft: `2px solid ${COLORS.BORDER_HIGHLIGHT}`,
-	borderBottom: `2px solid ${COLORS.BORDER_SHADOW}`,
-	borderRight: `2px solid ${COLORS.BORDER_DARK}`,
 	fontFamily: 'var(--font-sans)',
 };
 
-const toolbarStyle: CSSProperties = {
+// Sidebar for tools, sizes, and colors
+const sidebarStyle: CSSProperties = {
+	width: 140,
 	display: 'flex',
-	flexWrap: 'wrap',
-	gap: 12,
-	padding: '8px 10px',
-	borderBottom: `1px solid ${COLORS.BORDER_SHADOW}`,
+	flexDirection: 'column',
 	backgroundColor: COLORS.WIN_GRAY,
-	fontSize: 11,
+	borderRight: `2px solid ${COLORS.BORDER_SHADOW}`,
+	padding: 8,
+	gap: 12,
 };
 
-const groupStyle: CSSProperties = {
+// Main canvas area
+const canvasAreaStyle: CSSProperties = {
+	flex: 1,
 	display: 'flex',
-	alignItems: 'center',
-	gap: 8,
-};
-
-const sectionLabelStyle: CSSProperties = {
-	fontWeight: 700,
+	flexDirection: 'column',
 };
 
 const canvasSectionStyle: CSSProperties = {
@@ -60,52 +61,107 @@ const canvasSectionStyle: CSSProperties = {
 	flex: 1,
 	alignItems: 'center',
 	justifyContent: 'center',
-	padding: 12,
+	padding: 16,
+	backgroundColor: COLORS.WIN_GRAY,
 };
 
 const statusBarStyle: CSSProperties = {
 	display: 'flex',
 	alignItems: 'center',
 	justifyContent: 'space-between',
-	padding: '6px 10px',
+	padding: '6px 12px',
 	fontSize: 11,
-	borderTop: `1px solid ${COLORS.BORDER_SHADOW}`,
+	borderTop: `2px solid ${COLORS.BORDER_SHADOW}`,
+	backgroundColor: COLORS.WIN_GRAY,
 };
 
-const paletteContainerStyle: CSSProperties = {
+// Section headers in sidebar
+const sectionHeaderStyle: CSSProperties = {
+	fontSize: 11,
+	fontWeight: 'bold',
+	color: COLORS.TEXT_BLACK,
+	marginBottom: 4,
+	textAlign: 'center',
+};
+
+// Tool buttons (large and professional)
+const toolButtonStyle = (active: boolean): CSSProperties => ({
+	width: '100%',
+	height: 42,
+	display: 'flex',
+	alignItems: 'center',
+	justifyContent: 'center',
+	gap: 6,
+	fontSize: 11,
+	fontWeight: active ? 'bold' : 'normal',
+	backgroundColor: active ? COLORS.WIN_BLUE : COLORS.WIN_GRAY,
+	color: active ? COLORS.WIN_WHITE : COLORS.TEXT_BLACK,
+	border: active 
+		? `2px solid ${COLORS.BORDER_DARK}`
+		: `2px solid ${COLORS.BORDER_LIGHT}`,
+	borderTopColor: active ? COLORS.BORDER_SHADOW : COLORS.BORDER_LIGHT,
+	borderLeftColor: active ? COLORS.BORDER_SHADOW : COLORS.BORDER_HIGHLIGHT,
+	borderBottomColor: active ? COLORS.BORDER_LIGHT : COLORS.BORDER_SHADOW,
+	borderRightColor: active ? COLORS.BORDER_LIGHT : COLORS.BORDER_DARK,
+	cursor: 'pointer',
+	transition: 'none',
+});
+
+// Brush size buttons with visual preview
+const brushSizeButtonStyle = (size: number, active: boolean): CSSProperties => ({
+	width: '100%',
+	height: 36,
+	display: 'flex',
+	alignItems: 'center',
+	justifyContent: 'space-between',
+	padding: '0 8px',
+	fontSize: 11,
+	backgroundColor: active ? COLORS.WIN_BLUE : COLORS.WIN_GRAY,
+	color: active ? COLORS.WIN_WHITE : COLORS.TEXT_BLACK,
+	border: active 
+		? `2px solid ${COLORS.BORDER_DARK}`
+		: `1px solid ${COLORS.BORDER_SHADOW}`,
+	cursor: 'pointer',
+	marginBottom: 2,
+});
+
+// Color palette grid
+const colorPaletteStyle: CSSProperties = {
 	display: 'grid',
-	gridTemplateColumns: 'repeat(8, 22px)',
+	gridTemplateColumns: 'repeat(4, 1fr)',
 	gap: 4,
+	marginTop: 4,
 };
 
-const brushSizes = [2, 4, 6, 10, 16];
+// Individual color swatch
+const colorSwatchStyle = (color: string, active: boolean): CSSProperties => ({
+	width: 28,
+	height: 28,
+	backgroundColor: color,
+	border: active 
+		? `3px solid ${COLORS.WIN_BLUE}` 
+		: `2px solid ${COLORS.BORDER_DARK}`,
+	cursor: 'pointer',
+	borderRadius: 2,
+});
 
-function raisedButtonStyle(active: boolean): CSSProperties {
-	return {
-		borderTop: `2px solid ${active ? COLORS.BORDER_SHADOW : COLORS.BORDER_LIGHT}`,
-		borderLeft: `2px solid ${active ? COLORS.BORDER_DARK : COLORS.BORDER_HIGHLIGHT}`,
-		borderBottom: `2px solid ${active ? COLORS.BORDER_LIGHT : COLORS.BORDER_SHADOW}`,
-		borderRight: `2px solid ${active ? COLORS.BORDER_HIGHLIGHT : COLORS.BORDER_DARK}`,
-		backgroundColor: COLORS.WIN_GRAY,
-		color: COLORS.TEXT_BLACK,
-		padding: '4px 8px',
-		minWidth: 48,
-		textAlign: 'center',
-		fontSize: 11,
-		cursor: 'pointer',
-	};
-}
+// Action buttons (Clear, Save)
+const actionButtonStyle: CSSProperties = {
+	width: '100%',
+	height: 32,
+	fontSize: 11,
+	backgroundColor: COLORS.WIN_GRAY,
+	color: COLORS.TEXT_BLACK,
+	border: `2px solid ${COLORS.BORDER_LIGHT}`,
+	borderTopColor: COLORS.BORDER_LIGHT,
+	borderLeftColor: COLORS.BORDER_HIGHLIGHT,
+	borderBottomColor: COLORS.BORDER_SHADOW,
+	borderRightColor: COLORS.BORDER_DARK,
+	cursor: 'pointer',
+	marginBottom: 4,
+};
 
-function colorSwatchStyle(color: string, active: boolean): CSSProperties {
-	return {
-		width: 22,
-		height: 22,
-		backgroundColor: color,
-		border: active ? `2px solid ${COLORS.TEXT_BLACK}` : `1px solid ${COLORS.BORDER_DARK}`,
-		boxSizing: 'border-box',
-		cursor: 'pointer',
-	};
-}
+const brushSizes = [2, 4, 6, 10, 16, 20];
 
 export default function Paint({
 	canvasWidth,
@@ -114,8 +170,9 @@ export default function Paint({
 	backgroundColor,
 	palette,
 }: PaintProps) {
-	const width = Math.max(160, Math.floor(canvasWidth));
-	const height = Math.max(120, Math.floor(canvasHeight));
+	// Use much larger default canvas size for professional look
+	const width = Math.max(600, Math.floor(canvasWidth));
+	const height = Math.max(400, Math.floor(canvasHeight));
 	const effectiveBackground = backgroundColor ?? COLORS.WIN_WHITE;
 	const colors = useMemo(
 		() => (palette.length > 0 ? palette : DEFAULT_PALETTE),
@@ -259,42 +316,54 @@ export default function Paint({
 
 	return (
 		<div style={containerStyle}>
-			<div style={toolbarStyle}>
-				<div style={groupStyle}>
-					<span style={sectionLabelStyle}>Tool:</span>
+			{/* Left Sidebar with Tools, Sizes, Colors */}
+			<div style={sidebarStyle}>
+				{/* Tools Section */}
+				<div>
+					<div style={sectionHeaderStyle}>TOOLS</div>
 					<button
 						type="button"
 						onClick={() => setTool('brush')}
-						style={raisedButtonStyle(tool === 'brush')}
+						style={toolButtonStyle(tool === 'brush')}
 					>
-						Brush
+						🖌️ Brush
 					</button>
 					<button
 						type="button"
 						onClick={() => setTool('eraser')}
-						style={raisedButtonStyle(tool === 'eraser')}
+						style={toolButtonStyle(tool === 'eraser')}
 					>
-						Eraser
+						🧹 Eraser
 					</button>
 				</div>
 
-				<div style={groupStyle}>
-					<span style={sectionLabelStyle}>Brush Size:</span>
+				{/* Brush Sizes Section */}
+				<div>
+					<div style={sectionHeaderStyle}>BRUSH SIZE</div>
 					{brushSizes.map((size) => (
 						<button
 							key={size}
 							type="button"
 							onClick={() => setBrushSizeState(size)}
-							style={raisedButtonStyle(brushSizeState === size)}
+							style={brushSizeButtonStyle(size, brushSizeState === size)}
 						>
-							{size}px
+							<div
+								style={{
+									width: Math.min(size, 16),
+									height: Math.min(size, 16),
+									borderRadius: '50%',
+									backgroundColor: 'currentColor',
+								}}
+							/>
+							<span>{size}px</span>
 						</button>
 					))}
 				</div>
 
-				<div style={groupStyle}>
-					<span style={sectionLabelStyle}>Colors:</span>
-					<div style={paletteContainerStyle}>
+				{/* Colors Section */}
+				<div>
+					<div style={sectionHeaderStyle}>COLORS</div>
+					<div style={colorPaletteStyle}>
 						{colors.map((color) => (
 							<button
 								key={color}
@@ -305,56 +374,76 @@ export default function Paint({
 								}}
 								style={colorSwatchStyle(color, tool === 'brush' && currentColor === color)}
 								aria-label={`Select color ${color}`}
+								title={color}
 							/>
 						))}
 					</div>
 				</div>
 
-				<div style={groupStyle}>
+				{/* Action Buttons */}
+				<div style={{ marginTop: 'auto' }}>
 					<button
 						type="button"
 						onClick={handleClear}
-						style={raisedButtonStyle(false)}
+						style={actionButtonStyle}
 					>
-						Clear
+						Clear Canvas
 					</button>
 					<button
 						type="button"
 						onClick={handleDownload}
-						style={raisedButtonStyle(false)}
+						style={actionButtonStyle}
 					>
 						Save PNG
 					</button>
 				</div>
 			</div>
 
-			<div style={canvasSectionStyle}>
-				<canvas
-					ref={canvasRef}
-					onPointerDown={handlePointerDown}
-					onPointerMove={handlePointerMove}
-					onPointerUp={stopDrawing}
-					onPointerCancel={stopDrawing}
-					onPointerLeave={stopDrawing}
-					style={{
-						width,
-						height,
-						cursor: tool === 'eraser' ? 'cell' : 'crosshair',
-						backgroundColor: effectiveBackground,
-						touchAction: 'none',
-						borderTop: `2px solid ${COLORS.BORDER_LIGHT}`,
-						borderLeft: `2px solid ${COLORS.BORDER_HIGHLIGHT}`,
-						borderBottom: `2px solid ${COLORS.BORDER_SHADOW}`,
-						borderRight: `2px solid ${COLORS.BORDER_DARK}`,
-					}}
-				/>
-			</div>
+			{/* Main Canvas Area */}
+			<div style={canvasAreaStyle}>
+				<div style={canvasSectionStyle}>
+					<canvas
+						ref={canvasRef}
+						onPointerDown={handlePointerDown}
+						onPointerMove={handlePointerMove}
+						onPointerUp={stopDrawing}
+						onPointerCancel={stopDrawing}
+						onPointerLeave={stopDrawing}
+						style={{
+							width,
+							height,
+							cursor: tool === 'eraser' ? 'cell' : 'crosshair',
+							backgroundColor: effectiveBackground,
+							touchAction: 'none',
+							border: `3px solid ${COLORS.BORDER_SHADOW}`,
+							borderTopColor: COLORS.BORDER_SHADOW,
+							borderLeftColor: COLORS.BORDER_SHADOW,
+							borderBottomColor: COLORS.BORDER_LIGHT,
+							borderRightColor: COLORS.BORDER_LIGHT,
+							boxShadow: 'inset 1px 1px 2px rgba(0,0,0,0.1)',
+						}}
+					/>
+				</div>
 
-			<div style={statusBarStyle}>
-				<span>Tool: {tool === 'brush' ? 'Brush' : 'Eraser'}</span>
-				<span>Color: {tool === 'eraser' ? 'Background' : currentColor}</span>
-				<span>Brush: {brushSizeState}px</span>
-				<span>Canvas: {width} x {height}</span>
+				{/* Enhanced Status Bar */}
+				<div style={statusBarStyle}>
+					<span>Tool: {tool === 'brush' ? 'Brush' : 'Eraser'}</span>
+					<span>Size: {brushSizeState}px</span>
+					<span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+						Color:
+						<div
+							style={{
+								width: 16,
+								height: 16,
+								backgroundColor: tool === 'eraser' ? effectiveBackground : currentColor,
+								border: `1px solid ${COLORS.BORDER_DARK}`,
+								borderRadius: 2,
+							}}
+						/>
+						{tool === 'eraser' ? 'Background' : currentColor}
+					</span>
+					<span>Canvas: {width} × {height}</span>
+				</div>
 			</div>
 		</div>
 	);
