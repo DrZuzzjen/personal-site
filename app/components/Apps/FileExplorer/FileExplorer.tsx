@@ -16,7 +16,6 @@ function resolveInitialPath(path?: string | null) {
   return path === undefined ? DEFAULT_START_PATH : path;
 }
 
-
 function getParentPath(path: string | null): string | null {
   if (!path) {
     return null;
@@ -56,8 +55,12 @@ export default function FileExplorer({ initialPath }: FileExplorerProps = {}) {
   const { rootItems, getItemByPath } = useFileSystemContext();
   const { openWindow } = useWindowContext();
 
-  const [currentPath, setCurrentPath] = useState<string | null>('/My Computer');
+  const [currentPath, setCurrentPath] = useState<string | null>(() => resolveInitialPath(initialPath));
   const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setCurrentPath(resolveInitialPath(initialPath));
+  }, [initialPath]);
 
   useEffect(() => {
     setSelectedId(null);

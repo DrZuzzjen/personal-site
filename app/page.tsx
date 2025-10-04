@@ -3,17 +3,33 @@
 import { useEffect, useRef } from 'react';
 import Window from '@/app/components/Window/Window';
 import Desktop from '@/app/components/Desktop/Desktop';
+import Taskbar from '@/app/components/Taskbar/Taskbar';
+import FileExplorer from '@/app/components/Apps/FileExplorer/FileExplorer';
 import { useWindowContext } from '@/app/lib/WindowContext';
 import { COLORS } from '@/app/lib/constants';
 import type { Window as WindowType } from '@/app/lib/types';
 
 function renderWindowContent(windowData: WindowType) {
+	const { content } = windowData;
+
 	if (windowData.appType === 'notepad') {
+		let resolvedText: string | null = null;
+
+		if (typeof content === 'string') {
+			resolvedText = content;
+		} else if (content && typeof content === 'object') {
+			const recordContent = content as Record<string, unknown>;
+			if (typeof recordContent.fileContent === 'string') {
+				resolvedText = recordContent.fileContent;
+			} else if (typeof recordContent.body === 'string') {
+				resolvedText = recordContent.body;
+			}
+		}
+
 		const text =
-			typeof windowData.content === 'string'
-				? windowData.content
-				: windowData.content?.body ??
-				  'Welcome to the Windows 3.1 portfolio prototype. This window is powered by the Phase 2 window manager.';
+			resolvedText === null || resolvedText === undefined
+				? 'Welcome to the Windows 3.1 portfolio prototype. This window is powered by the Phase 2 window manager.'
+				: resolvedText;
 
 		return (
 			<pre
@@ -34,31 +50,20 @@ function renderWindowContent(windowData: WindowType) {
 			</pre>
 		);
 	}
-
 	if (windowData.appType === 'explorer') {
-		return (
-			<div
-				style={{
-					display: 'flex',
-					flexDirection: 'column',
-					gap: 12,
-					color: COLORS.TEXT_BLACK,
-				}}
-			>
-				<strong>Program Manager</strong>
-				<p style={{ margin: 0 }}>
-					This is a placeholder for the future Program Manager experience. Phase
-					3 will wire up real app launchers and the taskbar.
-				</p>
-				<ul style={{ margin: 0, paddingLeft: 16 }}>
-					<li>Draggable outline windows</li>
-					<li>Z-index focus management</li>
-					<li>Minimize, maximize, and close buttons</li>
-				</ul>
-			</div>
-		);
-	}
+		let initialPath: string | null | undefined;
 
+		if (typeof content === 'string') {
+			initialPath = content;
+		} else if (content && typeof content === 'object' && 'folderPath' in content) {
+			const folderPath = (content as { folderPath?: unknown }).folderPath;
+			if (typeof folderPath === 'string' || folderPath === null) {
+				initialPath = folderPath;
+			}
+		}
+
+		return <FileExplorer initialPath={initialPath} />;
+	}
 	return (
 		<div style={{ color: COLORS.TEXT_BLACK }}>
 			{windowData.title} app content coming soon.
@@ -140,7 +145,7 @@ export default function MainPage() {
 				<div
 					style={{
 						position: 'fixed',
-						bottom: 16,
+						bottom: 56,
 						left: 16,
 						color: COLORS.TEXT_WHITE,
 						zIndex: 1000,
@@ -149,6 +154,11 @@ export default function MainPage() {
 					No windows open. Double-click desktop icons to launch apps.
 				</div>
 			) : null}
+
+		<Taskbar />
 		</>
 	);
 }
+
+
+
