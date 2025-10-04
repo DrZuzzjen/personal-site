@@ -35,8 +35,31 @@ const menuBarStyle: CSSProperties = {
 const menuItemStyle: CSSProperties = {
 	fontWeight: 700,
 	padding: '2px 6px',
-	cursor: 'default',
+	cursor: 'pointer',
 	userSelect: 'none',
+	position: 'relative',
+};
+
+const fileMenuDropdownStyle: CSSProperties = {
+	position: 'absolute',
+	top: '100%',
+	left: 0,
+	minWidth: 120,
+	backgroundColor: COLORS.WIN_GRAY,
+	border: `2px solid ${COLORS.BORDER_LIGHT}`,
+	borderTopColor: COLORS.BORDER_HIGHLIGHT,
+	borderLeftColor: COLORS.BORDER_HIGHLIGHT,
+	borderBottomColor: COLORS.BORDER_DARK,
+	borderRightColor: COLORS.BORDER_DARK,
+	boxShadow: '2px 2px 4px rgba(0,0,0,0.3)',
+	zIndex: 1000,
+};
+
+const fileMenuItemStyle: CSSProperties = {
+	padding: '4px 12px',
+	cursor: 'pointer',
+	fontSize: 12,
+	borderBottom: `1px solid ${COLORS.BORDER_SHADOW}`,
 };
 
 const infoBarStyle: CSSProperties = {
@@ -92,6 +115,7 @@ export default function Notepad({ fileName, filePath, body, readOnly }: NotepadP
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 	const [isWrapped, setIsWrapped] = useState(true);
 	const [cursorPosition, setCursorPosition] = useState({ line: 1, column: 1 });
+	const [showFileMenu, setShowFileMenu] = useState(false);
 	
 	// State for editing
 	const [editedText, setEditedText] = useState(body);
@@ -225,14 +249,59 @@ export default function Notepad({ fileName, filePath, body, readOnly }: NotepadP
 			}
 		};
 
+		const handleClickOutside = (e: MouseEvent) => {
+			// Close file menu when clicking outside
+			if (showFileMenu) {
+				setShowFileMenu(false);
+			}
+		};
+
 		document.addEventListener('keydown', handleKeyDown);
-		return () => document.removeEventListener('keydown', handleKeyDown);
-	}, [hasChanges, filePath]); // Dependencies
+		document.addEventListener('click', handleClickOutside);
+		return () => {
+			document.removeEventListener('keydown', handleKeyDown);
+			document.removeEventListener('click', handleClickOutside);
+		};
+	}, [hasChanges, filePath, showFileMenu]); // Dependencies
 
 	return (
 		<div style={containerStyle}>
 			<div style={menuBarStyle}>
-				{MENU_ITEMS.map((item) => (
+				<span 
+					style={menuItemStyle}
+					onClick={() => setShowFileMenu(!showFileMenu)}
+				>
+					File
+					{showFileMenu && (
+						<div style={fileMenuDropdownStyle}>
+							<div 
+								style={fileMenuItemStyle}
+								onClick={(e) => { e.stopPropagation(); handleNew(); setShowFileMenu(false); }}
+								onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = COLORS.WIN_BLUE; e.currentTarget.style.color = COLORS.TEXT_WHITE; }}
+								onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = COLORS.TEXT_BLACK; }}
+							>
+								New    Ctrl+N
+							</div>
+							<div 
+								style={fileMenuItemStyle}
+								onClick={(e) => { e.stopPropagation(); handleSave(); setShowFileMenu(false); }}
+								onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = COLORS.WIN_BLUE; e.currentTarget.style.color = COLORS.TEXT_WHITE; }}
+								onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = COLORS.TEXT_BLACK; }}
+							>
+								Save   Ctrl+S
+							</div>
+							<div 
+								style={fileMenuItemStyle}
+								onClick={(e) => { e.stopPropagation(); handleSaveAs(); setShowFileMenu(false); }}
+								onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = COLORS.WIN_BLUE; e.currentTarget.style.color = COLORS.TEXT_WHITE; }}
+								onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = COLORS.TEXT_BLACK; }}
+							>
+								Save As...
+							</div>
+						</div>
+					)}
+				</span>
+				{MENU_ITEMS.slice(1).map((item) => (
 					<span key={item} style={menuItemStyle}>
 						{item}
 					</span>
