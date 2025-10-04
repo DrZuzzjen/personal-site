@@ -3,7 +3,7 @@ import { useWindowContext } from '../lib/WindowContext';
 import { useFileSystemContext } from '../lib/FileSystemContext';
 
 export default function TestFoundation() {
-  const { windows, openWindow, closeWindow } = useWindowContext();
+  const { windows, openWindow } = useWindowContext();
   const { rootItems, desktopIcons, createFile } = useFileSystemContext();
 
   return (

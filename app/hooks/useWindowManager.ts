@@ -81,7 +81,7 @@ export function useWindowManager() {
   }, []);
 
   // Update window content (for apps to store state)
-  const updateWindowContent = useCallback((id: string, content: any) => {
+  const updateWindowContent = useCallback((id: string, content: unknown) => {
     setWindows(prev =>
       prev.map(w => (w.id === id ? { ...w, content } : w))
     );

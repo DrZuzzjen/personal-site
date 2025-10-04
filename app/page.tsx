@@ -1,103 +1,172 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import { useEffect, useMemo, useRef } from 'react';
+import Window from '@/app/components/Window/Window';
+import { useWindowContext } from '@/app/lib/WindowContext';
+import { COLORS } from '@/app/lib/constants';
+import type { Window as WindowType } from '@/app/lib/types';
+
+function renderWindowContent(windowData: WindowType) {
+  if (windowData.appType === 'notepad') {
+    const text =
+      typeof windowData.content === 'string'
+        ? windowData.content
+        : windowData.content?.body ??
+          'Welcome to the Windows 3.1 portfolio prototype. This window is powered by the Phase 2 window manager.';
+
+    return (
+      <pre
+        style={{
+          backgroundColor: COLORS.WIN_WHITE,
+          border: `1px solid ${COLORS.BORDER_SHADOW}`,
+          color: COLORS.TEXT_BLACK,
+          padding: 8,
+          margin: 0,
+          width: '100%',
+          height: '100%',
+          overflow: 'auto',
+          whiteSpace: 'pre-wrap',
+          fontFamily: 'var(--font-mono)',
+        }}
+      >
+        {text}
+      </pre>
+    );
+  }
+
+  if (windowData.appType === 'explorer') {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 12,
+          color: COLORS.TEXT_BLACK,
+        }}
+      >
+        <strong>Program Manager</strong>
+        <p style={{ margin: 0 }}>
+          This is a placeholder for the future Program Manager experience. Phase 3 will wire up
+          real app launchers and the taskbar.
+        </p>
+        <ul style={{ margin: 0, paddingLeft: 16 }}>
+          <li>Draggable outline windows</li>
+          <li>Z-index focus management</li>
+          <li>Minimize, maximize, and close buttons</li>
+        </ul>
+      </div>
+    );
+  }
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+    <div style={{ color: COLORS.TEXT_BLACK }}>
+      {windowData.title} app content coming soon.
     </div>
+  );
+}
+
+export default function Desktop() {
+  const { windows, openWindow } = useWindowContext();
+  const bootRef = useRef(false);
+
+  useEffect(() => {
+    if (bootRef.current) {
+      return;
+    }
+
+    if (windows.length > 0) {
+      bootRef.current = true;
+      return;
+    }
+
+    bootRef.current = true;
+
+    openWindow({
+      title: 'Welcome.txt - Notepad',
+      appType: 'notepad',
+      position: { x: 120, y: 100 },
+      size: { width: 420, height: 280 },
+      icon: 'NP',
+      content:
+        'Hello! This draggable window is rendered through the new Phase 2 window system. Try dragging it around.',
+    });
+
+    openWindow({
+      title: 'Program Manager',
+      appType: 'explorer',
+      position: { x: 360, y: 180 },
+      size: { width: 420, height: 320 },
+      icon: 'PM',
+      content: null,
+    });
+  }, [openWindow, windows.length]);
+
+  const desktopStyle = useMemo(
+    () => ({
+      position: 'relative' as const,
+      backgroundColor: COLORS.DESKTOP_TEAL,
+      minHeight: '100vh',
+      width: '100%',
+      overflow: 'hidden',
+      padding: 24,
+      boxSizing: 'border-box' as const,
+      color: COLORS.TEXT_WHITE,
+      fontFamily: 'var(--font-sans)',
+    }),
+    [],
+  );
+
+  const wallpaperOverlayStyle = useMemo(
+    () => ({
+      position: 'absolute' as const,
+      inset: 0,
+      backgroundImage:
+        'linear-gradient(135deg, rgba(0, 0, 0, 0.12) 0%, rgba(255, 255, 255, 0.08) 100%)',
+      pointerEvents: 'none' as const,
+    }),
+    [],
+  );
+
+  return (
+    <main style={desktopStyle}>
+      <div style={wallpaperOverlayStyle} aria-hidden />
+
+      <div
+        style={{
+          position: 'absolute',
+          top: 16,
+          left: 16,
+          color: COLORS.TEXT_WHITE,
+          textShadow: '1px 1px 0 rgba(0, 0, 0, 0.35)',
+        }}
+      >
+        <div style={{ fontSize: 18, fontWeight: 700 }}>Windows 3.1 Portfolio</div>
+        <div style={{ fontSize: 13 }}>Phase 2 Window Manager Demo</div>
+      </div>
+
+      {windows.map((windowData) => (
+        <Window
+          key={windowData.id}
+          id={windowData.id}
+          title={windowData.title}
+          icon={windowData.icon}
+        >
+          {renderWindowContent(windowData)}
+        </Window>
+      ))}
+
+      {windows.length === 0 ? (
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 16,
+            left: 16,
+            color: COLORS.TEXT_WHITE,
+          }}
+        >
+          No windows open. Use the window manager to launch an app.
+        </div>
+      ) : null}
+    </main>
   );
 }
