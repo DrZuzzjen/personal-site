@@ -358,11 +358,11 @@ export default function MainPage() {
 
 	// Start Menu handlers
 	const handleLaunchApp = (appType: string, content?: any) => {
-		const position = { 
-			x: 100 + Math.random() * 200, 
-			y: 80 + Math.random() * 150 
+		const position = {
+			x: 100 + Math.random() * 200,
+			y: 80 + Math.random() * 150,
 		};
-		
+
 		switch (appType) {
 			case 'paint':
 				openWindow({
@@ -374,7 +374,7 @@ export default function MainPage() {
 					content: content || DEFAULT_PAINT_CONFIG,
 				});
 				break;
-				
+
 			case 'minesweeper':
 				openWindow({
 					title: 'Minesweeper.exe',
@@ -385,7 +385,7 @@ export default function MainPage() {
 					content: content || DEFAULT_MINESWEEPER_CONFIG,
 				});
 				break;
-				
+
 			case 'notepad':
 				openWindow({
 					title: `${content?.fileName || 'Untitled'}.txt - Notepad`,
@@ -401,7 +401,7 @@ export default function MainPage() {
 					} as NotepadWindowContent,
 				});
 				break;
-				
+
 			case 'file-explorer':
 				openWindow({
 					title: `${content?.path || 'My Computer'} - File Explorer`,
@@ -416,7 +416,11 @@ export default function MainPage() {
 	};
 
 	const handleRestart = () => {
-		if (confirm('Restart Windows?\n\nThis will close all programs and restart your computer.')) {
+		if (
+			confirm(
+				'Restart Windows?\n\nThis will close all programs and restart your computer.'
+			)
+		) {
 			// Clear localStorage to trigger boot sequence
 			localStorage.removeItem('hasBooted');
 			// Reset state
@@ -430,7 +434,11 @@ export default function MainPage() {
 	};
 
 	const handleShutDown = () => {
-		if (confirm('Shut Down Windows?\n\nThis will close all programs and shut down Windows so you can safely turn off power.')) {
+		if (
+			confirm(
+				'Shut Down Windows?\n\nThis will close all programs and shut down Windows so you can safely turn off power.'
+			)
+		) {
 			setIsShutDown(true);
 		}
 	};
@@ -444,13 +452,13 @@ export default function MainPage() {
 			{ name: 'Purple', value: '#800080' },
 			{ name: 'Pink', value: '#FF69B4' },
 		];
-		
+
 		const colorChoice = prompt(
 			'Choose a background color:\n\n' +
-			colors.map((c, i) => `${i + 1}. ${c.name}`).join('\n') +
-			'\n\nEnter number (1-5):'
+				colors.map((c, i) => `${i + 1}. ${c.name}`).join('\n') +
+				'\n\nEnter number (1-5):'
 		);
-		
+
 		if (colorChoice) {
 			const index = parseInt(colorChoice) - 1;
 			if (index >= 0 && index < colors.length) {
@@ -465,7 +473,8 @@ export default function MainPage() {
 	const handleShowFind = () => {
 		setErrorDialog({
 			visible: true,
-			message: 'Find: Files or Folders\n\nSearch functionality coming soon!\n\nFor now, use File Explorer to browse files.',
+			message:
+				'Find: Files or Folders\n\nSearch functionality coming soon!\n\nFor now, use File Explorer to browse files.',
 			title: 'Find',
 		});
 	};
@@ -473,26 +482,27 @@ export default function MainPage() {
 	const handleShowHelp = () => {
 		handleLaunchApp('notepad', {
 			fileName: 'Help',
-			content: 'Windows 3.1 Portfolio Help\n\n' +
-					'Welcome to the Windows 3.1 Portfolio Experience!\n\n' +
-					'How to use:\n' +
-					'• Double-click desktop icons to open apps\n' +
-					'• Right-click icons or files for context menu\n' +
-					'• Drag windows around by their title bar\n' +
-					'• Use taskbar buttons to switch between windows\n' +
-					'• Click Start button for system controls\n\n' +
-					'Applications:\n' +
-					'• Paint.exe - Simple drawing program\n' +
-					'• Minesweeper.exe - Classic puzzle game\n' +
-					'• Notepad.exe - Text editor\n' +
-					'• File Explorer - Browse files and folders\n\n' +
-					'System Controls:\n' +
-					'• Restart Windows - Replay boot sequence\n' +
-					'• Shut Down - End the portfolio session\n' +
-					'• Settings - Change background color\n\n' +
-					'Easter Eggs:\n' +
-					'Try deleting protected files for surprises! 😉\n\n' +
-					'Press any key during boot to skip the sequence.',
+			content:
+				'Windows 3.1 Portfolio Help\n\n' +
+				'Welcome to the Windows 3.1 Portfolio Experience!\n\n' +
+				'How to use:\n' +
+				'• Double-click desktop icons to open apps\n' +
+				'• Right-click icons or files for context menu\n' +
+				'• Drag windows around by their title bar\n' +
+				'• Use taskbar buttons to switch between windows\n' +
+				'• Click Start button for system controls\n\n' +
+				'Applications:\n' +
+				'• Paint.exe - Simple drawing program\n' +
+				'• Minesweeper.exe - Classic puzzle game\n' +
+				'• Notepad.exe - Text editor\n' +
+				'• File Explorer - Browse files and folders\n\n' +
+				'System Controls:\n' +
+				'• Restart Windows - Replay boot sequence\n' +
+				'• Shut Down - End the portfolio session\n' +
+				'• Settings - Change background color\n\n' +
+				'Easter Eggs:\n' +
+				'Try deleting protected files for surprises! 😉\n\n' +
+				'Press any key during boot to skip the sequence.',
 			readOnly: true,
 		});
 	};

@@ -65,10 +65,10 @@ export function useWindowManager() {
         return prev.map((w) =>
           w.id === id
             ? {
-                ...w,
-                isMinimized: false,
-                zIndex: shouldRaise ? nextZIndex : w.zIndex,
-              }
+              ...w,
+              isMinimized: false,
+              zIndex: shouldRaise ? nextZIndex : w.zIndex,
+            }
             : w,
         );
       });
