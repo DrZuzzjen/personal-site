@@ -101,7 +101,7 @@ export default function Chatbot({}: ChatbotProps) {
       const welcomeMessage: Message = {
         id: 'welcome',
         role: 'assistant',
-        content: 'Hey there! 😊 Welcome to my portfolio chat! Ask me anything about the projects or skills showcased here. I can help you explore! :D',
+        content: '*Claude Bot has signed in* \n\nHey there! 😊 Welcome to this awesome retro portfolio! I\'m here to help you explore all the cool features. This place is packed with working Windows 3.1 apps, easter eggs, and tons of interactive stuff! :D\n\nWhat would you like to check out first?',
         timestamp: new Date(),
       };
       setMessages([welcomeMessage]);
@@ -286,31 +286,40 @@ Project details: ${context.projects.map(p => `${p.name}: ${p.content}`).join(' |
       >
         {messages.length === 0 && (
           <div className="text-center text-gray-500 mt-8">
-            <p className="mb-4">Welcome! Try asking:</p>
+            <div className="mb-4">
+              <div className="text-lg mb-2">💬 Welcome to MSN Messenger!</div>
+              <p className="text-sm">I'm your friendly portfolio guide. Try asking:</p>
+            </div>
             <div className="space-y-2 text-sm">
               <button 
-                onClick={() => sendMessage("Tell me about the projects")}
-                className="block mx-auto px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded"
+                onClick={() => sendMessage("What's cool about this portfolio?")}
+                className="block mx-auto px-4 py-2 bg-blue-100 hover:bg-blue-200 rounded transition-colors"
               >
-                • "Tell me about the projects"
+                💻 "What's cool about this portfolio?"
               </button>
               <button 
-                onClick={() => sendMessage("What technologies were used?")}
-                className="block mx-auto px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded"
+                onClick={() => sendMessage("Show me the best features")}
+                className="block mx-auto px-4 py-2 bg-blue-100 hover:bg-blue-200 rounded transition-colors"
               >
-                • "What technologies were used?"
+                ✨ "Show me the best features"
               </button>
               <button 
-                onClick={() => sendMessage("Who built this site?")}
-                className="block mx-auto px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded"
+                onClick={() => sendMessage("What apps can I try?")}
+                className="block mx-auto px-4 py-2 bg-blue-100 hover:bg-blue-200 rounded transition-colors"
               >
-                • "Who built this site?"
+                🎮 "What apps can I try?"
               </button>
               <button 
-                onClick={() => sendMessage("Show me something cool")}
-                className="block mx-auto px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded"
+                onClick={() => sendMessage("Tell me about the tech stack")}
+                className="block mx-auto px-4 py-2 bg-blue-100 hover:bg-blue-200 rounded transition-colors"
               >
-                • "Show me something cool"
+                🔧 "Tell me about the tech stack"
+              </button>
+              <button 
+                onClick={() => sendMessage("Any easter eggs? ;)")}
+                className="block mx-auto px-4 py-2 bg-blue-100 hover:bg-blue-200 rounded transition-colors"
+              >
+                🥚 "Any easter eggs? ;)"
               </button>
             </div>
           </div>
