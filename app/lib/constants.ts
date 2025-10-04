@@ -369,6 +369,18 @@ export const APP_EXECUTABLES: FileSystemItem[] = [
     createdAt: Date.now(),
     modifiedAt: Date.now(),
   },
+  {
+    id: 'chatbot-exe',
+    name: 'MSN Messenger.exe',
+    type: 'file',
+    extension: 'exe',
+    path: '/Desktop/MSN Messenger.exe',
+    isProtected: true,
+    isSystem: true,
+    icon: 'chatbot',
+    createdAt: Date.now(),
+    modifiedAt: Date.now(),
+  },
 ];
 
 // Desktop icons for executables
@@ -407,6 +419,12 @@ export const APP_DESKTOP_ICONS: DesktopIcon[] = [
     id: 'desktop-icon-tv',
     fileSystemId: 'tv-exe',
     position: { x: 0, y: 7 },
+    isSelected: false,
+  },
+  {
+    id: 'desktop-icon-chatbot',
+    fileSystemId: 'chatbot-exe',
+    position: { x: 0, y: 8 },
     isSelected: false,
   },
 ];

@@ -2,7 +2,7 @@
 // WINDOW SYSTEM TYPES
 // ============================================
 
-export type AppType = 'notepad' | 'paint' | 'minesweeper' | 'mycomputer' | 'explorer' | 'snake' | 'camera' | 'tv';
+export type AppType = 'notepad' | 'paint' | 'minesweeper' | 'mycomputer' | 'explorer' | 'snake' | 'camera' | 'tv' | 'chatbot';
 
 export interface WindowPosition {
   x: number;

@@ -11,6 +11,7 @@ import Paint from '@/app/components/Apps/Paint/Paint';
 import Snake from '@/app/components/Apps/Snake/Snake';
 import Camera from '@/app/components/Apps/Camera/Camera';
 import TV from '@/app/components/Apps/TV/TV';
+import Chatbot from '@/app/components/Apps/Chatbot/Chatbot';
 import { BootSequence } from '@/app/components/BootSequence';
 import { ErrorDialog, BSOD } from '@/app/components/Dialogs';
 import { ShutDownScreen } from '@/app/components/StartMenu';
@@ -338,6 +339,9 @@ function renderWindowContent(
 		case 'tv': {
 			return <TV />;
 		}
+		case 'chatbot': {
+			return <Chatbot windowRef={undefined} />;
+		}
 		default:
 			return (
 				<div style={{ color: COLORS.TEXT_BLACK }}>
@@ -525,6 +529,17 @@ export default function MainPage() {
 					position,
 					size: { width: 880, height: 720 },
 					icon: '📺',
+					content: {},
+				});
+				break;
+
+			case 'chatbot':
+				openWindow({
+					title: 'MSN Messenger - Claude Bot',
+					appType: 'chatbot',
+					position,
+					size: { width: 480, height: 620 },
+					icon: '💬',
 					content: {},
 				});
 				break;
