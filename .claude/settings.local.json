@@ -18,7 +18,13 @@
       "Read(//c/Users/gutij/**)",
       "Bash(cat:*)",
       "Bash(npm install:*)",
-      "Bash(mcp-remote:*)"
+      "Bash(mcp-remote:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git merge:*)",
+      "Bash(npm run lint:*)",
+      "Bash(git checkout:*)",
+      "Bash(git log:*)"
     ],
     "deny": [],
     "ask": []

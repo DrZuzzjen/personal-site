@@ -48,21 +48,31 @@ export function useWindowManager() {
     );
   }, []);
 
-  // Focus a window (bring to front)
+  // Focus a window (bring to front and restore if minimized)
   const focusWindow = useCallback((id: string) => {
     setWindows(prev => {
-      const window = prev.find(w => w.id === id);
-      if (!window) return prev;
+      const target = prev.find(w => w.id === id);
+      if (!target) {
+        return prev;
+      }
 
-      // If already at top, no change
-      const maxZ = Math.max(...prev.map(w => w.zIndex));
-      if (window.zIndex === maxZ) return prev;
+      const maxZ = prev.reduce(
+        (highest, item) => (item.zIndex > highest ? item.zIndex : highest),
+        Z_INDEX.WINDOW_BASE,
+      );
+      const shouldRaise = target.zIndex !== maxZ;
 
-      // Bring to front
       return prev.map(w =>
-        w.id === id ? { ...w, zIndex: nextZIndex } : w
+        w.id === id
+          ? {
+              ...w,
+              isMinimized: false,
+              zIndex: shouldRaise ? nextZIndex : w.zIndex,
+            }
+          : w,
       );
     });
+
     setNextZIndex((prev: number) => prev + 1);
   }, [nextZIndex]);
 
@@ -99,3 +109,4 @@ export function useWindowManager() {
     updateWindowContent,
   };
 }
+
