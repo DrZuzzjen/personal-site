@@ -8,6 +8,7 @@ import FileExplorer from '@/app/components/Apps/FileExplorer/FileExplorer';
 import Notepad from '@/app/components/Apps/Notepad/Notepad';
 import Minesweeper from '@/app/components/Apps/Minesweeper/Minesweeper';
 import Paint from '@/app/components/Apps/Paint/Paint';
+import Camera from '@/app/components/Apps/Camera/Camera';
 import { BootSequence } from '@/app/components/BootSequence';
 import { ErrorDialog, BSOD } from '@/app/components/Dialogs';
 import { ShutDownScreen } from '@/app/components/StartMenu';
@@ -21,6 +22,7 @@ import type {
 	MinesweeperWindowContent,
 	MinesweeperDifficulty,
 	PaintWindowContent,
+	CameraWindowContent,
 } from '@/app/lib/types';
 
 const DEFAULT_NOTEPAD_MESSAGE =
@@ -267,6 +269,9 @@ function renderWindowContent(
 			const config = resolvePaintContent(windowData.content);
 			return <Paint {...config} />;
 		}
+		case 'camera': {
+			return <Camera />;
+		}
 		default:
 			return (
 				<div style={{ color: COLORS.TEXT_BLACK }}>
@@ -418,6 +423,21 @@ export default function MainPage() {
 						body: content?.content || DEFAULT_NOTEPAD_MESSAGE,
 						readOnly: content?.readOnly || false,
 					} as NotepadWindowContent,
+				});
+				break;
+
+			case 'camera':
+				openWindow({
+					title: 'Camera',
+					appType: 'camera',
+					position,
+					size: { width: 720, height: 580 },
+					icon: '📹',
+					content: {
+						isActive: false,
+						hasPermission: false,
+						error: null,
+					} as CameraWindowContent,
 				});
 				break;
 
@@ -622,9 +642,9 @@ Press any key to continue your portfolio exploration...`,
 				}}
 			>
 				<div style={{ fontSize: 18, fontWeight: 700 }}>
-					Windows 3.1 Portfolio
+					Jean Francois Gutierrez Portfolio
 				</div>
-				<div style={{ fontSize: 13 }}>Phase 3 Desktop + Windows Demo</div>
+				<div style={{ fontSize: 13 }}>Windows 3.1 </div>
 			</div>
 
 			{windows.length === 0 ? (
