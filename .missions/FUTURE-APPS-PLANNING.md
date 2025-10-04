@@ -200,28 +200,30 @@ function executeCommand(cmd: string, args: string[]) {
 
 ---
 
-### 🤔 Questions for You
+### ✅ DECISIONS MADE
 
-1. **Game Choice**: Which hidden game sounds most fun?
-   - Text adventure (Zork-style, portfolio-themed)
-   - ASCII Snake (simple, addictive)
-   - Hack simulator (flashy, funny)
-   - Multiple options available?
+1. **Hidden Game**: **Hack the Mainframe Simulator** 🎯
+   - Flashy, funny hacking sequences
+   - Progress bars, Matrix effects
+   - "Access Granted" messages
+   - Portfolio-themed rewards
 
-2. **Command Scope**: Should commands be:
-   - **Functional**: Actually create/delete files in virtual FS
-   - **Read-only**: Only navigate and read, can't modify
-   - **Mixed**: Some commands work, some are cosmetic
+2. **Command Scope**: **FUNCTIONAL** ⚙️
+   - Commands actually create/delete files in virtual FS
+   - Icons created in terminal **appear on desktop!**
+   - Full integration with file system
+   - Real power, real Windows feel
 
-3. **Color**: Default terminal color?
-   - Green (classic Matrix/terminal)
-   - Amber (old CRT monitors)
-   - White (MS-DOS default)
-   - User can toggle with `color` command?
+3. **Color**: **GREEN** 💚
+   - Classic Matrix/terminal aesthetic (#00ff00)
+   - Can toggle with `color` command later
+   - Authentic hacker vibes
 
-4. **Easter Egg Density**: How many hidden commands?
-   - Just a few major ones (adventure, hack)
-   - Tons of silly commands (cowsay, fortune, matrix, etc.)
+4. **Easter Egg Density**: **ALL OF THEM** 🎉
+   - Hack simulator as main game
+   - Plus: cowsay, fortune, matrix, etc.
+   - Go wild with silly commands
+   - Maximum fun factor
 
 ---
 
@@ -533,32 +535,36 @@ Show suggested prompts when chat is empty:
 
 ---
 
-### 🤔 Questions for You
+### ✅ DECISIONS MADE
 
-1. **API Key**: How should we handle Groq API key?
-   - Environment variable (I'll show you how to add to Vercel)
-   - User enters their own key
-   - Free tier rate limiting concerns?
+1. **API Key**: **Environment Variable** 🔐
+   - User will get Groq API key (free)
+   - Store in Vercel environment variable
+   - Server-side route to hide key
+   - User will provide docs later
 
-2. **Personality**: Should the bot:
-   - Strictly answer portfolio questions
-   - Be more conversational/fun (jokes, random chat)
-   - Have a specific character (like Clippy but cooler)
+2. **Personality**: **ALL OF THE ABOVE** 🎭
+   - Portfolio Q&A when asked
+   - Conversational and fun (early 2000s MSN vibes)
+   - Can joke around, casual chat
+   - Helpful but with personality
 
-3. **Privacy**: Should chat history:
-   - Persist across sessions (localStorage)
-   - Reset when window closes
-   - Give user option to "Clear History"
+3. **Privacy**: **User's Choice** 🔒
+   - Persist chat history (localStorage)
+   - "Clear History" button available
+   - User controls their data
 
-4. **Scope**: Just MSN style, or could we also add:
-   - IRC/AIM aesthetic option
-   - Multiple bot personalities
-   - Voice messages (text-to-speech, just for fun)
+4. **Features**: **FULL MSN EXPERIENCE** 📱
+   - MSN style (primary)
+   - **NUDGE** feature confirmed! (window shake + "zumbido" buzz sound)
+   - Emoticons, typing indicator
+   - Sound effects (ding, buzz, etc.)
 
-5. **Integration**: Should chatbot:
-   - Know about files in My Documents (access file system)
-   - Be able to open apps ("Open Paint for me")
-   - Just chat, no integration
+5. **Integration**: **DEEP INTEGRATION** 🔗
+   - Can access file system (knows about projects)
+   - Can open apps ("Open Paint", "Show me Project 1")
+   - Full Windows 3.1 assistant
+   - Knows everything about the portfolio
 
 ---
 
@@ -626,29 +632,32 @@ Show suggested prompts when chat is empty:
 
 ---
 
-## ❓ Questions for You
+## ✅ FINAL PLAN - READY TO BUILD!
 
-Let me know your thoughts on:
+### Terminal App Confirmed Features:
+✅ **Hack the Mainframe** simulator as main game
+✅ **FUNCTIONAL** commands that create/edit/delete real files
+✅ **Terminal-created icons appear on desktop!**
+✅ **GREEN** phosphor text (#00ff00)
+✅ **All the easter eggs** (cowsay, fortune, matrix, sudo jokes, etc.)
 
-### Terminal App:
-1. Which hidden game(s) should we include?
-2. Should commands actually modify files or just read?
-3. Preferred default color (green/amber/white)?
-4. Any specific easter eggs you want?
+### Chatbot App Confirmed Features:
+✅ **Groq API** with environment variable (user will get key)
+✅ **MSN Messenger** style UI
+✅ **Full personality** - helpful, fun, conversational
+✅ **NUDGE feature** with window shake + buzz sound!
+✅ **Deep integration** - knows files, can open apps
+✅ **Chat persistence** with Clear History option
+✅ **Classic emoticons** and sound effects
 
-### Chatbot App:
-5. Do you have a Groq API key? (I can guide you to get one)
-6. What bot personality fits your portfolio vibe?
-7. Should it persist chat history?
-8. Just portfolio Q&A or more open-ended conversation?
-
-### General:
-9. Which app should we build first? (Terminal or Chatbot)
-10. Any other features/ideas for either app?
-11. Should these integrate with existing apps? (e.g., chatbot can open Paint)
+### Build Order:
+1. ✅ **Snake Game** (Codex - COMPLETE!)
+2. 🚧 **Desktop Features** (Steve - IN PROGRESS)
+3. **Terminal App** (NEXT - High technical value)
+4. **Chatbot App** (AFTER Terminal - User will provide Groq docs)
 
 ---
 
-**Status**: Awaiting your input to refine the plan! 🎯
+**Status**: All decisions made! Ready for mission creation when Steve finishes! 🚀
 
-Once you answer, I'll create detailed mission files like we did for Snake and Desktop features.
+User will provide Groq documentation later for chatbot implementation.
