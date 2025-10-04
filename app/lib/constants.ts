@@ -46,7 +46,9 @@ export const Z_INDEX = {
   WINDOW_BASE: 100,
   DRAG_OUTLINE: 9999,
   TASKBAR: 10000,
+  START_MENU: 1500,
   MODAL: 10001,
+  SHUTDOWN_SCREEN: 10000,
 } as const;
 
 // ============================================

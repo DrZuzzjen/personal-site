@@ -24,7 +24,7 @@ export interface Window {
   isMinimized: boolean;
   isMaximized: boolean;
   icon?: string;
-  content?: unknown; // App-specific content (file data, paint canvas state, etc.)
+  content?: WindowContent; // App-specific state (file data, game config, etc.)
 }
 
 // ============================================
@@ -60,6 +60,14 @@ export interface DesktopIcon {
 // APP-SPECIFIC TYPES
 // ============================================
 
+// Notepad
+export interface NotepadWindowContent {
+  filePath?: string | null;
+  fileName?: string | null;
+  body: string;
+  readOnly?: boolean;
+}
+
 // Paint App
 export type PaintTool = 'pencil' | 'eraser' | 'fill' | 'line' | 'rectangle' | 'circle' | 'select';
 
@@ -68,6 +76,14 @@ export interface PaintState {
   currentColor: string;
   brushSize: number;
   canvasData?: ImageData;
+}
+
+export interface PaintWindowContent {
+  canvasWidth: number;
+  canvasHeight: number;
+  backgroundColor: string;
+  brushSize: number;
+  palette: string[];
 }
 
 // Minesweeper
@@ -86,6 +102,30 @@ export interface MinesweeperState {
   flagCount: number;
 }
 
+export type MinesweeperDifficulty = 'beginner' | 'intermediate' | 'expert' | 'custom';
+
+export interface MinesweeperWindowContent {
+  rows: number;
+  cols: number;
+  mines: number;
+  difficulty: MinesweeperDifficulty;
+  firstClickSafe: boolean;
+}
+
+// File Explorer
+export interface ExplorerWindowContent {
+  folderPath?: string | null;
+}
+
+export type WindowContent =
+  | NotepadWindowContent
+  | PaintWindowContent
+  | MinesweeperWindowContent
+  | ExplorerWindowContent
+  | string
+  | null
+  | undefined;
+
 // ============================================
 // CONTEXT/HOOK RETURN TYPES
 // ============================================
@@ -99,17 +139,19 @@ export interface WindowManagerContext {
   focusWindow: (id: string) => void;
   updateWindowPosition: (id: string, position: WindowPosition) => void;
   updateWindowSize: (id: string, size: WindowSize) => void;
-  updateWindowContent: (id: string, content: unknown) => void;
+  updateWindowContent: (id: string, content: WindowContent) => void;
+  updateWindowTitle: (id: string, title: string) => void;
 }
 
 export interface FileSystemContext {
   rootItems: FileSystemItem[];
   desktopIcons: DesktopIcon[];
-  createFile: (parentPath: string, name: string, content?: string) => void;
+  createFile: (parentPath: string, name: string, content?: string) => FileSystemItem | null;
   createFolder: (parentPath: string, name: string) => void;
   deleteItem: (path: string) => boolean; // Returns false if protected
   moveItem: (fromPath: string, toPath: string) => boolean;
   getItemByPath: (path: string) => FileSystemItem | null;
+  updateFileContent: (path: string, content: string) => boolean;
   updateIconPosition: (iconId: string, position: { x: number; y: number }) => void;
   selectIcon: (iconId: string) => void;
   deselectAllIcons: () => void;

@@ -10,6 +10,7 @@ import Minesweeper from '@/app/components/Apps/Minesweeper/Minesweeper';
 import Paint from '@/app/components/Apps/Paint/Paint';
 import { BootSequence } from '@/app/components/BootSequence';
 import { ErrorDialog, BSOD } from '@/app/components/Dialogs';
+import { ShutDownScreen } from '@/app/components/StartMenu';
 import { useWindowContext } from '@/app/lib/WindowContext';
 import { COLORS } from '@/app/lib/constants';
 import type {
@@ -44,14 +45,25 @@ const DEFAULT_PAINT_CONFIG: PaintWindowContent = {
 	canvasHeight: 200,
 	backgroundColor: '#FFFFFF',
 	brushSize: 4,
-	palette: ['#000000', '#FFFFFF', '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF'],
+	palette: [
+		'#000000',
+		'#FFFFFF',
+		'#FF0000',
+		'#00FF00',
+		'#0000FF',
+		'#FFFF00',
+		'#FF00FF',
+		'#00FFFF',
+	],
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === 'object' && value !== null;
 }
 
-function resolveNotepadContent(content: WindowContent | undefined): NotepadWindowContent {
+function resolveNotepadContent(
+	content: WindowContent | undefined
+): NotepadWindowContent {
 	if (typeof content === 'string') {
 		return {
 			filePath: null,
@@ -83,7 +95,9 @@ function resolveNotepadContent(content: WindowContent | undefined): NotepadWindo
 		}
 
 		const fallbackName =
-			fileName ?? (filePath ? filePath.split('/').pop() ?? null : null) ?? 'Untitled.txt';
+			fileName ??
+			(filePath ? filePath.split('/').pop() ?? null : null) ??
+			'Untitled.txt';
 
 		const body =
 			'body' in content && typeof content.body === 'string'
@@ -111,7 +125,9 @@ function resolveNotepadContent(content: WindowContent | undefined): NotepadWindo
 	};
 }
 
-function resolveExplorerPath(content: WindowContent | undefined): string | null {
+function resolveExplorerPath(
+	content: WindowContent | undefined
+): string | null {
 	if (typeof content === 'string') {
 		return content;
 	}
@@ -129,21 +145,29 @@ function resolveExplorerPath(content: WindowContent | undefined): string | null 
 	return null;
 }
 
-function resolveMinesweeperContent(content: WindowContent | undefined): MinesweeperWindowContent {
+function resolveMinesweeperContent(
+	content: WindowContent | undefined
+): MinesweeperWindowContent {
 	if (isRecord(content)) {
 		const rows =
-			typeof content.rows === 'number' ? content.rows : DEFAULT_MINESWEEPER_CONFIG.rows;
+			typeof content.rows === 'number'
+				? content.rows
+				: DEFAULT_MINESWEEPER_CONFIG.rows;
 		const cols =
-			typeof content.cols === 'number' ? content.cols : DEFAULT_MINESWEEPER_CONFIG.cols;
+			typeof content.cols === 'number'
+				? content.cols
+				: DEFAULT_MINESWEEPER_CONFIG.cols;
 		const mines =
-			typeof content.mines === 'number' ? content.mines : DEFAULT_MINESWEEPER_CONFIG.mines;
+			typeof content.mines === 'number'
+				? content.mines
+				: DEFAULT_MINESWEEPER_CONFIG.mines;
 
 		let difficulty = DEFAULT_MINESWEEPER_CONFIG.difficulty;
 		if (typeof content.difficulty === 'string') {
 			const candidate = content.difficulty as string;
 			if (
 				ALLOWED_MINESWEEPER_DIFFICULTIES.includes(
-					candidate as MinesweeperDifficulty,
+					candidate as MinesweeperDifficulty
 				)
 			) {
 				difficulty = candidate as MinesweeperDifficulty;
@@ -167,7 +191,9 @@ function resolveMinesweeperContent(content: WindowContent | undefined): Mineswee
 	return { ...DEFAULT_MINESWEEPER_CONFIG };
 }
 
-function resolvePaintContent(content: WindowContent | undefined): PaintWindowContent {
+function resolvePaintContent(
+	content: WindowContent | undefined
+): PaintWindowContent {
 	if (isRecord(content)) {
 		const canvasWidth =
 			typeof content.canvasWidth === 'number'
@@ -189,7 +215,7 @@ function resolvePaintContent(content: WindowContent | undefined): PaintWindowCon
 		let palette = DEFAULT_PAINT_CONFIG.palette;
 		if (Array.isArray(content.palette)) {
 			const validColors = (content.palette as unknown[]).filter(
-				(value): value is string => typeof value === 'string',
+				(value): value is string => typeof value === 'string'
 			);
 			if (validColors.length > 0) {
 				palette = validColors;
@@ -214,7 +240,10 @@ function resolvePaintContent(content: WindowContent | undefined): PaintWindowCon
 	};
 }
 
-function renderWindowContent(windowData: WindowType, onProtectedDelete?: (filePath: string, fileName: string) => void) {
+function renderWindowContent(
+	windowData: WindowType,
+	onProtectedDelete?: (filePath: string, fileName: string) => void
+) {
 	switch (windowData.appType) {
 		case 'notepad': {
 			const notepadProps = resolveNotepadContent(windowData.content);
@@ -222,7 +251,12 @@ function renderWindowContent(windowData: WindowType, onProtectedDelete?: (filePa
 		}
 		case 'explorer': {
 			const initialPath = resolveExplorerPath(windowData.content);
-			return <FileExplorer initialPath={initialPath} onProtectedDelete={onProtectedDelete} />;
+			return (
+				<FileExplorer
+					initialPath={initialPath}
+					onProtectedDelete={onProtectedDelete}
+				/>
+			);
 		}
 		case 'minesweeper': {
 			const config = resolveMinesweeperContent(windowData.content);
@@ -251,6 +285,9 @@ export default function MainPage() {
 		return false;
 	});
 
+	// Start Menu related state
+	const [isShutDown, setIsShutDown] = useState(false);
+
 	// Easter egg dialog states
 	const [errorDialog, setErrorDialog] = useState<{
 		visible: boolean;
@@ -270,6 +307,16 @@ export default function MainPage() {
 	useEffect(() => {
 		if (bootComplete && typeof window !== 'undefined') {
 			localStorage.setItem('hasBooted', 'true');
+		}
+	}, [bootComplete]);
+
+	// Apply saved background color on load
+	useEffect(() => {
+		if (typeof window !== 'undefined') {
+			const savedColor = localStorage.getItem('desktopBgColor');
+			if (savedColor) {
+				document.body.style.backgroundColor = savedColor;
+			}
 		}
 	}, [bootComplete]);
 
@@ -309,6 +356,147 @@ export default function MainPage() {
 		});
 	}, [openWindow, windows.length, bootComplete]);
 
+	// Start Menu handlers
+	const handleLaunchApp = (appType: string, content?: any) => {
+		const position = { 
+			x: 100 + Math.random() * 200, 
+			y: 80 + Math.random() * 150 
+		};
+		
+		switch (appType) {
+			case 'paint':
+				openWindow({
+					title: 'Paint.exe',
+					appType: 'paint',
+					position,
+					size: { width: 400, height: 350 },
+					icon: 'PT',
+					content: content || DEFAULT_PAINT_CONFIG,
+				});
+				break;
+				
+			case 'minesweeper':
+				openWindow({
+					title: 'Minesweeper.exe',
+					appType: 'minesweeper',
+					position,
+					size: { width: 320, height: 280 },
+					icon: 'MS',
+					content: content || DEFAULT_MINESWEEPER_CONFIG,
+				});
+				break;
+				
+			case 'notepad':
+				openWindow({
+					title: `${content?.fileName || 'Untitled'}.txt - Notepad`,
+					appType: 'notepad',
+					position,
+					size: { width: 440, height: 320 },
+					icon: 'NP',
+					content: {
+						fileName: content?.fileName || 'Untitled',
+						filePath: content?.filePath || null,
+						body: content?.content || DEFAULT_NOTEPAD_MESSAGE,
+						readOnly: content?.readOnly || false,
+					} as NotepadWindowContent,
+				});
+				break;
+				
+			case 'file-explorer':
+				openWindow({
+					title: `${content?.path || 'My Computer'} - File Explorer`,
+					appType: 'explorer',
+					position,
+					size: { width: 480, height: 360 },
+					icon: 'FE',
+					content: { folderPath: content?.path || null },
+				});
+				break;
+		}
+	};
+
+	const handleRestart = () => {
+		if (confirm('Restart Windows?\n\nThis will close all programs and restart your computer.')) {
+			// Clear localStorage to trigger boot sequence
+			localStorage.removeItem('hasBooted');
+			// Reset state
+			setBootComplete(false);
+			setIsShutDown(false);
+			// Could also clear user files and background color if desired
+			// localStorage.removeItem('desktopBgColor');
+			// Force a full reload to completely reset state
+			window.location.reload();
+		}
+	};
+
+	const handleShutDown = () => {
+		if (confirm('Shut Down Windows?\n\nThis will close all programs and shut down Windows so you can safely turn off power.')) {
+			setIsShutDown(true);
+		}
+	};
+
+	const handleShowSettings = () => {
+		// Simple background color picker
+		const colors = [
+			{ name: 'Teal', value: '#008080' },
+			{ name: 'Blue', value: '#000080' },
+			{ name: 'Green', value: '#008000' },
+			{ name: 'Purple', value: '#800080' },
+			{ name: 'Pink', value: '#FF69B4' },
+		];
+		
+		const colorChoice = prompt(
+			'Choose a background color:\n\n' +
+			colors.map((c, i) => `${i + 1}. ${c.name}`).join('\n') +
+			'\n\nEnter number (1-5):'
+		);
+		
+		if (colorChoice) {
+			const index = parseInt(colorChoice) - 1;
+			if (index >= 0 && index < colors.length) {
+				const selectedColor = colors[index].value;
+				localStorage.setItem('desktopBgColor', selectedColor);
+				// Update the desktop background
+				document.body.style.backgroundColor = selectedColor;
+			}
+		}
+	};
+
+	const handleShowFind = () => {
+		setErrorDialog({
+			visible: true,
+			message: 'Find: Files or Folders\n\nSearch functionality coming soon!\n\nFor now, use File Explorer to browse files.',
+			title: 'Find',
+		});
+	};
+
+	const handleShowHelp = () => {
+		handleLaunchApp('notepad', {
+			fileName: 'Help',
+			content: 'Windows 3.1 Portfolio Help\n\n' +
+					'Welcome to the Windows 3.1 Portfolio Experience!\n\n' +
+					'How to use:\n' +
+					'• Double-click desktop icons to open apps\n' +
+					'• Right-click icons or files for context menu\n' +
+					'• Drag windows around by their title bar\n' +
+					'• Use taskbar buttons to switch between windows\n' +
+					'• Click Start button for system controls\n\n' +
+					'Applications:\n' +
+					'• Paint.exe - Simple drawing program\n' +
+					'• Minesweeper.exe - Classic puzzle game\n' +
+					'• Notepad.exe - Text editor\n' +
+					'• File Explorer - Browse files and folders\n\n' +
+					'System Controls:\n' +
+					'• Restart Windows - Replay boot sequence\n' +
+					'• Shut Down - End the portfolio session\n' +
+					'• Settings - Change background color\n\n' +
+					'Easter Eggs:\n' +
+					'Try deleting protected files for surprises! 😉\n\n' +
+					'Press any key during boot to skip the sequence.',
+			readOnly: true,
+		});
+	};
+
 	// Easter egg handlers for protected file operations
 	const handleProtectedDelete = (filePath: string, fileName: string) => {
 		if (fileName === 'About.txt') {
@@ -345,14 +533,16 @@ Press any key to continue your portfolio exploration...`,
 			// Funny message for Recycle Bin
 			setErrorDialog({
 				visible: true,
-				message: 'Cannot delete the Recycle Bin. Where would deleted files go? Into the void? 🗑️',
+				message:
+					'Cannot delete the Recycle Bin. Where would deleted files go? Into the void? 🗑️',
 				title: 'Error',
 			});
 		} else if (fileName === 'Resume.pdf') {
 			// Special message for Resume
 			setErrorDialog({
 				visible: true,
-				message: 'Hey! That\'s my resume! You should be downloading it, not deleting it! 📄✨',
+				message:
+					"Hey! That's my resume! You should be downloading it, not deleting it! 📄✨",
 				title: 'Resume Protection',
 			});
 		} else if (fileName.includes('.exe')) {
@@ -421,7 +611,14 @@ Press any key to continue your portfolio exploration...`,
 				</div>
 			) : null}
 
-			<Taskbar />
+			<Taskbar
+				onLaunchApp={handleLaunchApp}
+				onRestart={handleRestart}
+				onShutDown={handleShutDown}
+				onShowSettings={handleShowSettings}
+				onShowFind={handleShowFind}
+				onShowHelp={handleShowHelp}
+			/>
 
 			{/* Easter Egg Dialogs */}
 			<ErrorDialog
@@ -438,6 +635,8 @@ Press any key to continue your portfolio exploration...`,
 				message={bsod.message}
 				onDismiss={() => setBsod({ visible: false, message: '' })}
 			/>
+
+			<ShutDownScreen isVisible={isShutDown} />
 		</>
 	);
 }

@@ -32,10 +32,12 @@ export function useFileSystem() {
   // Create a file
   const createFile = useCallback((parentPath: string, name: string, content: string = '') => {
     const parent = getItemByPath(parentPath);
-    if (!parent || parent.type !== 'folder') return;
+    if (!parent || parent.type !== 'folder') {
+      return null;
+    }
 
     const newFile: FileSystemItem = {
-      id: `file-${Date.now()}`,
+      id: `file-${Date.now()}` ,
       name,
       type: 'file',
       extension: (name.split('.').pop() as FileExtension) || null,
@@ -64,6 +66,38 @@ export function useFileSystem() {
       };
       return addToTree(prev);
     });
+
+    return newFile;
+  }, [getItemByPath]);
+
+  const updateFileContent = useCallback((path: string, content: string): boolean => {
+    const target = getItemByPath(path);
+    if (!target || target.type !== 'file') {
+      return false;
+    }
+
+    const updatedAt = Date.now();
+
+    setRootItems(prev => {
+      const updateTree = (items: FileSystemItem[]): FileSystemItem[] =>
+        items.map(item => {
+          if (item.path === path && item.type === 'file') {
+            return {
+              ...item,
+              content,
+              modifiedAt: updatedAt,
+            };
+          }
+          if (item.children) {
+            return { ...item, children: updateTree(item.children) };
+          }
+          return item;
+        });
+
+      return updateTree(prev);
+    });
+
+    return true;
   }, [getItemByPath]);
 
   // Create a folder
@@ -161,6 +195,7 @@ export function useFileSystem() {
     desktopIcons,
     createFile,
     createFolder,
+    updateFileContent,
     deleteItem,
     moveItem,
     getItemByPath,

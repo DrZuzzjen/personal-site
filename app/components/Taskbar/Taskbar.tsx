@@ -1,11 +1,12 @@
 'use client';
 
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useWindowContext } from '@/app/lib/WindowContext';
 import { COLORS, Z_INDEX } from '@/app/lib/constants';
 import type { Window as WindowType } from '@/app/lib/types';
 import TaskbarButton from './TaskbarButton';
 import Clock from './Clock';
+import { StartMenu } from '@/app/components/StartMenu';
 
 function getActiveWindowId(windows: WindowType[]): string | null {
   const visibleWindows = windows.filter((windowItem) => !windowItem.isMinimized);
@@ -21,8 +22,25 @@ function getActiveWindowId(windows: WindowType[]): string | null {
   return topWindow.id;
 }
 
-export default function Taskbar() {
+interface TaskbarProps {
+  onLaunchApp: (appType: string, content?: any) => void;
+  onRestart: () => void;
+  onShutDown: () => void;
+  onShowSettings: () => void;
+  onShowFind: () => void;
+  onShowHelp: () => void;
+}
+
+export default function Taskbar({
+  onLaunchApp,
+  onRestart,
+  onShutDown,
+  onShowSettings,
+  onShowFind,
+  onShowHelp,
+}: TaskbarProps) {
   const { windows, focusWindow, minimizeWindow } = useWindowContext();
+  const [isStartMenuOpen, setIsStartMenuOpen] = useState(false);
 
   const activeWindowId = useMemo(() => getActiveWindowId(windows), [windows]);
 
@@ -42,6 +60,14 @@ export default function Taskbar() {
     },
     [activeWindowId, focusWindow, minimizeWindow],
   );
+
+  const handleStartButtonClick = () => {
+    setIsStartMenuOpen(!isStartMenuOpen);
+  };
+
+  const handleStartMenuClose = () => {
+    setIsStartMenuOpen(false);
+  };
 
   return (
     <div
@@ -76,13 +102,14 @@ export default function Taskbar() {
           fontWeight: 700,
           color: COLORS.TEXT_BLACK,
           backgroundColor: COLORS.WIN_GRAY,
-          borderTop: '2px solid ' + COLORS.BORDER_LIGHT,
-          borderLeft: '2px solid ' + COLORS.BORDER_HIGHLIGHT,
-          borderBottom: '2px solid ' + COLORS.BORDER_SHADOW,
-          borderRight: '2px solid ' + COLORS.BORDER_DARK,
+          borderTop: isStartMenuOpen ? `2px solid ${COLORS.BORDER_SHADOW}` : `2px solid ${COLORS.BORDER_LIGHT}`,
+          borderLeft: isStartMenuOpen ? `2px solid ${COLORS.BORDER_SHADOW}` : `2px solid ${COLORS.BORDER_HIGHLIGHT}`,
+          borderBottom: isStartMenuOpen ? `2px solid ${COLORS.BORDER_LIGHT}` : `2px solid ${COLORS.BORDER_SHADOW}`,
+          borderRight: isStartMenuOpen ? `2px solid ${COLORS.BORDER_LIGHT}` : `2px solid ${COLORS.BORDER_DARK}`,
           cursor: 'pointer',
         }}
         title="Start"
+        onClick={handleStartButtonClick}
       >
         Start
       </button>
@@ -107,6 +134,17 @@ export default function Taskbar() {
       </div>
 
       <Clock />
+
+      <StartMenu
+        isOpen={isStartMenuOpen}
+        onClose={handleStartMenuClose}
+        onLaunchApp={onLaunchApp}
+        onRestart={onRestart}
+        onShutDown={onShutDown}
+        onShowSettings={onShowSettings}
+        onShowFind={onShowFind}
+        onShowHelp={onShowHelp}
+      />
     </div>
   );
 }

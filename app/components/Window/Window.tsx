@@ -166,7 +166,11 @@ export default function Window({
     boxSizing: 'border-box',
   };
 
-  const renderedChildren = children ?? currentWindow.content ?? null;
+  let renderedChildren: ReactNode | null = children ?? null;
+
+  if (!renderedChildren && typeof currentWindow?.content === 'string') {
+    renderedChildren = currentWindow.content;
+  }
 
   return (
     <>
@@ -204,3 +208,4 @@ export default function Window({
     </>
   );
 }
+

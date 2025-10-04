@@ -45,7 +45,7 @@ const PAINT_PALETTE = [
 
 function createNotepadLaunch(
 	item: FileSystemItem,
-	overrides?: Partial<NotepadWindowContent>,
+	overrides?: Partial<NotepadWindowContent>
 ): LaunchConfig {
 	const baseContent: NotepadWindowContent = {
 		filePath: item.path,
@@ -69,7 +69,10 @@ function createNotepadLaunch(
 	};
 }
 
-function createUnsupportedFileLaunch(item: FileSystemItem, message: string): LaunchConfig {
+function createUnsupportedFileLaunch(
+	item: FileSystemItem,
+	message: string
+): LaunchConfig {
 	return createNotepadLaunch(item, {
 		body: message,
 	});
@@ -131,7 +134,7 @@ function getLaunchConfigForFile(item: FileSystemItem): LaunchConfig | null {
 
 		return createUnsupportedFileLaunch(
 			item,
-			`No application handler is defined for ${item.name}.`,
+			`No application handler is defined for ${item.name}.`
 		);
 	}
 
@@ -142,17 +145,20 @@ function getLaunchConfigForFile(item: FileSystemItem): LaunchConfig | null {
 	if (item.extension === 'pdf') {
 		return createUnsupportedFileLaunch(
 			item,
-			'This preview is not available yet. Download functionality is coming in a later phase.',
+			'This preview is not available yet. Download functionality is coming in a later phase.'
 		);
 	}
 
 	return createUnsupportedFileLaunch(
 		item,
-		`No application is associated with "${item.name}" yet.`,
+		`No application is associated with "${item.name}" yet.`
 	);
 }
 
-export default function DesktopIcon({ icon, onProtectedDelete }: DesktopIconProps) {
+export default function DesktopIcon({
+	icon,
+	onProtectedDelete,
+}: DesktopIconProps) {
 	const [lastClickTime, setLastClickTime] = useState(0);
 	const iconRef = useRef<HTMLDivElement>(null);
 	const [contextMenu, setContextMenu] = useState<{
@@ -160,8 +166,13 @@ export default function DesktopIcon({ icon, onProtectedDelete }: DesktopIconProp
 		y: number;
 	} | null>(null);
 
-	const { selectIcon, getItemByPath, updateIconPosition, rootItems, deleteItem } =
-		useFileSystemContext();
+	const {
+		selectIcon,
+		getItemByPath,
+		updateIconPosition,
+		rootItems,
+		deleteItem,
+	} = useFileSystemContext();
 
 	const { openWindow } = useWindowContext();
 
@@ -185,7 +196,7 @@ export default function DesktopIcon({ icon, onProtectedDelete }: DesktopIconProp
 		currentPosition: pixelPosition,
 		onPositionChange: (
 			iconId: string,
-			newPixelPos: { x: number; y: number },
+			newPixelPos: { x: number; y: number }
 		) => {
 			// Convert pixel position back to grid position for storage
 			const gridPos = {
@@ -268,7 +279,7 @@ export default function DesktopIcon({ icon, onProtectedDelete }: DesktopIconProp
 	};
 
 	const getIconDisplay = (
-		item: FileSystemItem,
+		item: FileSystemItem
 	): { symbol: string; color: string } => {
 		if (item.isSystem) {
 			if (item.name === 'My Computer')
@@ -439,4 +450,3 @@ export default function DesktopIcon({ icon, onProtectedDelete }: DesktopIconProp
 		</>
 	);
 }
-

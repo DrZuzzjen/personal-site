@@ -11,7 +11,10 @@ interface DesktopProps {
 	onProtectedDelete?: (filePath: string, fileName: string) => void;
 }
 
-export default function Desktop({ className, onProtectedDelete }: DesktopProps) {
+export default function Desktop({
+	className,
+	onProtectedDelete,
+}: DesktopProps) {
 	const [contextMenu, setContextMenu] = useState<{
 		x: number;
 		y: number;
@@ -84,7 +87,11 @@ export default function Desktop({ className, onProtectedDelete }: DesktopProps) 
 			}}
 		>
 			{desktopIcons.map((icon) => (
-				<DesktopIcon key={icon.id} icon={icon} onProtectedDelete={onProtectedDelete} />
+				<DesktopIcon
+					key={icon.id}
+					icon={icon}
+					onProtectedDelete={onProtectedDelete}
+				/>
 			))}
 
 			{/* Context Menu */}
