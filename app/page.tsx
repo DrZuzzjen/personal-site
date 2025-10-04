@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Window from '@/app/components/Window/Window';
 import Desktop from '@/app/components/Desktop/Desktop';
 import Taskbar from '@/app/components/Taskbar/Taskbar';
 import FileExplorer from '@/app/components/Apps/FileExplorer/FileExplorer';
+import { BootSequence } from '@/app/components/BootSequence';
 import { useWindowContext } from '@/app/lib/WindowContext';
 import { COLORS } from '@/app/lib/constants';
 import type { Window as WindowType } from '@/app/lib/types';
@@ -74,9 +75,23 @@ function renderWindowContent(windowData: WindowType) {
 export default function MainPage() {
 	const { windows, openWindow } = useWindowContext();
 	const bootRef = useRef(false);
+	const [bootComplete, setBootComplete] = useState(() => {
+		// Check if user has already seen the boot sequence
+		if (typeof window !== 'undefined') {
+			return localStorage.getItem('hasBooted') === 'true';
+		}
+		return false;
+	});
+
+	// Save boot state to localStorage
+	useEffect(() => {
+		if (bootComplete) {
+			localStorage.setItem('hasBooted', 'true');
+		}
+	}, [bootComplete]);
 
 	useEffect(() => {
-		if (bootRef.current) {
+		if (bootRef.current || !bootComplete) {
 			return;
 		}
 
@@ -105,7 +120,12 @@ export default function MainPage() {
 			icon: 'PM',
 			content: null,
 		});
-	}, [openWindow, windows.length]);
+	}, [openWindow, windows.length, bootComplete]);
+
+	// Show boot sequence on first visit
+	if (!bootComplete) {
+		return <BootSequence onBootComplete={() => setBootComplete(true)} />;
+	}
 
 	return (
 		<>
