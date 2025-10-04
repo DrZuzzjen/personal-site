@@ -33,6 +33,28 @@ export default function Desktop({
 	} = useFileSystemContext();
 	const { openWindow } = useWindowContext();
 
+	// Helper function to find next available desktop position
+	const findNextAvailablePosition = () => {
+		const maxCols = Math.floor(window.innerWidth / DESKTOP_GRID.ICON_WIDTH);
+		const maxRows = Math.floor((window.innerHeight - 100) / DESKTOP_GRID.ICON_HEIGHT); // Account for taskbar
+		
+		// Check each position starting from top-left
+		for (let row = 0; row < maxRows; row++) {
+			for (let col = 0; col < maxCols; col++) {
+				const position = { x: col, y: row };
+				// Check if this position is already occupied
+				const isOccupied = desktopIcons.some(icon => 
+					icon.position.x === position.x && icon.position.y === position.y
+				);
+				if (!isOccupied) {
+					return position;
+				}
+			}
+		}
+		// If all positions are taken, just use a random one
+		return { x: Math.floor(Math.random() * maxCols), y: Math.floor(Math.random() * maxRows) };
+	};
+
 	const handleDesktopClick = (event: React.MouseEvent<HTMLDivElement>) => {
 		// Only deselect if clicking on the desktop background itself
 		if (event.target === event.currentTarget) {
@@ -56,18 +78,29 @@ export default function Desktop({
 
 	const handleNewFolder = () => {
 		const folderName = prompt('Enter folder name:', 'New Folder');
-		
+
 		if (folderName && folderName.trim()) {
 			// Create the folder with the user-provided name
 			createFolder('/Desktop', folderName.trim());
+			
+			// Get the created folder and create a desktop icon for it
+			// Use setTimeout to ensure the folder is created first
+			setTimeout(() => {
+				const createdFolder = getItemByPath(`/Desktop/${folderName.trim()}`);
+				if (createdFolder) {
+					// Find a good position for the new icon
+					const position = findNextAvailablePosition();
+					createDesktopIcon(createdFolder, position);
+				}
+			}, 10);
 		}
-		
+
 		setContextMenu(null);
 	};
 
 	const handleNewTextFile = () => {
 		const fileName = prompt('Enter file name:', 'New Text Document.txt');
-		
+
 		if (fileName && fileName.trim()) {
 			const finalFileName = fileName.trim();
 			const filePath = `/Desktop/${finalFileName}`;
@@ -76,6 +109,11 @@ export default function Desktop({
 			const newFile = createFile('/Desktop', finalFileName, '');
 
 			if (newFile) {
+				// Create a desktop icon for the new file
+				// Find a good position for the new icon
+				const position = findNextAvailablePosition();
+				createDesktopIcon(newFile, position);
+
 				// Open the new file in Notepad automatically
 				openWindow({
 					title: `${finalFileName} - Notepad`,
