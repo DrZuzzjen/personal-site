@@ -205,6 +205,7 @@ export default function Paint({
 	brushSize,
 	backgroundColor,
 	palette,
+	backgroundImage,
 }: PaintProps) {
 	// Use much larger default canvas size for professional look
 	const width = Math.max(600, Math.floor(canvasWidth));
@@ -253,14 +254,46 @@ export default function Paint({
 		canvas.style.width = `${width}px`;
 		canvas.style.height = `${height}px`;
 		ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+		
+		// Fill background color first
 		ctx.fillStyle = effectiveBackground;
 		ctx.fillRect(0, 0, width, height);
+
+		// Load background image if provided (for screenshots from Camera app)
+		if (backgroundImage) {
+			const img = new Image();
+			img.onload = () => {
+				// Calculate dimensions to fit the image properly
+				const imgAspect = img.width / img.height;
+				const canvasAspect = width / height;
+				
+				let drawWidth = width;
+				let drawHeight = height;
+				let offsetX = 0;
+				let offsetY = 0;
+
+				// Scale to fit while maintaining aspect ratio
+				if (imgAspect > canvasAspect) {
+					// Image is wider than canvas
+					drawHeight = width / imgAspect;
+					offsetY = (height - drawHeight) / 2;
+				} else {
+					// Image is taller than canvas
+					drawWidth = height * imgAspect;
+					offsetX = (width - drawWidth) / 2;
+				}
+
+				ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+			};
+			img.src = backgroundImage;
+		}
+
 		ctx.lineCap = 'round';
 		ctx.lineJoin = 'round';
 		ctxRef.current = ctx;
 		drawingRef.current = false;
 		lastPointRef.current = null;
-	}, [width, height, effectiveBackground]);
+	}, [width, height, effectiveBackground, backgroundImage]);
 
 	const toCanvasPoint = (
 		event: React.PointerEvent<HTMLCanvasElement>

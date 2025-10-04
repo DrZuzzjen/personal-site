@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { COLORS } from '../../../lib/constants';
+import { useFileSystemContext } from '../../../lib/FileSystemContext';
 
 interface CameraProps {
   onClose?: () => void;
@@ -15,6 +16,8 @@ export default function Camera({ onClose }: CameraProps) {
   const [micLevel, setMicLevel] = useState(0);
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
+  
+  const { createImageFile } = useFileSystemContext();
 
   const setupAudioMonitoring = useCallback((mediaStream: MediaStream) => {
     try {
@@ -104,28 +107,32 @@ export default function Camera({ onClose }: CameraProps) {
     // Draw the current video frame
     ctx.drawImage(video, 0, 0);
 
-    // Convert to blob and download
-    canvas.toBlob((blob) => {
-      if (!blob) return;
+    // Convert to data URL (base64)
+    const imageData = canvas.toDataURL('image/png');
+    const fileName = `Screenshot_${new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)}.png`;
 
-      const fileName = `Webcam_${new Date().toISOString().replace(/[:.]/g, '-')}.png`;
-      const url = URL.createObjectURL(blob);
-      
-      // Create download link
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = fileName;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      
-      // Clean up
-      URL.revokeObjectURL(url);
-
-      // Show confirmation
-      alert(`📸 Screenshot saved as ${fileName}!`);
-    }, 'image/png');
-  }, [isActive]);
+    // Save to virtual Desktop
+    const savedFile = createImageFile('/Desktop', fileName, imageData);
+    
+    if (savedFile) {
+      // Show success message with Windows 3.1 style alert
+      alert(`📸 Screenshot saved to Desktop!\n\n${fileName}\n\nYou can now open it in Paint!`);
+    } else {
+      // Fallback to download if virtual save fails
+      canvas.toBlob((blob) => {
+        if (!blob) return;
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        alert(`📸 Screenshot downloaded as ${fileName}!`);
+      }, 'image/png');
+    }
+  }, [isActive, createImageFile]);
 
   // Start camera on component mount
   useEffect(() => {

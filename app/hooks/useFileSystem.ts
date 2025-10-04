@@ -191,11 +191,54 @@ export function useFileSystem() {
     );
   }, []);
 
+  // Create an image file with base64 data
+  const createImageFile = useCallback((parentPath: string, name: string, imageData: string) => {
+    const parent = getItemByPath(parentPath);
+    if (!parent || parent.type !== 'folder') {
+      return null;
+    }
+
+    const newFile: FileSystemItem = {
+      id: `img-${Date.now()}`,
+      name,
+      type: 'file',
+      extension: 'png',
+      path: `${parentPath}/${name}`,
+      imageData,
+      isProtected: false,
+      isSystem: false,
+      icon: '🖼️',
+      createdAt: Date.now(),
+      modifiedAt: Date.now(),
+    };
+
+    setRootItems(prev => {
+      const addToTree = (items: FileSystemItem[]): FileSystemItem[] => {
+        return items.map(item => {
+          if (item.path === parentPath) {
+            return {
+              ...item,
+              children: [...(item.children || []), newFile],
+            };
+          }
+          if (item.children) {
+            return { ...item, children: addToTree(item.children) };
+          }
+          return item;
+        });
+      };
+      return addToTree(prev);
+    });
+
+    return newFile;
+  }, [getItemByPath]);
+
   return {
     rootItems,
     desktopIcons,
     createFile,
     createFolder,
+    createImageFile,
     updateFileContent,
     deleteItem,
     moveItem,

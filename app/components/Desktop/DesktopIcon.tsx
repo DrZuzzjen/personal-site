@@ -171,6 +171,27 @@ function getLaunchConfigForFile(item: FileSystemItem): LaunchConfig | null {
 		return createNotepadLaunch(item);
 	}
 
+	if (item.extension === 'png' && item.imageData) {
+		// Open PNG files in Paint
+		const content: PaintWindowContent = {
+			canvasWidth: 640,
+			canvasHeight: 480,
+			backgroundColor: '#FFFFFF',
+			brushSize: 4,
+			palette: PAINT_PALETTE,
+			backgroundImage: item.imageData, // Load the screenshot as background
+		};
+
+		return {
+			title: `${item.name} - Paint`,
+			appType: 'paint',
+			position: { x: 180, y: 120 },
+			size: PAINT_WINDOW_SIZE,
+			icon: 'PT',
+			content,
+		};
+	}
+
 	if (item.extension === 'pdf') {
 		return createUnsupportedFileLaunch(
 			item,
