@@ -29,8 +29,8 @@ export function useIconDrag({
     const gridY = Math.round(y / DESKTOP_GRID.ICON_HEIGHT) * DESKTOP_GRID.ICON_HEIGHT;
     
     // Keep icons within screen bounds
-    const maxX = window.innerWidth - DESKTOP_GRID.ICON_WIDTH;
-    const maxY = window.innerHeight - DESKTOP_GRID.ICON_HEIGHT;
+    const maxX = Math.floor((window.innerWidth - DESKTOP_GRID.ICON_WIDTH) / DESKTOP_GRID.ICON_WIDTH) * DESKTOP_GRID.ICON_WIDTH;
+    const maxY = Math.floor((window.innerHeight - DESKTOP_GRID.ICON_HEIGHT) / DESKTOP_GRID.ICON_HEIGHT) * DESKTOP_GRID.ICON_HEIGHT;
     
     return {
       x: Math.max(0, Math.min(gridX, maxX)),
