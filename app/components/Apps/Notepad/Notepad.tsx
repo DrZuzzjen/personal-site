@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { COLORS } from '@/app/lib/constants';
+import { useFileSystemContext } from '@/app/lib/FileSystemContext';
+import { useWindowContext } from '@/app/lib/WindowContext';
 import type { NotepadWindowContent } from '@/app/lib/types';
 
 export type NotepadProps = NotepadWindowContent;
@@ -90,11 +92,20 @@ export default function Notepad({ fileName, filePath, body, readOnly }: NotepadP
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 	const [isWrapped, setIsWrapped] = useState(true);
 	const [cursorPosition, setCursorPosition] = useState({ line: 1, column: 1 });
+	
+	// State for editing
+	const [editedText, setEditedText] = useState(body);
+	
+	// File system and window context
+	const { updateFileContent, createFile } = useFileSystemContext();
+	const { openWindow } = useWindowContext();
 
-	const text = body;
+	const text = editedText; // Use edited text instead of original body
+	const hasChanges = editedText !== body; // Track if user made changes
 	const displayName = fileName ?? 'Untitled.txt';
+	const displayTitle = hasChanges ? `${displayName}*` : displayName; // Show asterisk for unsaved changes
 	const displayPath = filePath ?? '(unsaved document)';
-	const isReadOnly = readOnly !== false;
+	const isReadOnly = readOnly === true; // Only readonly if explicitly set to true
 
 	const lineCount = useMemo(() => text.split(/\r\n|\r|\n/).length, [text]);
 	const charCount = text.length;
@@ -114,6 +125,11 @@ export default function Notepad({ fileName, filePath, body, readOnly }: NotepadP
 		element.setSelectionRange(0, 0);
 		setCursorPosition({ line: 1, column: 1 });
 	}, [text]);
+
+	// Reset edited text when body prop changes (new file loaded)
+	useEffect(() => {
+		setEditedText(body);
+	}, [body]);
 
 	const updateCursorPosition = () => {
 		const element = textareaRef.current;
@@ -140,6 +156,79 @@ export default function Notepad({ fileName, filePath, body, readOnly }: NotepadP
 		queueCursorUpdate();
 	};
 
+	// Save current file
+	const handleSave = () => {
+		if (!filePath) {
+			// No file path = new file, need "Save As"
+			alert('Please use Save As for new files');
+			return;
+		}
+
+		const success = updateFileContent(filePath, editedText);
+		if (success) {
+			console.log('File saved!');
+			// Could show a toast notification here
+		} else {
+			alert('Failed to save file');
+		}
+	};
+
+	// Create new notepad window
+	const handleNew = () => {
+		openWindow({
+			title: 'Untitled - Notepad',
+			appType: 'notepad',
+			position: { x: 120 + Math.random() * 100, y: 100 + Math.random() * 100 },
+			size: { width: 440, height: 320 },
+			icon: 'NP',
+			content: {
+				fileName: null,
+				filePath: null,
+				body: '',
+				readOnly: false,
+			} as NotepadWindowContent,
+		});
+	};
+
+	// Save As - create new file
+	const handleSaveAs = () => {
+		const filename = prompt('Save as:', fileName || 'Untitled.txt');
+		if (!filename) return; // User cancelled
+
+		// Make sure it ends with .txt
+		const finalName = filename.endsWith('.txt') ? filename : filename + '.txt';
+		
+		// Create file in My Documents
+		const newFile = createFile('/My Documents', finalName, editedText);
+
+		if (newFile) {
+			alert(`File saved as ${finalName}`);
+			// Could close current window and open the new file here
+		} else {
+			alert('Failed to create file - maybe it already exists?');
+		}
+	};
+
+	// Keyboard shortcuts
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (e.ctrlKey && e.key === 's') {
+				e.preventDefault();
+				if (hasChanges && filePath) {
+					handleSave();
+				} else if (!filePath) {
+					handleSaveAs();
+				}
+			} else if (e.ctrlKey && e.key === 'n') {
+				e.preventDefault();
+				handleNew();
+			}
+		};
+
+		document.addEventListener('keydown', handleKeyDown);
+		return () => document.removeEventListener('keydown', handleKeyDown);
+	}, [hasChanges, filePath]); // Dependencies
+
 	return (
 		<div style={containerStyle}>
 			<div style={menuBarStyle}>
@@ -151,13 +240,14 @@ export default function Notepad({ fileName, filePath, body, readOnly }: NotepadP
 			</div>
 
 			<div style={infoBarStyle}>
-				<span>{displayName}</span>
+				<span>{displayTitle}</span>
 				<span>{displayPath}</span>
 			</div>
 
 			<textarea
 				ref={textareaRef}
 				value={text}
+				onChange={(e) => setEditedText(e.target.value)}
 				readOnly={isReadOnly}
 				spellCheck={false}
 				wrap={isWrapped ? 'soft' : 'off'}
@@ -199,12 +289,38 @@ export default function Notepad({ fileName, filePath, body, readOnly }: NotepadP
 				<div style={statusGroupStyle}>
 					<button
 						type="button"
+						onClick={handleNew}
+						style={statusButtonStyle}
+					>
+						New
+					</button>
+					<button
+						type="button"
+						onClick={handleSave}
+						disabled={!hasChanges || !filePath}
+						style={{
+							...statusButtonStyle,
+							opacity: hasChanges && filePath ? 1 : 0.5,
+							cursor: hasChanges && filePath ? 'pointer' : 'not-allowed',
+						}}
+					>
+						Save
+					</button>
+					<button
+						type="button"
+						onClick={handleSaveAs}
+						style={statusButtonStyle}
+					>
+						Save As
+					</button>
+					<button
+						type="button"
 						onClick={handleToggleWrap}
 						style={statusButtonStyle}
 					>
 						Word Wrap: {isWrapped ? 'On' : 'Off'}
 					</button>
-					<span>{isReadOnly ? 'Read-only' : 'Editable'}</span>
+					<span>{isReadOnly ? 'Read-only' : hasChanges ? 'Modified' : 'Saved'}</span>
 				</div>
 			</div>
 		</div>
