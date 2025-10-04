@@ -43,3 +43,5 @@ next-env.d.ts
 
 .github/instructions/kluster-code-verify.instructions.md
 .kluster
+# Missions and feedback files
+#.missions/

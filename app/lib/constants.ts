@@ -258,6 +258,19 @@ Key Features:
     modifiedAt: Date.now(),
     children: [],
   },
+  {
+    id: 'desktop',
+    name: 'Desktop',
+    type: 'folder',
+    extension: 'folder',
+    path: '/Desktop',
+    isProtected: true,
+    isSystem: true,
+    icon: 'folder',
+    createdAt: Date.now(),
+    modifiedAt: Date.now(),
+    children: [],
+  },
 ];
 
 // ============================================
@@ -332,6 +345,30 @@ export const APP_EXECUTABLES: FileSystemItem[] = [
     createdAt: Date.now(),
     modifiedAt: Date.now(),
   },
+  {
+    id: 'camera-exe',
+    name: 'Camera.exe',
+    type: 'file',
+    extension: 'exe',
+    path: '/Desktop/Camera.exe',
+    isProtected: true,
+    isSystem: true,
+    icon: 'camera',
+    createdAt: Date.now(),
+    modifiedAt: Date.now(),
+  },
+  {
+    id: 'tv-exe',
+    name: 'TV.exe',
+    type: 'file',
+    extension: 'exe',
+    path: '/Desktop/TV.exe',
+    isProtected: true,
+    isSystem: true,
+    icon: 'tv',
+    createdAt: Date.now(),
+    modifiedAt: Date.now(),
+  },
 ];
 
 // Desktop icons for executables
@@ -358,6 +395,18 @@ export const APP_DESKTOP_ICONS: DesktopIcon[] = [
     id: 'desktop-icon-snake',
     fileSystemId: 'snake-exe',
     position: { x: 0, y: 5 },
+    isSelected: false,
+  },
+  {
+    id: 'desktop-icon-camera',
+    fileSystemId: 'camera-exe',
+    position: { x: 0, y: 6 },
+    isSelected: false,
+  },
+  {
+    id: 'desktop-icon-tv',
+    fileSystemId: 'tv-exe',
+    position: { x: 0, y: 7 },
     isSelected: false,
   },
 ];

@@ -2,7 +2,7 @@
 // WINDOW SYSTEM TYPES
 // ============================================
 
-export type AppType = 'notepad' | 'paint' | 'minesweeper' | 'mycomputer' | 'explorer' | 'snake';
+export type AppType = 'notepad' | 'paint' | 'minesweeper' | 'mycomputer' | 'explorer' | 'snake' | 'camera' | 'tv';
 
 export interface WindowPosition {
   x: number;
@@ -32,7 +32,7 @@ export interface Window {
 // ============================================
 
 export type FileType = 'file' | 'folder';
-export type FileExtension = 'txt' | 'exe' | 'pdf' | 'folder' | null;
+export type FileExtension = 'txt' | 'exe' | 'pdf' | 'png' | 'folder' | null;
 
 export interface FileSystemItem {
   id: string;
@@ -41,6 +41,7 @@ export interface FileSystemItem {
   extension: FileExtension | null;
   path: string; // e.g., "/Desktop/My Documents/Project1.txt"
   content?: string; // For text files
+  imageData?: string; // For image files (base64 data URL)
   children?: FileSystemItem[]; // For folders
   isProtected: boolean; // Cannot be deleted/moved
   isSystem: boolean; // System files (My Computer, Recycle Bin)
@@ -84,6 +85,7 @@ export interface PaintWindowContent {
   backgroundColor: string;
   brushSize: number;
   palette: string[];
+  backgroundImage?: string; // Optional base64 image data to load as background
 }
 
 // Minesweeper
@@ -128,12 +130,20 @@ export interface ExplorerWindowContent {
   folderPath?: string | null;
 }
 
+// Camera App
+export interface CameraWindowContent {
+  isActive?: boolean;
+  hasPermission?: boolean;
+  error?: string | null;
+}
+
 export type WindowContent =
   | NotepadWindowContent
   | PaintWindowContent
   | MinesweeperWindowContent
   | SnakeWindowContent
   | ExplorerWindowContent
+  | CameraWindowContent
   | string
   | null
   | undefined;
@@ -160,6 +170,7 @@ export interface FileSystemContext {
   desktopIcons: DesktopIcon[];
   createFile: (parentPath: string, name: string, content?: string) => FileSystemItem | null;
   createFolder: (parentPath: string, name: string) => void;
+  createImageFile: (parentPath: string, name: string, imageData: string) => FileSystemItem | null;
   deleteItem: (path: string) => boolean; // Returns false if protected
   moveItem: (fromPath: string, toPath: string) => boolean;
   getItemByPath: (path: string) => FileSystemItem | null;

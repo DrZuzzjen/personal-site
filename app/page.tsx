@@ -9,6 +9,8 @@ import Notepad from '@/app/components/Apps/Notepad/Notepad';
 import Minesweeper from '@/app/components/Apps/Minesweeper/Minesweeper';
 import Paint from '@/app/components/Apps/Paint/Paint';
 import Snake from '@/app/components/Apps/Snake/Snake';
+import Camera from '@/app/components/Apps/Camera/Camera';
+import TV from '@/app/components/Apps/TV/TV';
 import { BootSequence } from '@/app/components/BootSequence';
 import { ErrorDialog, BSOD } from '@/app/components/Dialogs';
 import { ShutDownScreen } from '@/app/components/StartMenu';
@@ -23,6 +25,7 @@ import type {
 	MinesweeperDifficulty,
 	PaintWindowContent,
 	SnakeWindowContent,
+	CameraWindowContent,
 } from '@/app/lib/types';
 
 const DEFAULT_NOTEPAD_MESSAGE =
@@ -327,8 +330,13 @@ function renderWindowContent(
 			return <Paint {...config} />;
 		}
 		case 'snake': {
-			const config = resolveSnakeContent(windowData.content);
-			return <Snake {...config} />;
+			return <Snake />;
+		}
+		case 'camera': {
+			return <Camera />;
+		}
+		case 'tv': {
+			return <TV />;
 		}
 		default:
 			return (
@@ -373,7 +381,8 @@ export default function MainPage() {
 
 	useEffect(() => {
 		const checkMobile = () => {
-			const mobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || 
+			const mobile =
+				/iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
 				window.innerWidth < 768;
 			setIsMobile(mobile);
 		};
@@ -490,7 +499,33 @@ export default function MainPage() {
 					position,
 					size: { width: 850, height: 580 },
 					icon: 'SN',
-					content: DEFAULT_SNAKE_CONFIG,
+					content: {},
+				});
+				break;
+
+			case 'camera':
+				openWindow({
+					title: 'Camera',
+					appType: 'camera',
+					position,
+					size: { width: 720, height: 580 },
+					icon: '📹',
+					content: {
+						isActive: false,
+						hasPermission: false,
+						error: null,
+					} as CameraWindowContent,
+				});
+				break;
+
+			case 'tv':
+				openWindow({
+					title: 'TV',
+					appType: 'tv',
+					position,
+					size: { width: 880, height: 720 },
+					icon: '📺',
+					content: {},
 				});
 				break;
 
@@ -695,9 +730,9 @@ Press any key to continue your portfolio exploration...`,
 				}}
 			>
 				<div style={{ fontSize: 18, fontWeight: 700 }}>
-					Windows 3.1 Portfolio
+					Jean Francois Gutierrez Portfolio
 				</div>
-				<div style={{ fontSize: 13 }}>Phase 3 Desktop + Windows Demo</div>
+				<div style={{ fontSize: 13 }}>Windows 3.1 </div>
 			</div>
 
 			{windows.length === 0 ? (
@@ -742,9 +777,7 @@ Press any key to continue your portfolio exploration...`,
 			<ShutDownScreen isVisible={isShutDown} />
 
 			{/* Mobile Warning */}
-			{isMobile && (
-				<MobileWarning onProceed={() => setIsMobile(false)} />
-			)}
+			{isMobile && <MobileWarning onProceed={() => setIsMobile(false)} />}
 		</>
 	);
 }

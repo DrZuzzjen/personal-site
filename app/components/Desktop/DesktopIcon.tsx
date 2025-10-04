@@ -12,6 +12,7 @@ import type {
 	MinesweeperWindowContent,
 	PaintWindowContent,
 	SnakeWindowContent,
+	CameraWindowContent,
 	WindowContent,
 } from '@/app/lib/types';
 
@@ -22,7 +23,7 @@ interface DesktopIconProps {
 
 interface LaunchConfig {
 	title: string;
-	appType: 'notepad' | 'paint' | 'minesweeper' | 'explorer' | 'snake';
+	appType: 'notepad' | 'paint' | 'minesweeper' | 'explorer' | 'snake' | 'camera' | 'tv';
 	position: { x: number; y: number };
 	size: { width: number; height: number };
 	icon?: string;
@@ -32,7 +33,9 @@ interface LaunchConfig {
 const DEFAULT_LAUNCH_POSITION = { x: 140, y: 110 };
 const NOTEPAD_WINDOW_SIZE = { width: 520, height: 380 };
 const MINESWEEPER_WINDOW_SIZE = { width: 360, height: 440 };
-const PAINT_WINDOW_SIZE = { width: 560, height: 460 };
+const PAINT_WINDOW_SIZE = { width: 800, height: 600 }; // Compact but roomy for new sidebar layout
+const CAMERA_WINDOW_SIZE = { width: 720, height: 580 }; // Good size for camera interface
+const TV_WINDOW_SIZE = { width: 880, height: 720 }; // Good size for retro TV with controls
 const PAINT_PALETTE = [
 	'#000000',
 	'#FFFFFF',
@@ -81,10 +84,10 @@ function createUnsupportedFileLaunch(
 
 function createPaintLaunch(): LaunchConfig {
 	const content: PaintWindowContent = {
-		canvasWidth: 320,
-		canvasHeight: 200,
+		canvasWidth: 600, // Larger canvas for new design
+		canvasHeight: 400,
 		backgroundColor: '#FFFFFF',
-		brushSize: 4,
+		brushSize: 6, // Slightly larger default brush
 		palette: PAINT_PALETTE,
 	};
 
@@ -118,25 +121,43 @@ function createMinesweeperLaunch(): LaunchConfig {
 }
 
 function createSnakeLaunch(): LaunchConfig {
-	const content: SnakeWindowContent = {
-		columns: 30,
-		rows: 25,
-		initialLength: 4,
-		initialSpeedMs: 180,
-		speedIncrementMs: 12,
-		speedIncreaseEvery: 3,
-		minimumSpeedMs: 60,
-	};
-
 	return {
 		title: 'Snake.exe',
 		appType: 'snake',
 		position: { x: 200, y: 140 },
 		size: { width: 850, height: 580 },
 		icon: 'SN',
+		content: {},
+	};
+}
+
+function createCameraLaunch(): LaunchConfig {
+	const content: CameraWindowContent = {
+		isActive: false,
+		hasPermission: false,
+		error: null,
+	};
+
+	return {
+		title: 'Camera',
+		appType: 'camera',
+		position: { x: 160, y: 80 },
+		size: CAMERA_WINDOW_SIZE,
+		icon: '📹',
 		content,
 	};
 }
+
+function createTVLaunch(): LaunchConfig {
+	return {
+		title: 'TV',
+		appType: 'tv',
+		position: { x: 120, y: 60 },
+		size: TV_WINDOW_SIZE,
+		icon: '📺',
+	};
+}
+
 
 function getLaunchConfigForFile(item: FileSystemItem): LaunchConfig | null {
 	if (item.extension === 'txt') {
@@ -164,6 +185,14 @@ function getLaunchConfigForFile(item: FileSystemItem): LaunchConfig | null {
 			return createSnakeLaunch();
 		}
 
+		if (exeName.includes('camera')) {
+			return createCameraLaunch();
+		}
+
+		if (exeName.includes('tv')) {
+			return createTVLaunch();
+		}
+
 		return createUnsupportedFileLaunch(
 			item,
 			`No application handler is defined for ${item.name}.`
@@ -172,6 +201,27 @@ function getLaunchConfigForFile(item: FileSystemItem): LaunchConfig | null {
 
 	if (item.content) {
 		return createNotepadLaunch(item);
+	}
+
+	if (item.extension === 'png' && item.imageData) {
+		// Open PNG files in Paint
+		const content: PaintWindowContent = {
+			canvasWidth: 640,
+			canvasHeight: 480,
+			backgroundColor: '#FFFFFF',
+			brushSize: 4,
+			palette: PAINT_PALETTE,
+			backgroundImage: item.imageData, // Load the screenshot as background
+		};
+
+		return {
+			title: `${item.name} - Paint`,
+			appType: 'paint',
+			position: { x: 180, y: 120 },
+			size: PAINT_WINDOW_SIZE,
+			icon: 'PT',
+			content,
+		};
 	}
 
 	if (item.extension === 'pdf') {
@@ -209,26 +259,32 @@ export default function DesktopIcon({
 	const { openWindow } = useWindowContext();
 
 	// Get the file system item data for this icon
-	// First try direct ID match in all items (recursive search), then path-based search
-	const findItemById = (
-		items: FileSystemItem[],
-		targetId: string
-	): FileSystemItem | null => {
-		for (const item of items) {
-			if (item.id === targetId) return item;
-			if (item.children) {
-				const found = findItemById(item.children, targetId);
-				if (found) return found;
+	// First try direct ID match, then search recursively through the entire tree
+	const findFileSystemItem = (): FileSystemItem | null => {
+		// First try direct ID match in top-level items
+		const directMatch = rootItems.find(
+			(item: FileSystemItem) => item.id === icon.fileSystemId
+		);
+		if (directMatch) return directMatch;
+
+		// Then search recursively through all items
+		const searchRecursively = (
+			items: FileSystemItem[]
+		): FileSystemItem | null => {
+			for (const item of items) {
+				if (item.id === icon.fileSystemId) return item;
+				if (item.children) {
+					const found = searchRecursively(item.children);
+					if (found) return found;
+				}
 			}
-		}
-		return null;
+			return null;
+		};
+
+		return searchRecursively(rootItems);
 	};
 
-	const fileSystemItem: FileSystemItem | null =
-		findItemById(rootItems, icon.fileSystemId) ||
-		getItemByPath(`/Desktop/${icon.fileSystemId}`) ||
-		getItemByPath(`/${icon.fileSystemId}`) ||
-		null;
+	const fileSystemItem: FileSystemItem | null = findFileSystemItem();
 
 	// Convert grid position to pixel position
 	const pixelPosition = {
@@ -355,6 +411,12 @@ export default function DesktopIcon({
 			}
 			if (exeName.includes('snake')) {
 				return { symbol: '🐍', color: '#C0C0C0' };
+			}
+			if (exeName.includes('camera')) {
+				return { symbol: '📷', color: '#C0C0C0' };
+			}
+			if (exeName.includes('tv')) {
+				return { symbol: '📺', color: '#C0C0C0' };
 			}
 			return { symbol: 'EXE', color: '#C0C0C0' };
 		}

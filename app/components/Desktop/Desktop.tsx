@@ -36,15 +36,18 @@ export default function Desktop({
 	// Helper function to find next available desktop position
 	const findNextAvailablePosition = () => {
 		const maxCols = Math.floor(window.innerWidth / DESKTOP_GRID.ICON_WIDTH);
-		const maxRows = Math.floor((window.innerHeight - 100) / DESKTOP_GRID.ICON_HEIGHT); // Account for taskbar
-		
+		const maxRows = Math.floor(
+			(window.innerHeight - 100) / DESKTOP_GRID.ICON_HEIGHT
+		); // Account for taskbar
+
 		// Check each position starting from top-left
 		for (let row = 0; row < maxRows; row++) {
 			for (let col = 0; col < maxCols; col++) {
 				const position = { x: col, y: row };
 				// Check if this position is already occupied
-				const isOccupied = desktopIcons.some(icon => 
-					icon.position.x === position.x && icon.position.y === position.y
+				const isOccupied = desktopIcons.some(
+					(icon) =>
+						icon.position.x === position.x && icon.position.y === position.y
 				);
 				if (!isOccupied) {
 					return position;
@@ -52,7 +55,10 @@ export default function Desktop({
 			}
 		}
 		// If all positions are taken, just use a random one
-		return { x: Math.floor(Math.random() * maxCols), y: Math.floor(Math.random() * maxRows) };
+		return {
+			x: Math.floor(Math.random() * maxCols),
+			y: Math.floor(Math.random() * maxRows),
+		};
 	};
 
 	const handleDesktopClick = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -82,7 +88,7 @@ export default function Desktop({
 		if (folderName && folderName.trim()) {
 			// Create the folder with the user-provided name
 			createFolder('/Desktop', folderName.trim());
-			
+
 			// Get the created folder and create a desktop icon for it
 			// Use setTimeout to ensure the folder is created first
 			setTimeout(() => {

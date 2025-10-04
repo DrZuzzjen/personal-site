@@ -22,18 +22,36 @@
 ## 🐛 Known Bugs
 
 ### 1. Desktop Right-Click "New" Submenu Not Showing
+<<<<<<< HEAD
 **Status**: 🚧 IN PROGRESS (Steve on develop)
+=======
+>>>>>>> master
 **Issue**: Right-click desktop → "New" option exists but submenu doesn't appear
 **Expected**: Should show submenu with "Text Document", "Folder", maybe "Image"
 **Current State**: Folder/File CRUD functions exist, just UI not wired
 **Fix**: Wire up context menu to show submenu options
+<<<<<<< HEAD
+=======
+
+### 2. Paint UI Needs Major Overhaul
+**Issue**: Paint looks rough - buttons cramped, canvas too small, poor spacing
+**Problems**:
+- Toolbar buttons too small and tight
+- Canvas size too small relative to window
+- Colors/tools hard to see
+- Overall layout feels amateur
+**Fix**: Redesign Paint UI with better spacing, larger canvas, clearer buttons
+>>>>>>> master
 
 ---
 
 ## 🚀 Enhancements Needed
 
 ### 1. Drag Files from FileExplorer to Desktop
+<<<<<<< HEAD
 **Status**: 🚧 IN PROGRESS (Steve on develop)
+=======
+>>>>>>> master
 **Feature**: Drag .txt files from My Documents to Desktop (like real Windows)
 **Current**: Files only exist in FileExplorer, can't drag to desktop
 **Requirements**:
@@ -101,6 +119,7 @@
 
 ## 📋 New Apps to Build
 
+<<<<<<< HEAD
 ### 🐍 Snake Game (Codex - IN PROGRESS)
 **Description**: Classic Snake with retro aesthetic
 **Features**: Arrow key controls, score tracking, high scores (localStorage)
@@ -174,6 +193,29 @@
 **Status**: 📋 Planning phase - needs user input
 
 ---
+=======
+### Camera App 📹
+**Description**: Access user's webcam/mic and show in retro CRT-style frame
+**Tech**: `navigator.mediaDevices.getUserMedia()`
+**UI Features**:
+- Old webcam aesthetic with scan lines
+- CRT monitor frame
+- Show live video feed
+- Mic level indicator
+- Record/snapshot buttons (optional)
+**Priority**: HIGH - User requested
+
+### Video Playlist (Retro TV) 📺
+**Description**: YouTube playlist embedded in old TV frame
+**Tech**: YouTube iframe embed API
+**UI Features**:
+- Wooden TV borders, rabbit ear antenna
+- Channel knobs/dials
+- Channel switching between playlist videos
+- Static/noise effect between channels (optional)
+- Volume control
+**Priority**: HIGH - User requested
+>>>>>>> master
 
 ### Sound System
 **Feature**: Windows error beep, startup sound
@@ -218,6 +260,7 @@
 - ✅ Mobile warning dialog
 - ✅ Notepad desktop icon
 - ✅ Window resizing (drag corners to resize)
+<<<<<<< HEAD
 - ✅ Paint UI redesign (larger canvas, sidebar, zoom controls)
 - ✅ Camera app with webcam and screenshot capture
 - ✅ Retro TV app with YouTube player
@@ -226,3 +269,9 @@
 ---
 
 *Last Updated: Post-deployment - Snake + Context Menu/Drag in progress on develop*
+=======
+
+---
+
+*Last Updated: Post Window Resizing - Ready for Paint UI & Context Menu fixes*
+>>>>>>> master
