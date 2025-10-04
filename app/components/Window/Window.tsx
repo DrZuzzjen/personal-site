@@ -1,12 +1,13 @@
 'use client';
 
 import type { CSSProperties, ReactNode } from 'react';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { COLORS, WINDOW_DEFAULTS, Z_INDEX } from '@/app/lib/constants';
-import type { WindowPosition, WindowSize } from '@/app/lib/types';
+import type { WindowPosition, WindowSize, Window as WindowType } from '@/app/lib/types';
 import { useWindowContext } from '@/app/lib/WindowContext';
 import WindowTitleBar from './WindowTitleBar';
 import { useWindowDrag } from './useWindowDrag';
+import { useWindowResize } from '@/app/hooks/useWindowResize';
 
 interface WindowProps {
   id: string;
@@ -68,7 +69,7 @@ export default function Window({
   const isMaximized = currentWindow?.isMaximized ?? false;
 
   const highestZIndex = useMemo(
-    () => windows.reduce((max, item) => (item.zIndex > max ? item.zIndex : max), Z_INDEX.WINDOW_BASE),
+    () => windows.reduce((max: number, item: WindowType): number => (item.zIndex > max ? item.zIndex : max), Z_INDEX.WINDOW_BASE),
     [windows],
   );
 
@@ -84,6 +85,23 @@ export default function Window({
     },
     onDragStart: () => focusWindow(id),
     disabled: isMaximized,
+  });
+
+  // Resize functionality
+  const [resizeDimensions, setResizeDimensions] = useState(size);
+  
+  const { isResizing, handleResizeStart } = useWindowResize({
+    windowId: id,
+    initialWidth: size.width,
+    initialHeight: size.height,
+    minWidth: 300,
+    minHeight: 200,
+    onResize: (width, height) => {
+      setResizeDimensions({ width, height });
+      if (currentWindow) {
+        updateWindowSize(id, { width, height });
+      }
+    },
   });
 
   const handleContainerMouseDown = useCallback(() => {
@@ -147,8 +165,8 @@ export default function Window({
     position: 'absolute',
     left: position.x,
     top: position.y,
-    width: size.width,
-    height: size.height,
+    width: isResizing ? resizeDimensions.width : size.width,
+    height: isResizing ? resizeDimensions.height : size.height,
     backgroundColor: COLORS.WIN_GRAY,
     zIndex,
     overflow: 'hidden',
@@ -189,6 +207,28 @@ export default function Window({
           onMaximize={handleMaximize}
         />
         <div style={contentStyle}>{renderedChildren}</div>
+        
+        {/* Resize Handle */}
+        {!isMaximized && (
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 0,
+              right: 0,
+              width: 16,
+              height: 16,
+              cursor: 'nwse-resize',
+              backgroundColor: COLORS.WIN_GRAY,
+              borderTop: `2px solid ${COLORS.BORDER_SHADOW}`,
+              borderLeft: `2px solid ${COLORS.BORDER_SHADOW}`,
+              borderBottom: `1px solid ${COLORS.BORDER_LIGHT}`,
+              borderRight: `1px solid ${COLORS.BORDER_LIGHT}`,
+              zIndex: 1,
+            }}
+            onMouseDown={handleResizeStart}
+            onClick={(e) => e.stopPropagation()}
+          />
+        )}
       </div>
 
       {isDragging && outlinePosition ? (

@@ -310,7 +310,8 @@ export default function MainPage() {
 
 	useEffect(() => {
 		const checkMobile = () => {
-			const mobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || 
+			const mobile =
+				/iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
 				window.innerWidth < 768;
 			setIsMobile(mobile);
 		};
@@ -668,9 +669,7 @@ Press any key to continue your portfolio exploration...`,
 			<ShutDownScreen isVisible={isShutDown} />
 
 			{/* Mobile Warning */}
-			{isMobile && (
-				<MobileWarning onProceed={() => setIsMobile(false)} />
-			)}
+			{isMobile && <MobileWarning onProceed={() => setIsMobile(false)} />}
 		</>
 	);
 }
