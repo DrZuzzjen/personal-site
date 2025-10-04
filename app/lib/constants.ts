@@ -46,7 +46,9 @@ export const Z_INDEX = {
   WINDOW_BASE: 100,
   DRAG_OUTLINE: 9999,
   TASKBAR: 10000,
+  START_MENU: 1500,
   MODAL: 10001,
+  SHUTDOWN_SCREEN: 10000,
 } as const;
 
 // ============================================
@@ -75,6 +77,14 @@ export const LOADING_MESSAGES = [
   'Preparing desktop environment...',
   'Almost there...',
 ] as const;
+
+export const BOOT_SEQUENCE = {
+  TIMINGS: {
+    POST_SCREEN: 3000,      // 3 seconds
+    MEMORY_CHECK: 3000,     // 3 seconds  
+    LOADING_SCREEN: 2000,   // 2 seconds
+  },
+} as const;
 
 // ============================================
 // INITIAL FILE SYSTEM

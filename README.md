@@ -12,7 +12,7 @@ Instead of a traditional portfolio site, this project simulates a complete Windo
 - Easter eggs and protected system files add personality
 - Users can create their own files and folders (persisted to localStorage)
 
-**This is a technical flex** - showcasing complex state management, canvas manipulation, window systems, and retro UI/UX.
+**This is a technical flex** - showcasing advanced frontend engineering: multi-window state orchestration, HTML5 Canvas painting, real-time game logic, drag-and-drop systems, and pixel-perfect retro UI/UX.
 
 ## ✨ Features
 
@@ -34,10 +34,47 @@ Instead of a traditional portfolio site, this project simulates a complete Windo
 
 - **Framework**: Next.js 15 (App Router)
 - **Language**: TypeScript
-- **Styling**: Tailwind CSS (for retro Windows 3.1 aesthetic)
-- **State**: React Context/Zustand (for window management)
-- **Storage**: localStorage (user-created files persist)
+- **Styling**: Tailwind CSS + CSS-in-JS (for authentic Windows 3.1 aesthetic)
+- **State Management**: React Context (WindowContext, FileSystemContext)
+- **Persistence**: localStorage (user-created files, preferences)
 - **Deployment**: Vercel
+
+## 💪 Technical Achievements
+
+### Window System Engineering
+- **Custom window manager** with z-index orchestration (focus management across 10+ windows)
+- **Outline dragging** - authentic Win3.1 behavior (drag outline only, not full window)
+- **State persistence** - minimize/maximize/restore with proper position memory
+- **Event propagation** - complex mouse/keyboard event handling across nested components
+
+### Canvas & Game Development
+- **MS Paint clone** - Real-time HTML5 Canvas drawing with multiple brush sizes, colors, and tools
+- **Minesweeper** - Complete game logic: mine placement, flood-fill reveal algorithm, win/loss detection
+- **Paint tools**: Brush, Eraser, customizable sizes (2px-16px), color palette, PNG export
+
+### File System Simulation
+- **Hierarchical structure** - Nested folders with path resolution
+- **CRUD operations** - Create, read, update, delete files and folders
+- **Protection system** - System files trigger easter eggs (ErrorDialog, fake BSOD)
+- **Context menu integration** - Right-click interactions with protected actions
+
+### Boot Sequence & Animation
+- **Multi-stage boot** - POST screen → Memory check → Loading screen → Desktop fade-in
+- **Typewriter effects** - Line-by-line text animation with timing control
+- **Skip functionality** - "Press any key" with global keyboard listener
+- **localStorage flag** - Skip boot for returning visitors (UX optimization)
+
+### UI/UX Polish
+- **Pixel-perfect borders** - 3D raised/sunken effects using 4-side border technique
+- **Taskbar integration** - Live window buttons, working clock (updates every 30s)
+- **Modal systems** - ErrorDialog and BSOD overlays with proper z-index layering
+- **Accessibility** - Keyboard navigation, ARIA labels, semantic HTML
+
+### State Architecture
+- **Multi-context design** - Separate concerns (windows, file system, dialogs)
+- **Custom hooks** - `useWindowManager`, `useFileSystem`, `useWindowDrag`, `useIconDrag`
+- **Grid snapping** - Desktop icon positioning with pixel-to-grid conversion
+- **Type safety** - Comprehensive TypeScript interfaces for all entities
 
 ## 🚀 Getting Started
 
@@ -55,23 +92,36 @@ Open [http://localhost:3000](http://localhost:3000) and watch the boot sequence!
 
 See [PHASES.md](./PHASES.md) for detailed development roadmap.
 
-**Current Status**: Phase 2 - Window System (In Progress)
+**Current Status**: Phase 7 - Start Menu & Final Polish (In Progress)
 
 - ✅ Phase 0: Planning & Concept
-- ✅ Phase 1: Foundation & Architecture (Steve - Completed)
-- 🟢 Phase 2: Window System Core (Codex - In Progress)
-- ⏳ Phase 3: Desktop & File System
-- ⏳ Phase 4: Boot Sequence
-- ⏳ Phase 5: Applications (Notepad, Minesweeper, Paint)
-- ⏳ Phase 6: Content & Easter Eggs
-- ⏳ Phase 7: Polish & Deployment
+- ✅ Phase 1: Foundation & Architecture (Steve)
+- ✅ Phase 2: Window System Core (Codex)
+- ✅ Phase 3: Desktop & File System (Steve + Codex parallel)
+- ✅ Phase 4: Boot Sequence (Steve)
+- ✅ Phase 5: Applications - Notepad, Minesweeper, Paint (Codex)
+- ✅ Phase 6: Easter Eggs & Dialogs (Steve)
+- 🟢 Phase 7: Start Menu & System Controls (Steve - In Progress)
 
 ## 🎨 Design Decisions
 
-- **Drag Behavior**: Outline dragging (authentic to Win3.1, more performant)
-- **Color Palette**: 32-bit color depth with classic Windows gray (#C0C0C0)
-- **Rendering**: Hybrid HTML/Canvas approach
-- **Mobile**: Desktop-only experience (show warning dialog on mobile)
+### Authenticity First
+- **Outline dragging** - Drag shows window outline only (authentic Win3.1, more performant)
+- **3D borders** - Raised/sunken effects using classic 4-side border technique
+- **System fonts** - Monospace for boot, sans-serif for UI
+- **Color accuracy** - Windows gray (#C0C0C0), classic blue title bars (#000080)
+
+### Performance Optimizations
+- **Hybrid rendering** - HTML/React for UI, Canvas for Paint (optimal for each use case)
+- **Event delegation** - Efficient mouse tracking during drag operations
+- **Selective re-renders** - Context design prevents unnecessary component updates
+- **Lazy evaluation** - Apps don't render until window opens
+
+### User Experience
+- **Skip boot** - Press any key, or auto-skip for returning visitors
+- **localStorage persistence** - User files, settings, boot state saved
+- **Desktop-first** - Optimized for desktop browsers (mobile warning planned)
+- **Easter eggs** - Protected files trigger humorous error dialogs and fake BSOD
 
 ## 📂 Project Structure
 

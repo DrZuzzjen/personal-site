@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useRef } from 'react';
 import { useFileSystemContext } from '@/app/lib/FileSystemContext';
@@ -8,18 +8,171 @@ import { useIconDrag } from './useIconDrag';
 import type {
 	DesktopIcon as DesktopIconType,
 	FileSystemItem,
+	NotepadWindowContent,
+	MinesweeperWindowContent,
+	PaintWindowContent,
+	WindowContent,
 } from '@/app/lib/types';
 
 interface DesktopIconProps {
 	icon: DesktopIconType;
+	onProtectedDelete?: (filePath: string, fileName: string) => void;
 }
 
-export default function DesktopIcon({ icon }: DesktopIconProps) {
+interface LaunchConfig {
+	title: string;
+	appType: 'notepad' | 'paint' | 'minesweeper' | 'explorer';
+	position: { x: number; y: number };
+	size: { width: number; height: number };
+	icon?: string;
+	content?: WindowContent;
+}
+
+const DEFAULT_LAUNCH_POSITION = { x: 140, y: 110 };
+const NOTEPAD_WINDOW_SIZE = { width: 520, height: 380 };
+const MINESWEEPER_WINDOW_SIZE = { width: 360, height: 440 };
+const PAINT_WINDOW_SIZE = { width: 560, height: 460 };
+const PAINT_PALETTE = [
+	'#000000',
+	'#FFFFFF',
+	'#FF0000',
+	'#00FF00',
+	'#0000FF',
+	'#FFFF00',
+	'#FF00FF',
+	'#00FFFF',
+];
+
+function createNotepadLaunch(
+	item: FileSystemItem,
+	overrides?: Partial<NotepadWindowContent>
+): LaunchConfig {
+	const baseContent: NotepadWindowContent = {
+		filePath: item.path,
+		fileName: item.name,
+		body: item.content ?? '',
+		readOnly: true,
+	};
+
+	const mergedContent: NotepadWindowContent = {
+		...baseContent,
+		...overrides,
+	};
+
+	return {
+		title: `${item.name} - Notepad`,
+		appType: 'notepad',
+		position: DEFAULT_LAUNCH_POSITION,
+		size: NOTEPAD_WINDOW_SIZE,
+		icon: 'NP',
+		content: mergedContent,
+	};
+}
+
+function createUnsupportedFileLaunch(
+	item: FileSystemItem,
+	message: string
+): LaunchConfig {
+	return createNotepadLaunch(item, {
+		body: message,
+	});
+}
+
+function createPaintLaunch(): LaunchConfig {
+	const content: PaintWindowContent = {
+		canvasWidth: 320,
+		canvasHeight: 200,
+		backgroundColor: '#FFFFFF',
+		brushSize: 4,
+		palette: PAINT_PALETTE,
+	};
+
+	return {
+		title: 'Paint',
+		appType: 'paint',
+		position: { x: 180, y: 120 },
+		size: PAINT_WINDOW_SIZE,
+		icon: 'PT',
+		content,
+	};
+}
+
+function createMinesweeperLaunch(): LaunchConfig {
+	const content: MinesweeperWindowContent = {
+		rows: 9,
+		cols: 9,
+		mines: 10,
+		difficulty: 'beginner',
+		firstClickSafe: true,
+	};
+
+	return {
+		title: 'Minesweeper',
+		appType: 'minesweeper',
+		position: { x: 220, y: 160 },
+		size: MINESWEEPER_WINDOW_SIZE,
+		icon: 'MS',
+		content,
+	};
+}
+
+function getLaunchConfigForFile(item: FileSystemItem): LaunchConfig | null {
+	if (item.extension === 'txt') {
+		return createNotepadLaunch(item);
+	}
+
+	if (item.extension === 'exe') {
+		const exeName = item.name.toLowerCase();
+
+		if (exeName.includes('paint')) {
+			return createPaintLaunch();
+		}
+
+		if (exeName.includes('minesweeper')) {
+			return createMinesweeperLaunch();
+		}
+
+		return createUnsupportedFileLaunch(
+			item,
+			`No application handler is defined for ${item.name}.`
+		);
+	}
+
+	if (item.content) {
+		return createNotepadLaunch(item);
+	}
+
+	if (item.extension === 'pdf') {
+		return createUnsupportedFileLaunch(
+			item,
+			'This preview is not available yet. Download functionality is coming in a later phase.'
+		);
+	}
+
+	return createUnsupportedFileLaunch(
+		item,
+		`No application is associated with "${item.name}" yet.`
+	);
+}
+
+export default function DesktopIcon({
+	icon,
+	onProtectedDelete,
+}: DesktopIconProps) {
 	const [lastClickTime, setLastClickTime] = useState(0);
 	const iconRef = useRef<HTMLDivElement>(null);
+	const [contextMenu, setContextMenu] = useState<{
+		x: number;
+		y: number;
+	} | null>(null);
 
-	const { selectIcon, getItemByPath, updateIconPosition, rootItems } =
-		useFileSystemContext();
+	const {
+		selectIcon,
+		getItemByPath,
+		updateIconPosition,
+		rootItems,
+		deleteItem,
+	} = useFileSystemContext();
 
 	const { openWindow } = useWindowContext();
 
@@ -86,28 +239,43 @@ export default function DesktopIcon({ icon }: DesktopIconProps) {
 				size: { width: 400, height: 300 },
 				content: { folderPath: fileSystemItem.path },
 			});
-		} else {
-			// For files, open appropriate app based on extension
-			const appType = getAppTypeForFile(fileSystemItem);
-			openWindow({
-				title: fileSystemItem.name,
-				appType,
-				position: { x: 100, y: 100 },
-				size: { width: 400, height: 300 },
-				content: {
-					filePath: fileSystemItem.path,
-					fileContent: fileSystemItem.content,
-				},
-			});
+			return;
 		}
+
+		const launchConfig = getLaunchConfigForFile(fileSystemItem);
+		if (!launchConfig) {
+			return;
+		}
+
+		openWindow(launchConfig);
 	};
 
-	const getAppTypeForFile = (
-		item: FileSystemItem
-	): 'notepad' | 'paint' | 'explorer' => {
-		if (item.extension === 'txt') return 'notepad';
-		if (item.isSystem && item.name === 'My Computer') return 'explorer';
-		return 'notepad'; // Default
+	const handleContextMenu = (event: React.MouseEvent) => {
+		event.preventDefault();
+		event.stopPropagation();
+		setContextMenu({
+			x: event.clientX,
+			y: event.clientY,
+		});
+	};
+
+	const handleDeleteItem = () => {
+		if (fileSystemItem.isProtected) {
+			// Trigger easter egg for protected items
+			if (onProtectedDelete) {
+				onProtectedDelete(fileSystemItem.path, fileSystemItem.name);
+			}
+			return;
+		}
+
+		// Delete non-protected items normally
+		const success = deleteItem(fileSystemItem.path);
+		if (!success) {
+			// This shouldn't happen for non-protected items, but just in case
+			if (onProtectedDelete) {
+				onProtectedDelete(fileSystemItem.path, fileSystemItem.name);
+			}
+		}
 	};
 
 	const getIconDisplay = (
@@ -115,81 +283,170 @@ export default function DesktopIcon({ icon }: DesktopIconProps) {
 	): { symbol: string; color: string } => {
 		if (item.isSystem) {
 			if (item.name === 'My Computer')
-				return { symbol: '💻', color: '#000080' };
+				return { symbol: 'PC', color: '#000080' };
 			if (item.name === 'Recycle Bin')
-				return { symbol: '🗑️', color: '#808080' };
+				return { symbol: 'RB', color: '#808080' };
 		}
 
 		if (item.type === 'folder') {
-			return { symbol: '📁', color: '#FFD700' };
+			return { symbol: 'DIR', color: '#FFD700' };
 		}
 
 		if (item.extension === 'txt') {
-			return { symbol: '📄', color: '#FFFFFF' };
+			return { symbol: 'TXT', color: '#FFFFFF' };
 		}
 
-		return { symbol: '📄', color: '#C0C0C0' };
+		if (item.extension === 'exe') {
+			return { symbol: 'EXE', color: '#C0C0C0' };
+		}
+
+		return { symbol: 'FILE', color: '#C0C0C0' };
 	};
 
 	const iconDisplay = getIconDisplay(fileSystemItem);
 
 	return (
-		<div
-			ref={iconRef}
-			onClick={handleClick}
-			onMouseDown={handleMouseDown}
-			style={{
-				position: 'absolute',
-				left: pixelPosition.x,
-				top: pixelPosition.y,
-				width: DESKTOP_GRID.ICON_WIDTH,
-				height: DESKTOP_GRID.ICON_HEIGHT,
-				display: 'flex',
-				flexDirection: 'column',
-				alignItems: 'center',
-				justifyContent: 'center',
-				cursor: isDragging ? 'grabbing' : 'pointer',
-				userSelect: 'none',
-				backgroundColor: icon.isSelected
-					? 'rgba(0, 120, 215, 0.3)'
-					: 'transparent',
-				borderRadius: 4,
-				padding: 4,
-			}}
-		>
-			{/* Icon */}
+		<>
 			<div
+				ref={iconRef}
+				onClick={handleClick}
+				onMouseDown={handleMouseDown}
+				onContextMenu={handleContextMenu}
 				style={{
-					width: 32,
-					height: 32,
-					backgroundColor: iconDisplay.color,
-					border: `2px solid ${COLORS.BORDER_SHADOW}`,
-					borderTopColor: COLORS.BORDER_LIGHT,
-					borderLeftColor: COLORS.BORDER_LIGHT,
+					position: 'absolute',
+					left: pixelPosition.x,
+					top: pixelPosition.y,
+					width: DESKTOP_GRID.ICON_WIDTH,
+					height: DESKTOP_GRID.ICON_HEIGHT,
 					display: 'flex',
+					flexDirection: 'column',
 					alignItems: 'center',
 					justifyContent: 'center',
-					fontSize: '16px',
-					marginBottom: 4,
+					cursor: isDragging ? 'grabbing' : 'pointer',
+					userSelect: 'none',
+					backgroundColor: icon.isSelected
+						? 'rgba(0, 120, 215, 0.3)'
+						: 'transparent',
+					borderRadius: 4,
+					padding: 4,
 				}}
 			>
-				{iconDisplay.symbol}
+				{/* Icon */}
+				<div
+					style={{
+						width: 32,
+						height: 32,
+						backgroundColor: iconDisplay.color,
+						border: `2px solid ${COLORS.BORDER_SHADOW}`,
+						borderTopColor: COLORS.BORDER_LIGHT,
+						borderLeftColor: COLORS.BORDER_LIGHT,
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'center',
+						fontSize: '16px',
+						marginBottom: 4,
+					}}
+				>
+					{iconDisplay.symbol}
+				</div>
+
+				{/* Label */}
+				<div
+					style={{
+						color: COLORS.TEXT_WHITE,
+						fontSize: '11px',
+						textAlign: 'center',
+						textShadow: '1px 1px 1px rgba(0, 0, 0, 0.8)',
+						lineHeight: '12px',
+						wordWrap: 'break-word',
+						maxWidth: '70px',
+					}}
+				>
+					{fileSystemItem.name}
+				</div>
 			</div>
 
-			{/* Label */}
-			<div
-				style={{
-					color: COLORS.TEXT_WHITE,
-					fontSize: '11px',
-					textAlign: 'center',
-					textShadow: '1px 1px 1px rgba(0, 0, 0, 0.8)',
-					lineHeight: '12px',
-					wordWrap: 'break-word',
-					maxWidth: '70px',
-				}}
-			>
-				{fileSystemItem.name}
-			</div>
-		</div>
+			{/* Context Menu */}
+			{contextMenu && (
+				<>
+					{/* Invisible overlay to catch clicks outside menu */}
+					<div
+						style={{
+							position: 'fixed',
+							top: 0,
+							left: 0,
+							right: 0,
+							bottom: 0,
+							zIndex: 10001,
+						}}
+						onClick={() => setContextMenu(null)}
+						onContextMenu={(e) => {
+							e.preventDefault();
+							setContextMenu(null);
+						}}
+					/>
+
+					{/* Context menu */}
+					<div
+						style={{
+							position: 'fixed',
+							left: contextMenu.x,
+							top: contextMenu.y,
+							backgroundColor: COLORS.WIN_GRAY,
+							border: `2px outset ${COLORS.WIN_GRAY}`,
+							boxShadow: '2px 2px 4px rgba(0,0,0,0.3)',
+							zIndex: 10002,
+							minWidth: '120px',
+							fontFamily: 'MS Sans Serif, sans-serif',
+							fontSize: '11px',
+						}}
+					>
+						<div
+							style={{
+								padding: '4px 12px',
+								cursor: 'pointer',
+								backgroundColor: 'transparent',
+							}}
+							onClick={() => {
+								handleDoubleClick();
+								setContextMenu(null);
+							}}
+							onMouseEnter={(e) => {
+								e.currentTarget.style.backgroundColor = COLORS.WIN_BLUE;
+								e.currentTarget.style.color = COLORS.WIN_WHITE;
+							}}
+							onMouseLeave={(e) => {
+								e.currentTarget.style.backgroundColor = 'transparent';
+								e.currentTarget.style.color = COLORS.TEXT_BLACK;
+							}}
+						>
+							Open
+						</div>
+						<div
+							style={{
+								padding: '4px 12px',
+								cursor: 'pointer',
+								backgroundColor: 'transparent',
+								borderTop: '1px solid ' + COLORS.BORDER_SHADOW,
+							}}
+							onClick={() => {
+								handleDeleteItem();
+								setContextMenu(null);
+							}}
+							onMouseEnter={(e) => {
+								e.currentTarget.style.backgroundColor = COLORS.WIN_BLUE;
+								e.currentTarget.style.color = COLORS.WIN_WHITE;
+							}}
+							onMouseLeave={(e) => {
+								e.currentTarget.style.backgroundColor = 'transparent';
+								e.currentTarget.style.color = COLORS.TEXT_BLACK;
+							}}
+						>
+							Delete
+						</div>
+					</div>
+				</>
+			)}
+		</>
 	);
 }
