@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s https://platform.kluster.ai/install-kluster-mcp-claude-code.sh)",
+      "Bash(bash:*)",
+      "Bash(where claude)",
+      "Bash(ls:*)",
+      "Bash(npx:*)",
+      "Bash(claude mcp add:*)",
+      "Bash(git init:*)",
+      "Read(//e/code/web-temp/**)",
+      "Bash(npm install)",
+      "Bash(find:*)",
+      "Read(//c/Users/gutij/AppData/Roaming/Claude/**)",
+      "Read(//c/ProgramData/**)",
+      "Bash(npm cache clean:*)",
+      "Bash(npm view:*)",
+      "Read(//c/Users/gutij/**)",
+      "Bash(cat:*)",
+      "Bash(npm install:*)",
+      "Bash(mcp-remote:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
