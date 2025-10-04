@@ -14,6 +14,35 @@ export default function Camera({ onClose }: CameraProps) {
   const [isActive, setIsActive] = useState(false);
   const [micLevel, setMicLevel] = useState(0);
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  const setupAudioMonitoring = useCallback((mediaStream: MediaStream) => {
+    try {
+      const context = new AudioContext();
+      const analyser = context.createAnalyser();
+      const microphone = context.createMediaStreamSource(mediaStream);
+
+      microphone.connect(analyser);
+      analyser.fftSize = 256;
+      analyser.smoothingTimeConstant = 0.8;
+
+      const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+      const updateLevel = () => {
+        if (context.state === 'closed') return;
+        
+        analyser.getByteFrequencyData(dataArray);
+        const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+        setMicLevel(average);
+        requestAnimationFrame(updateLevel);
+      };
+
+      updateLevel();
+      setAudioContext(context);
+    } catch (err) {
+      console.error('Audio monitoring failed:', err);
+    }
+  }, []);
 
   const getCamera = useCallback(async () => {
     try {
@@ -45,35 +74,7 @@ export default function Camera({ onClose }: CameraProps) {
         setError('Failed to access camera. Please try again.');
       }
     }
-  }, []);
-
-  const setupAudioMonitoring = useCallback((mediaStream: MediaStream) => {
-    try {
-      const context = new AudioContext();
-      const analyser = context.createAnalyser();
-      const microphone = context.createMediaStreamSource(mediaStream);
-
-      microphone.connect(analyser);
-      analyser.fftSize = 256;
-      analyser.smoothingTimeConstant = 0.8;
-
-      const dataArray = new Uint8Array(analyser.frequencyBinCount);
-
-      const updateLevel = () => {
-        if (context.state === 'closed') return;
-        
-        analyser.getByteFrequencyData(dataArray);
-        const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
-        setMicLevel(average);
-        requestAnimationFrame(updateLevel);
-      };
-
-      updateLevel();
-      setAudioContext(context);
-    } catch (err) {
-      console.error('Audio monitoring failed:', err);
-    }
-  }, []);
+  }, [setupAudioMonitoring]);
 
   const stopCamera = useCallback(() => {
     if (stream) {
@@ -128,13 +129,21 @@ export default function Camera({ onClose }: CameraProps) {
 
   // Start camera on component mount
   useEffect(() => {
-    getCamera();
+    if (!isInitialized) {
+      setIsInitialized(true);
+      getCamera();
+    }
     
     // Cleanup on unmount
     return () => {
-      stopCamera();
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+      if (audioContext && audioContext.state !== 'closed') {
+        audioContext.close();
+      }
     };
-  }, [getCamera, stopCamera]);
+  }, []); // Empty dependency array - only run on mount/unmount
 
   if (error) {
     return (
