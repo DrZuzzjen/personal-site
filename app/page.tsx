@@ -378,7 +378,7 @@ Press any key to continue your portfolio exploration...`,
 
 	return (
 		<>
-			<Desktop />
+			<Desktop onProtectedDelete={handleProtectedDelete} />
 
 			{windows.map((windowData) => (
 				<Window

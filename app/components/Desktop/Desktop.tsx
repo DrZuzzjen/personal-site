@@ -8,9 +8,10 @@ import ContextMenu from './ContextMenu';
 
 interface DesktopProps {
 	className?: string;
+	onProtectedDelete?: (filePath: string, fileName: string) => void;
 }
 
-export default function Desktop({ className }: DesktopProps) {
+export default function Desktop({ className, onProtectedDelete }: DesktopProps) {
 	const [contextMenu, setContextMenu] = useState<{
 		x: number;
 		y: number;
@@ -83,7 +84,7 @@ export default function Desktop({ className }: DesktopProps) {
 			}}
 		>
 			{desktopIcons.map((icon) => (
-				<DesktopIcon key={icon.id} icon={icon} />
+				<DesktopIcon key={icon.id} icon={icon} onProtectedDelete={onProtectedDelete} />
 			))}
 
 			{/* Context Menu */}
