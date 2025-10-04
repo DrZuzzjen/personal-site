@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useCallback, useMemo } from 'react';
 import { useWindowContext } from '@/app/lib/WindowContext';
@@ -8,14 +8,15 @@ import TaskbarButton from './TaskbarButton';
 import Clock from './Clock';
 
 function getActiveWindowId(windows: WindowType[]): string | null {
-  const visibleWindows = windows.filter(windowItem => !windowItem.isMinimized);
+  const visibleWindows = windows.filter((windowItem) => !windowItem.isMinimized);
   if (visibleWindows.length === 0) {
     return null;
   }
 
-  const topWindow = visibleWindows.reduce((currentTop, candidate) =>
-    candidate.zIndex > currentTop.zIndex ? candidate : currentTop,
-  visibleWindows[0]);
+  const topWindow = visibleWindows.reduce(
+    (currentTop, candidate) => (candidate.zIndex > currentTop.zIndex ? candidate : currentTop),
+    visibleWindows[0],
+  );
 
   return topWindow.id;
 }
@@ -25,24 +26,22 @@ export default function Taskbar() {
 
   const activeWindowId = useMemo(() => getActiveWindowId(windows), [windows]);
 
-  const sortedWindows = useMemo(
-    () => [...windows].sort((a, b) => a.zIndex - b.zIndex),
-    [windows],
-  );
+  const handleButtonClick = useCallback(
+    (windowItem: WindowType) => {
+      if (windowItem.isMinimized) {
+        focusWindow(windowItem.id);
+        return;
+      }
 
-  const handleButtonClick = useCallback((windowItem: WindowType) => {
-    if (windowItem.isMinimized) {
+      if (activeWindowId === windowItem.id) {
+        minimizeWindow(windowItem.id);
+        return;
+      }
+
       focusWindow(windowItem.id);
-      return;
-    }
-
-    if (activeWindowId === windowItem.id) {
-      minimizeWindow(windowItem.id);
-      return;
-    }
-
-    focusWindow(windowItem.id);
-  }, [activeWindowId, focusWindow, minimizeWindow]);
+    },
+    [activeWindowId, focusWindow, minimizeWindow],
+  );
 
   return (
     <div
@@ -57,10 +56,10 @@ export default function Taskbar() {
         gap: 8,
         padding: '4px 8px',
         backgroundColor: COLORS.WIN_GRAY,
-        borderTop: 2px solid ,
-        borderLeft: 2px solid ,
-        borderRight: 2px solid ,
-        borderBottom: 2px solid ,
+        borderTop: '2px solid ' + COLORS.BORDER_SHADOW,
+        borderLeft: '2px solid ' + COLORS.BORDER_HIGHLIGHT,
+        borderRight: '2px solid ' + COLORS.BORDER_DARK,
+        borderBottom: '2px solid ' + COLORS.BORDER_DARK,
         zIndex: Z_INDEX.TASKBAR,
         boxSizing: 'border-box',
       }}
@@ -77,10 +76,10 @@ export default function Taskbar() {
           fontWeight: 700,
           color: COLORS.TEXT_BLACK,
           backgroundColor: COLORS.WIN_GRAY,
-          borderTop: 2px solid ,
-          borderLeft: 2px solid ,
-          borderBottom: 2px solid ,
-          borderRight: 2px solid ,
+          borderTop: '2px solid ' + COLORS.BORDER_LIGHT,
+          borderLeft: '2px solid ' + COLORS.BORDER_HIGHLIGHT,
+          borderBottom: '2px solid ' + COLORS.BORDER_SHADOW,
+          borderRight: '2px solid ' + COLORS.BORDER_DARK,
           cursor: 'pointer',
         }}
         title="Start"
@@ -97,7 +96,7 @@ export default function Taskbar() {
           padding: '0 4px',
         }}
       >
-        {sortedWindows.map(windowItem => (
+        {windows.map((windowItem) => (
           <TaskbarButton
             key={windowItem.id}
             window={windowItem}
