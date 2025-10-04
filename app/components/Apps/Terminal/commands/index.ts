@@ -2,6 +2,7 @@ import type { Command } from '../types';
 import { createFilesystemCommands } from './filesystem';
 import { createNavigationCommands } from './navigation';
 import { createSystemCommands } from './system';
+import { createAppCommands } from './apps';
 
 const registry: Command[] = [];
 
@@ -11,6 +12,7 @@ function register(commands: Command[]) {
 
 register(createNavigationCommands());
 register(createFilesystemCommands());
+register(createAppCommands());
 register(createSystemCommands(() => registry));
 
 export function getCommands(): Command[] {
