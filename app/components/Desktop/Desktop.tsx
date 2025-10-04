@@ -55,35 +55,45 @@ export default function Desktop({
 	};
 
 	const handleNewFolder = () => {
-		createFolder('/Desktop', `New Folder`);
+		const folderName = prompt('Enter folder name:', 'New Folder');
+		
+		if (folderName && folderName.trim()) {
+			// Create the folder with the user-provided name
+			createFolder('/Desktop', folderName.trim());
+		}
+		
 		setContextMenu(null);
 	};
 
 	const handleNewTextFile = () => {
-		const fileName = 'New Text Document.txt';
-		const filePath = `/Desktop/${fileName}`;
+		const fileName = prompt('Enter file name:', 'New Text Document.txt');
+		
+		if (fileName && fileName.trim()) {
+			const finalFileName = fileName.trim();
+			const filePath = `/Desktop/${finalFileName}`;
 
-		// Create the file on desktop with empty content
-		const newFile = createFile('/Desktop', fileName, '');
+			// Create the file on desktop with empty content
+			const newFile = createFile('/Desktop', finalFileName, '');
 
-		if (newFile) {
-			// Open the new file in Notepad automatically
-			openWindow({
-				title: `${fileName} - Notepad`,
-				appType: 'notepad',
-				position: {
-					x: 120 + Math.random() * 100,
-					y: 100 + Math.random() * 100,
-				},
-				size: { width: 440, height: 320 },
-				icon: 'NP',
-				content: {
-					fileName: fileName,
-					filePath: filePath,
-					body: '',
-					readOnly: false,
-				} as NotepadWindowContent,
-			});
+			if (newFile) {
+				// Open the new file in Notepad automatically
+				openWindow({
+					title: `${finalFileName} - Notepad`,
+					appType: 'notepad',
+					position: {
+						x: 120 + Math.random() * 100,
+						y: 100 + Math.random() * 100,
+					},
+					size: { width: 440, height: 320 },
+					icon: 'NP',
+					content: {
+						fileName: finalFileName,
+						filePath: filePath,
+						body: '',
+						readOnly: false,
+					} as NotepadWindowContent,
+				});
+			}
 		}
 
 		setContextMenu(null);
