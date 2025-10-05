@@ -461,7 +461,7 @@ export default function MainPage() {
 		
 
 		switch (appType) {
-			case 'paint':
+			case 'paint': {
 				openWindow({
 					title: 'Paint.exe',
 					appType: 'paint',
@@ -471,8 +471,9 @@ export default function MainPage() {
 					content: content || DEFAULT_PAINT_CONFIG,
 				});
 				break;
+			}
 
-			case 'minesweeper':
+			case 'minesweeper': {
 				openWindow({
 					title: 'Minesweeper.exe',
 					appType: 'minesweeper',
@@ -482,8 +483,9 @@ export default function MainPage() {
 					content: content || DEFAULT_MINESWEEPER_CONFIG,
 				});
 				break;
+			}
 
-			case 'notepad':
+			case 'notepad': {
 				const fileName = content?.fileName || 'Untitled';
 				const title = fileName.endsWith('.txt') ? fileName : `${fileName}.txt`;
 				openWindow({
@@ -500,8 +502,9 @@ export default function MainPage() {
 					} as NotepadWindowContent,
 				});
 				break;
+			}
 
-			case 'snake':
+			case 'snake': {
 				openWindow({
 					title: 'Snake.exe',
 					appType: 'snake',
@@ -511,14 +514,15 @@ export default function MainPage() {
 					content: {},
 				});
 				break;
+			}
 
-			
+			case 'camera': {
 				openWindow({
 					title: 'Camera',
 					appType: 'camera',
 					position,
 					size: { width: 720, height: 580 },
-				icon: 'CM',
+					icon: 'CM',
 					content: {
 						isActive: false,
 						hasPermission: false,
@@ -526,8 +530,9 @@ export default function MainPage() {
 					} as CameraWindowContent,
 				});
 				break;
+			}
 
-			case 'tv':
+			case 'tv': {
 				openWindow({
 					title: 'TV',
 					appType: 'tv',
@@ -537,8 +542,9 @@ export default function MainPage() {
 					content: {},
 				});
 				break;
+			}
 
-			case 'chatbot':
+			case 'chatbot': {
 				openWindow({
 					title: 'MSN Messenger - Claude Bot',
 					appType: 'chatbot',
@@ -548,8 +554,9 @@ export default function MainPage() {
 					content: {},
 				});
 				break;
+			}
 
-			case 'terminal':
+			case 'terminal': {
 				openWindow({
 					title: 'Terminal',
 					appType: 'terminal',
@@ -559,8 +566,9 @@ export default function MainPage() {
 					content: {},
 				});
 				break;
+			}
 
-			case 'file-explorer':
+			case 'file-explorer': {
 				openWindow({
 					title: `${content?.path || 'My Computer'} - File Explorer`,
 					appType: 'explorer',
@@ -570,8 +578,8 @@ export default function MainPage() {
 					content: { folderPath: content?.path || null },
 				});
 				break;
+			}
 		}
-	}
 	};
 
 	const handleRestart = () => {
