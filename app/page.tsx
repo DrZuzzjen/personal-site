@@ -512,13 +512,13 @@ export default function MainPage() {
 				});
 				break;
 
-			case 'camera':
+			
 				openWindow({
 					title: 'Camera',
 					appType: 'camera',
 					position,
 					size: { width: 720, height: 580 },
-					icon: '?Y"?',
+				icon: 'CM',
 					content: {
 						isActive: false,
 						hasPermission: false,
@@ -533,7 +533,7 @@ export default function MainPage() {
 					appType: 'tv',
 					position,
 					size: { width: 880, height: 720 },
-					icon: '?Y"?',
+					icon: 'TV',
 					content: {},
 				});
 				break;
@@ -544,7 +544,7 @@ export default function MainPage() {
 					appType: 'chatbot',
 					position,
 					size: { width: 480, height: 620 },
-					icon: '?Y'?',
+					icon: 'IM',
 					content: {},
 				});
 				break;
