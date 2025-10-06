@@ -279,6 +279,22 @@ function getLaunchConfigForFile(item: FileSystemItem): LaunchConfig | null {
 	}
 
 	if (item.extension === 'pdf') {
+		// If the PDF has a content path (link to actual file), trigger download
+		if (item.content && item.content.startsWith('/')) {
+			// Trigger PDF download
+			const link = document.createElement('a');
+			link.href = item.content;
+			link.download = item.name;
+			link.target = '_blank';
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+
+			// Return null to not open any window
+			return null;
+		}
+
+		// Otherwise show placeholder message
 		return createUnsupportedFileLaunch(
 			item,
 			'This preview is not available yet. Download functionality is coming in a later phase.'

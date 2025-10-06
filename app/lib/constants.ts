@@ -465,7 +465,7 @@ Try generating your own personalized images!`,
         type: 'file',
         extension: 'pdf',
         path: '/A:/Resume.pdf',
-        content: '[PDF download link - to be added in Phase 6]',
+        content: '/jean_francois_cv.pdf', // Link to actual PDF in public folder
         isProtected: true,
         isSystem: false,
         icon: 'pdf',
