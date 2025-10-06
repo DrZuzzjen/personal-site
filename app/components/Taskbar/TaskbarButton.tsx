@@ -65,16 +65,15 @@ export function TaskbarButton({ window, isActive, onClick }: TaskbarButtonProps)
   const buttonStyle: CSSProperties = {
     ...baseButtonStyle,
     ...(isActive ? sunkenBorderStyle : raisedBorderStyle),
-    ...(isFlashing && !isActive ? {
-      animation: 'taskbar-flash 0.8s ease-in-out infinite',
-      // Don't set backgroundColor here - let CSS animation handle it
-    } : {}),
+    // DEBUG: Force red background when flashing to test if state is working
+    ...(isFlashing && !isActive ? { backgroundColor: 'red' } : {}),
   };
 
   return (
     <button
       type="button"
       style={buttonStyle}
+      className={isFlashing && !isActive ? 'taskbar-flashing' : ''}
       onClick={onClick}
       aria-pressed={isActive}
       title={title}

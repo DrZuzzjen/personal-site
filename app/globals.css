@@ -27,9 +27,13 @@ body {
 
 @keyframes taskbar-flash {
   0%, 100% {
-    background-color: #C0C0C0;
+    background-color: #C0C0C0 !important;
   }
   50% {
-    background-color: #FFE87C;
+    background-color: #FFE87C !important;
   }
+}
+
+.taskbar-flashing {
+  animation: taskbar-flash 0.8s ease-in-out infinite !important;
 }

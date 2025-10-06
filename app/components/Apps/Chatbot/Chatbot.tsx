@@ -170,6 +170,41 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 		};
 	}, []);
 
+	// Watch for new assistant messages and trigger notification if minimized
+	useEffect(() => {
+		if (!windowId || messages.length === 0) return;
+
+		const lastMessage = messages[messages.length - 1];
+
+		// Only check for assistant messages
+		if (lastMessage.role !== 'assistant') return;
+
+		// Check if window is minimized
+		const currentWindow = windows.find(w => w.id === windowId);
+		const isMinimized = currentWindow?.isMinimized ?? false;
+
+		console.log('🔔 Message watcher triggered:', {
+			messageId: lastMessage.id,
+			windowId,
+			isMinimized,
+			currentWindow: currentWindow ? { id: currentWindow.id, title: currentWindow.title, isMinimized: currentWindow.isMinimized } : null,
+		});
+
+		if (isMinimized) {
+			console.log('🚨 MSN NOTIFICATION: Starting taskbar flash');
+			setWindowFlashing(windowId, true);
+
+			// Stop flashing after 10 seconds
+			if (flashingTimerRef.current) {
+				clearTimeout(flashingTimerRef.current);
+			}
+			flashingTimerRef.current = setTimeout(() => {
+				console.log('⏰ Stopping taskbar flash after 10s');
+				setWindowFlashing(windowId, false);
+			}, 10000);
+		}
+	}, [messages, windows, windowId, setWindowFlashing]);
+
 	// Build portfolio context for AI
 	const getPortfolioContext = () => {
 		const myComputerItem = rootItems.find(
@@ -202,36 +237,9 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 		};
 		setMessages((prev) => [...prev, newMessage]);
 
-		// Check if window is minimized for notification
-		const currentWindow = windowId ? windows.find(w => w.id === windowId) : null;
-		const isMinimized = currentWindow?.isMinimized ?? false;
-
-		console.log('🔔 Chatbot addMessage:', {
-			role: message.role,
-			windowId,
-			currentWindow: currentWindow ? { id: currentWindow.id, title: currentWindow.title, isMinimized: currentWindow.isMinimized } : null,
-			isMinimized,
-		});
-
+		// Play sounds (notification handled by useEffect watcher)
 		if (message.role === 'assistant') {
 			playSound('messageReceived');
-
-			// If window is minimized, start flashing taskbar
-			if (isMinimized && windowId) {
-				console.log('🚨 MSN NOTIFICATION: Starting taskbar flash');
-				setWindowFlashing(windowId, true);
-
-				// Stop flashing after 10 seconds
-				if (flashingTimerRef.current) {
-					clearTimeout(flashingTimerRef.current);
-				}
-				flashingTimerRef.current = setTimeout(() => {
-					console.log('⏰ Stopping taskbar flash after 10s');
-					setWindowFlashing(windowId, false);
-				}, 10000);
-			} else {
-				console.log('ℹ️ No notification: window is not minimized or no windowId');
-			}
 		} else if (message.role === 'user') {
 			playSound('messageSent');
 
