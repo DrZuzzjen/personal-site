@@ -127,61 +127,68 @@ export default function Portfolio() {
 			</div>
 
 			{/* Main Display Area */}
-			<div className='flex-1 overflow-auto p-4'>
-				<div className='max-w-4xl mx-auto'>
+			<div className='flex-1 overflow-auto p-3'>
+				<div className='h-full flex flex-col'>
 					{/* Media Display */}
-					<div className='bg-black border-4 border-[#808080] mb-4 aspect-video flex items-center justify-center'>
+					<div className='bg-black border-4 border-[#808080] mb-3 flex-shrink-0' style={{ height: '45%' }}>
 						<MediaViewer item={currentItem} />
 					</div>
 
 					{/* Info Panel */}
-					<div className='bg-white border-2 border-[#808080] p-4'>
-						{/* Title */}
-						<div className='flex items-start justify-between mb-3'>
-							<div>
-								<h2 className='text-xl font-bold mb-1'>
-									{currentItem.icon} {currentItem.title}
-								</h2>
-								<p className='text-sm text-gray-600 italic'>
-									{currentItem.tagline}
-								</p>
+					<div className='bg-[#C0C0C0] border-4 border-t-white border-l-white border-r-[#808080] border-b-[#808080] p-3 flex-1 overflow-auto'>
+						{/* Title Bar */}
+						<div className='bg-[#000080] text-white px-2 py-1 mb-2 flex items-center justify-between'>
+							<div className='flex items-center gap-2'>
+								<span className='text-lg'>{currentItem.icon}</span>
+								<span className='font-bold text-sm'>{currentItem.title}</span>
 							</div>
-							<span className='bg-[#000080] text-white px-2 py-1 text-xs'>
+							<span className='text-xs bg-[#C0C0C0] text-black px-2 py-0.5'>
 								{currentItem.year}
 							</span>
 						</div>
 
+						{/* Tagline */}
+						<div className='bg-white border-2 border-[#808080] p-2 mb-2'>
+							<p className='text-xs italic text-gray-700'>
+								{currentItem.tagline}
+							</p>
+						</div>
+
 						{/* Description */}
-						<p className='text-sm mb-3 leading-relaxed'>
-							{currentItem.description}
-						</p>
+						<div className='bg-white border-2 border-[#808080] p-2 mb-2'>
+							<p className='text-xs leading-relaxed text-black'>
+								{currentItem.description}
+							</p>
+						</div>
 
 						{/* Tech Stack */}
 						{currentItem.tech && currentItem.tech.length > 0 && (
-							<div className='mb-3'>
-								<div className='text-xs font-bold text-gray-600 mb-1'>
-									🛠️ Tech Stack:
+							<div className='mb-2'>
+								<div className='bg-[#808080] text-white px-2 py-0.5 text-xs font-bold mb-1'>
+									🛠️ Tech Stack
 								</div>
-								<div className='flex flex-wrap gap-1'>
-									{currentItem.tech.map((tech) => (
-										<span
-											key={tech}
-											className='bg-[#C0C0C0] border border-[#808080] px-2 py-0.5 text-xs'
-										>
-											{tech}
-										</span>
-									))}
+								<div className='bg-white border-2 border-[#808080] p-2'>
+									<div className='flex flex-wrap gap-1'>
+										{currentItem.tech.map((tech) => (
+											<span
+												key={tech}
+												className='bg-[#000080] text-white px-2 py-0.5 text-[10px]'
+											>
+												{tech}
+											</span>
+										))}
+									</div>
 								</div>
 							</div>
 						)}
 
 						{/* Impact */}
 						{currentItem.impact && (
-							<div className='mb-3'>
-								<div className='text-xs font-bold text-gray-600 mb-1'>
-									⚡ Impact:
+							<div className='mb-2'>
+								<div className='bg-[#808080] text-white px-2 py-0.5 text-xs font-bold mb-1'>
+									⚡ Impact
 								</div>
-								<div className='bg-yellow-100 border border-yellow-400 px-2 py-1 text-sm'>
+								<div className='bg-yellow-200 border-2 border-yellow-600 px-2 py-1 text-xs text-black font-bold'>
 									{currentItem.impact}
 								</div>
 							</div>
@@ -189,67 +196,52 @@ export default function Portfolio() {
 
 						{/* Links */}
 						{currentItem.links && (
-							<div className='flex flex-wrap gap-2'>
-								{currentItem.links.github && (
-									<a
-										href={currentItem.links.github}
-										target='_blank'
-										rel='noopener noreferrer'
-										className='px-3 py-1 bg-[#C0C0C0] border-2 border-t-white border-l-white border-r-[#404040] border-b-[#404040] hover:border-t-[#404040] hover:border-l-[#404040] hover:border-r-white hover:border-b-white active:border-inset text-xs'
-									>
-										🔗 GitHub
-									</a>
-								)}
-								{currentItem.links.demo && (
-									<a
-										href={currentItem.links.demo}
-										target='_blank'
-										rel='noopener noreferrer'
-										className='px-3 py-1 bg-[#C0C0C0] border-2 border-t-white border-l-white border-r-[#404040] border-b-[#404040] hover:border-t-[#404040] hover:border-l-[#404040] hover:border-r-white hover:border-b-white active:border-inset text-xs'
-									>
-										▶ Live Demo
-									</a>
-								)}
-								{currentItem.links.npm && (
-									<a
-										href={currentItem.links.npm}
-										target='_blank'
-										rel='noopener noreferrer'
-										className='px-3 py-1 bg-[#C0C0C0] border-2 border-t-white border-l-white border-r-[#404040] border-b-[#404040] hover:border-t-[#404040] hover:border-l-[#404040] hover:border-r-white hover:border-b-white active:border-inset text-xs'
-									>
-										📦 NPM
-									</a>
-								)}
-								{currentItem.links.video && (
-									<a
-										href={currentItem.links.video}
-										target='_blank'
-										rel='noopener noreferrer'
-										className='px-3 py-1 bg-[#C0C0C0] border-2 border-t-white border-l-white border-r-[#404040] border-b-[#404040] hover:border-t-[#404040] hover:border-l-[#404040] hover:border-r-white hover:border-b-white active:border-inset text-xs'
-									>
-										📺 Full Video
-									</a>
-								)}
-								{currentItem.links.docs && (
-									<a
-										href={currentItem.links.docs}
-										target='_blank'
-										rel='noopener noreferrer'
-										className='px-3 py-1 bg-[#C0C0C0] border-2 border-t-white border-l-white border-r-[#404040] border-b-[#404040] hover:border-t-[#404040] hover:border-l-[#404040] hover:border-r-white hover:border-b-white active:border-inset text-xs'
-									>
-										📄 Docs
-									</a>
-								)}
-								{currentItem.links.certificate && (
-									<a
-										href={currentItem.links.certificate}
-										target='_blank'
-										rel='noopener noreferrer'
-										className='px-3 py-1 bg-[#C0C0C0] border-2 border-t-white border-l-white border-r-[#404040] border-b-[#404040] hover:border-t-[#404040] hover:border-l-[#404040] hover:border-r-white hover:border-b-white active:border-inset text-xs'
-									>
-										🏅 Certificate
-									</a>
-								)}
+							<div>
+								<div className='bg-[#808080] text-white px-2 py-0.5 text-xs font-bold mb-1'>
+									🔗 Links
+								</div>
+								<div className='bg-white border-2 border-[#808080] p-2 flex flex-wrap gap-1'>
+									{currentItem.links.github && (
+										<a
+											href={currentItem.links.github}
+											target='_blank'
+											rel='noopener noreferrer'
+											className='px-2 py-1 bg-[#C0C0C0] border-2 border-t-white border-l-white border-r-[#404040] border-b-[#404040] hover:border-t-[#404040] hover:border-l-[#404040] hover:border-r-white hover:border-b-white text-[10px] text-black'
+										>
+											GitHub
+										</a>
+									)}
+									{currentItem.links.demo && (
+										<a
+											href={currentItem.links.demo}
+											target='_blank'
+											rel='noopener noreferrer'
+											className='px-2 py-1 bg-[#C0C0C0] border-2 border-t-white border-l-white border-r-[#404040] border-b-[#404040] hover:border-t-[#404040] hover:border-l-[#404040] hover:border-r-white hover:border-b-white text-[10px] text-black'
+										>
+											Demo
+										</a>
+									)}
+									{currentItem.links.linkedin && (
+										<a
+											href={currentItem.links.linkedin}
+											target='_blank'
+											rel='noopener noreferrer'
+											className='px-2 py-1 bg-[#C0C0C0] border-2 border-t-white border-l-white border-r-[#404040] border-b-[#404040] hover:border-t-[#404040] hover:border-l-[#404040] hover:border-r-white hover:border-b-white text-[10px] text-black'
+										>
+											LinkedIn
+										</a>
+									)}
+									{currentItem.links.huggingface && (
+										<a
+											href={currentItem.links.huggingface}
+											target='_blank'
+											rel='noopener noreferrer'
+											className='px-2 py-1 bg-[#C0C0C0] border-2 border-t-white border-l-white border-r-[#404040] border-b-[#404040] hover:border-t-[#404040] hover:border-l-[#404040] hover:border-r-white hover:border-b-white text-[10px] text-black'
+										>
+											HuggingFace
+										</a>
+									)}
+								</div>
 							</div>
 						)}
 					</div>
@@ -272,7 +264,7 @@ export default function Portfolio() {
 						>
 							<div className='h-full flex flex-col items-center justify-center'>
 								<div className='text-2xl mb-1'>{item.icon}</div>
-								<div className='text-[10px] font-bold truncate w-full text-center'>
+								<div className='text-[10px] font-bold truncate w-full text-center text-black'>
 									{item.title}
 								</div>
 							</div>

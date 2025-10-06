@@ -195,7 +195,7 @@ function createPortfolioLaunch(): LaunchConfig {
 		title: 'Portfolio Media Center - Jean Francois',
 		appType: 'portfolio',
 		position: { x: 120, y: 60 },
-		size: { width: 900, height: 650 },
+		size: { width: 750, height: 863 },
 		icon: '📂',
 		content: {},
 	};

@@ -423,7 +423,7 @@ export default function MainPage() {
 						content: {
 							fileName: 'Welcome.txt',
 							filePath: null,
-							body: 'Welcome to Jean Francois Portfolio!\n\nThis is a fully functional Windows 3.1 OS simulation.\n\nFeel free to explore:\n• MSN Messenger - Chat with the AI assistant\n• Portfolio.exe - View my projects\n• Paint.exe, Minesweeper.exe, Snake.exe - Games!\n• My Computer - Browse the file system\n\nEnjoy! 🎨',
+							body: 'Welcome to Jean Francois Portfolio!\n\nI\'m an AI Engineer and Developer Relations professional.\n\nThis is a fully functional Windows 3.1 OS simulation showcasing my work.\n\nFeel free to explore:\n• Portfolio.exe - View my projects and demos\n• MSN Messenger - Chat with AI assistant if you need help\n• Paint.exe, Minesweeper.exe, Snake.exe - Classic games!\n• My Computer - Browse the file system\n\nConnect with me:\n• LinkedIn: linkedin.com/in/jeanfrancoisgutierrez\n• GitHub: github.com/franzuzz\n\nNote: Terminal is only available on mobile devices.\n\nEnjoy! 🎨',
 							readOnly: true,
 						} as NotepadWindowContent,
 					});
@@ -493,18 +493,9 @@ export default function MainPage() {
 			content: {
 				fileName: 'Welcome.txt',
 				filePath: null,
-				body: 'Hello! This is my portfolio and personal website, have fun exploring it!.',
+				body: 'Welcome to Jean Francois Portfolio!\n\nI\'m an AI Engineer and Developer Relations professional.\n\nThis is a fully functional Windows 3.1 OS simulation showcasing my work.\n\nFeel free to explore:\n• Portfolio.exe - View my projects and demos\n• MSN Messenger - Chat with AI assistant if you need help\n• Paint.exe, Minesweeper.exe, Snake.exe - Classic games!\n• My Computer - Browse the file system\n\nConnect with me:\n• LinkedIn: linkedin.com/in/jeanfrancoisgutierrez\n• GitHub: github.com/franzuzz\n\nNote: Terminal is only available on mobile devices.\n\nEnjoy! 🎨',
 				readOnly: true,
 			},
-		});
-
-		openWindow({
-			title: 'Program Manager',
-			appType: 'explorer',
-			position: { x: 360, y: 180 },
-			size: { width: 420, height: 320 },
-			icon: 'PM',
-			content: { folderPath: null },
 		});
 	}, [openWindow, windows.length, bootComplete]);
 
@@ -630,7 +621,7 @@ export default function MainPage() {
 					title: 'Portfolio Media Center - Jean Francois',
 					appType: 'portfolio',
 					position,
-					size: { width: 900, height: 650 },
+					size: { width: 684, height: 863 },
 					icon: '📂',
 					content: {},
 				});

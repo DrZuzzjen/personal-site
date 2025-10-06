@@ -31,6 +31,7 @@ const lineTypeToColor: Record<TerminalLineType, string> = {
 export default function Terminal({ isMobile = false, className }: TerminalProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
+  const initializedRef = useRef(false);
   const fileSystem = useFileSystemContext();
   const windowManager = useWindowContext();
 
@@ -58,8 +59,11 @@ export default function Terminal({ isMobile = false, className }: TerminalProps)
   } = useTerminalState({ initialPath: '/C:/Users/Guest' });
 
   useEffect(() => {
-    appendLine({ text: 'Initializing MS-DOS compatible shell...', type: 'system' });
-    appendLine({ text: 'Type "help" to list available commands.', type: 'system' });
+    if (!initializedRef.current) {
+      appendLine({ text: 'Initializing MS-DOS compatible shell...', type: 'system' });
+      appendLine({ text: 'Type "help" to list available commands.', type: 'system' });
+      initializedRef.current = true;
+    }
   }, [appendLine]);
 
   useEffect(() => {
