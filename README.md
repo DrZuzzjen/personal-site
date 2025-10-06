@@ -2,7 +2,8 @@
 
 A fully functional Windows 3.1 operating system simulation built as a portfolio website. Not just a theme - a complete OS experience with draggable windows, a file system, MS Paint, Minesweeper, and more.
 
-**🚀 Live Demo**: [https://web-b3nosxc4i-drzuzzjens-projects.vercel.app](https://web-b3nosxc4i-drzuzzjens-projects.vercel.app)
+**🚀 Live Demo**: [https://web-indol-three-98.vercel.app](https://web-indol-three-98.vercel.app)  
+**📋 GitHub Repository**: [https://github.com/DrZuzzjen/personal-site](https://github.com/DrZuzzjen/personal-site)
 
 ## 🎯 Concept
 
