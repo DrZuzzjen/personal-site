@@ -25,6 +25,8 @@ export interface Window {
   isMaximized: boolean;
   icon?: string;
   content?: WindowContent; // App-specific state (file data, game config, etc.)
+  minimizeOnClose?: boolean; // If true, close button minimizes instead of closing
+  isFlashing?: boolean; // For taskbar notification
 }
 
 // ============================================
@@ -163,6 +165,7 @@ export interface WindowManagerContext {
   updateWindowSize: (id: string, size: WindowSize) => void;
   updateWindowContent: (id: string, content: WindowContent) => void;
   updateWindowTitle: (id: string, title: string) => void;
+  setWindowFlashing: (id: string, isFlashing: boolean) => void;
 }
 
 export interface FileSystemContext {

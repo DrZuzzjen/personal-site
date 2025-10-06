@@ -109,9 +109,22 @@ export default function Window({
   }, [focusWindow, id]);
 
   const handleClose = useCallback(() => {
-    closeWindow(id);
-    onClose?.();
-  }, [closeWindow, id, onClose]);
+    // If minimizeOnClose is true, minimize instead of closing
+    console.log('Window close clicked:', {
+      id,
+      title: currentWindow?.title,
+      minimizeOnClose: currentWindow?.minimizeOnClose
+    });
+
+    if (currentWindow?.minimizeOnClose) {
+      console.log('Minimizing window instead of closing');
+      minimizeWindow(id);
+    } else {
+      console.log('Closing window');
+      closeWindow(id);
+      onClose?.();
+    }
+  }, [closeWindow, minimizeWindow, id, onClose, currentWindow]);
 
   const handleMinimize = useCallback(() => {
     minimizeWindow(id);
@@ -157,7 +170,7 @@ export default function Window({
     }
   }, [currentWindow, focusWindow, id, maximizeWindow, updateWindowPosition, updateWindowSize]);
 
-  if (!currentWindow || isMinimized) {
+  if (!currentWindow) {
     return null;
   }
 
@@ -174,6 +187,7 @@ export default function Window({
     boxShadow: isFocused
       ? '2px 2px 0 rgba(0, 0, 0, 0.4)'
       : '1px 1px 0 rgba(0, 0, 0, 0.2)',
+    display: isMinimized ? 'none' : 'block', // Hide but don't unmount
   };
 
   const contentStyle: CSSProperties = {
