@@ -27,6 +27,7 @@ export function useFileSystem() {
   // Initialize desktop icons from localStorage or default
   useEffect(() => {
     const defaultDesktopIcons = [...INITIAL_DESKTOP_ICONS, ...APP_DESKTOP_ICONS];
+    const DESKTOP_ICONS_VERSION = '1.1'; // Increment this when desktop icon structure changes
 
     const ensureDefaultIcons = (icons: DesktopIcon[]): DesktopIcon[] => {
       const existing = new Set(icons.map((icon) => icon.fileSystemId));
@@ -40,6 +41,18 @@ export function useFileSystem() {
 
       return merged;
     };
+
+    // Check version to force migration when needed
+    const savedVersion = localStorage.getItem('desktop-icons-version');
+    const needsMigration = savedVersion !== DESKTOP_ICONS_VERSION;
+
+    if (needsMigration) {
+      console.log('[FileSystem] Desktop icons version mismatch, resetting to defaults');
+      localStorage.setItem('desktop-icons-version', DESKTOP_ICONS_VERSION);
+      localStorage.removeItem('desktop-icons'); // Clear old icons
+      setDesktopIcons(defaultDesktopIcons);
+      return;
+    }
 
     const savedIcons = localStorage.getItem('desktop-icons');
     if (savedIcons) {
