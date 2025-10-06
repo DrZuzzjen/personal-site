@@ -406,8 +406,36 @@ export default function MainPage() {
 	useEffect(() => {
 		if (bootComplete && typeof window !== 'undefined') {
 			localStorage.setItem('hasBooted', 'true');
+
+			// Launch startup apps after boot
+			const shouldLaunchStartupApps = localStorage.getItem('launchStartupApps');
+			if (shouldLaunchStartupApps === 'true') {
+				localStorage.removeItem('launchStartupApps');
+
+				// Launch Portfolio
+				setTimeout(() => {
+					openWindow({
+						title: 'Portfolio Media Center - Jean Francois',
+						appType: 'portfolio',
+						position: { x: 80, y: 60 },
+						size: { width: 900, height: 650 },
+						icon: '📂',
+					});
+				}, 300);
+
+				// Launch MSN Messenger
+				setTimeout(() => {
+					openWindow({
+						title: 'MSN Messenger - Jean Francois',
+						appType: 'chatbot',
+						position: { x: 150, y: 120 },
+						size: { width: 380, height: 520 },
+						icon: '💬',
+					});
+				}, 600);
+			}
 		}
-	}, [bootComplete]);
+	}, [bootComplete, openWindow]);
 
 	// Apply saved background color on load
 	useEffect(() => {

@@ -48,11 +48,53 @@ export default function Submenu({
 				onClick={() => handleItemClick(() => onLaunchApp('notepad'))}
 			/>
 			<StartMenuItem
+				icon='🐍'
+				text='Snake.exe'
+				hasArrow={false}
+				onHover={() => {}}
+				onClick={() => handleItemClick(() => onLaunchApp('snake'))}
+			/>
+			<StartMenuItem
+				icon='📷'
+				text='Camera.exe'
+				hasArrow={false}
+				onHover={() => {}}
+				onClick={() => handleItemClick(() => onLaunchApp('camera'))}
+			/>
+			<StartMenuItem
+				icon='📺'
+				text='TV.exe'
+				hasArrow={false}
+				onHover={() => {}}
+				onClick={() => handleItemClick(() => onLaunchApp('tv'))}
+			/>
+			<StartMenuItem
+				icon='💬'
+				text='MSN Messenger.exe'
+				hasArrow={false}
+				onHover={() => {}}
+				onClick={() => handleItemClick(() => onLaunchApp('chatbot'))}
+			/>
+			<StartMenuItem
+				icon='📂'
+				text='Portfolio.exe'
+				hasArrow={false}
+				onHover={() => {}}
+				onClick={() => handleItemClick(() => onLaunchApp('portfolio'))}
+			/>
+			<StartMenuItem
 				icon='CMD'
 				text='Terminal.exe'
 				hasArrow={false}
 				onHover={() => {}}
 				onClick={() => handleItemClick(() => onLaunchApp('terminal'))}
+			/>
+			<div
+				style={{
+					height: 1,
+					margin: '4px 0',
+					borderTop: `1px solid ${COLORS.BORDER_SHADOW}`,
+				}}
 			/>
 			<StartMenuItem
 				icon='🖥️'

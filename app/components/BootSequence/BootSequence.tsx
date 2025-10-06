@@ -17,6 +17,7 @@ export default function BootSequence({
 	skipBoot = false,
 }: BootSequenceProps) {
 	const [currentStage, setCurrentStage] = useState<BootStage>('post');
+	const [startupAppsLaunched, setStartupAppsLaunched] = useState(false);
 
 	useEffect(() => {
 		if (skipBoot) {
@@ -53,6 +54,14 @@ export default function BootSequence({
 				break;
 
 			case 'complete':
+				// Launch startup apps before completing boot
+				if (!startupAppsLaunched) {
+					setStartupAppsLaunched(true);
+					// Store startup apps to be launched after boot
+					if (typeof window !== 'undefined') {
+						window.localStorage.setItem('launchStartupApps', 'true');
+					}
+				}
 				onBootComplete();
 				break;
 		}
