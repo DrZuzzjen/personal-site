@@ -245,7 +245,7 @@ Project details: ${context.projects
 			console.error('Chat error:', error);
 			addMessage({
 				role: 'assistant',
-				content: 'Oops! Connection error. Try again? 😅',
+				content: 'Zzzzzzz 😴\n\nOpening Hours: not now\n\n(AI is probably rate-limited, try again later!)',
 			});
 		} finally {
 			setIsTyping(false);

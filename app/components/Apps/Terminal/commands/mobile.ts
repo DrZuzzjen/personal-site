@@ -212,5 +212,84 @@ export function createMobileCommands(): Command[] {
         return { lines };
       },
     },
+    {
+      name: 'gallery',
+      description: 'View project gallery (ASCII art)',
+      usage: 'gallery',
+      category: 'fun',
+      aliases: ['projects'],
+      execute: async () => {
+        const lines: TerminalLineInput[] = [
+          { type: 'output', text: '' },
+          { type: 'success', text: '🎨 PROJECT GALLERY' },
+          { type: 'output', text: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' },
+          { type: 'output', text: '' },
+
+          // Project 1: Real-Time AI Narrator
+          { type: 'warning', text: '┌─────────────────────────────────────┐' },
+          { type: 'warning', text: '│  🎥 Real-Time AI Narrator (2024)   │' },
+          { type: 'warning', text: '└─────────────────────────────────────┘' },
+          { type: 'output', text: 'David Attenborough narrates your life' },
+          { type: 'output', text: 'in real-time using AI' },
+          { type: 'output', text: '' },
+          { type: 'system', text: '🔗 github.com/cbh123/narrator' },
+          { type: 'output', text: '' },
+
+          // Project 2: Random Prediction Game
+          { type: 'warning', text: '┌─────────────────────────────────────┐' },
+          { type: 'warning', text: '│  🎲 Random Prediction Game (2024)  │' },
+          { type: 'warning', text: '└─────────────────────────────────────┘' },
+          { type: 'output', text: 'Challenge AI to predict your random' },
+          { type: 'output', text: 'choices. Can you outsmart the model?' },
+          { type: 'output', text: '' },
+          { type: 'system', text: '🔗 github.com/DrZuzzjen/random-prediction' },
+          { type: 'output', text: '' },
+
+          // Project 3: YouClip
+          { type: 'warning', text: '┌─────────────────────────────────────┐' },
+          { type: 'warning', text: '│  📹 YouClip (2024)                  │' },
+          { type: 'warning', text: '└─────────────────────────────────────┘' },
+          { type: 'output', text: 'Semantic search for YouTube videos' },
+          { type: 'output', text: 'using CLIP embeddings' },
+          { type: 'output', text: '' },
+          { type: 'system', text: '🔗 github.com/DrZuzzjen/YouCLIP' },
+          { type: 'output', text: '' },
+
+          // Project 4: LLM Arena
+          { type: 'warning', text: '┌─────────────────────────────────────┐' },
+          { type: 'warning', text: '│  ⚔️  LLM Arena (2024)               │' },
+          { type: 'warning', text: '└─────────────────────────────────────┘' },
+          { type: 'output', text: 'Compare different LLM models' },
+          { type: 'output', text: 'side-by-side in real-time' },
+          { type: 'output', text: '' },
+          { type: 'system', text: '🔗 github.com/DrZuzzjen/LLM_Arena' },
+          { type: 'output', text: '' },
+
+          // Project 5: BASF Hackathon Winner
+          { type: 'warning', text: '┌─────────────────────────────────────┐' },
+          { type: 'warning', text: '│  🏆 BASF Hackathon Winner (2024)   │' },
+          { type: 'warning', text: '└─────────────────────────────────────┘' },
+          { type: 'output', text: 'AI-powered emotional analysis tool' },
+          { type: 'output', text: '1st place winner!' },
+          { type: 'output', text: '' },
+          { type: 'system', text: '🔗 github.com/DrZuzzjen/emosnaz' },
+          { type: 'output', text: '' },
+
+          // Project 6: Flux Fine-tuning
+          { type: 'warning', text: '┌─────────────────────────────────────┐' },
+          { type: 'warning', text: '│  🎨 Flux Fine-tuning (2024)         │' },
+          { type: 'warning', text: '└─────────────────────────────────────┘' },
+          { type: 'output', text: 'Custom image generation model' },
+          { type: 'output', text: 'fine-tuned for specific styles' },
+          { type: 'output', text: '' },
+
+          { type: 'output', text: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' },
+          { type: 'system', text: '💡 TIP: Type "portfolio" for more options' },
+          { type: 'output', text: '' },
+        ];
+
+        return { lines };
+      },
+    },
   ];
 }
