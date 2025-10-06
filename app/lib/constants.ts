@@ -218,21 +218,27 @@ Check out My Documents for project details, or play some Minesweeper while you'r
                   },
                   {
                     id: 'project-1',
-                    name: 'Project_1.txt',
+                    name: 'Real-Time AI Narrator.txt',
                     type: 'file',
                     extension: 'txt',
-                    path: '/C:/Users/Guest/Documents/Project_1.txt',
-                    content: `Project Name: [Your Project]
-Tech Stack: Next.js, TypeScript, Tailwind
-GitHub: [repo-url]
+                    path: '/C:/Users/Guest/Documents/Real-Time AI Narrator.txt',
+                    content: `🎥 Real-Time AI Narrator (2024)
 
-Description:
-[Your project description here]
+David Attenborough narrates your life in real-time
 
-Key Features:
-- Feature 1
-- Feature 2
-- Feature 3`,
+"In the heart of the domestic jungle, we observe the majestic Homo sapiens in its natural habitat."
+
+A simple and tremendously fun project that narrates your life in real time as if it were the famous Sir David Attenborough.
+
+**Tech Stack:**
+- Python
+- GPT-4 Vision
+- ElevenLabs (voice synthesis)
+- OpenCV (real-time video processing)
+
+**GitHub:** https://github.com/cbh123/narrator
+
+Watch the demo video in Portfolio.exe!`,
                     isProtected: false,
                     isSystem: false,
                     icon: 'notepad',
@@ -241,11 +247,29 @@ Key Features:
                   },
                   {
                     id: 'project-2',
-                    name: 'Project_2.txt',
+                    name: 'Random Prediction Game.txt',
                     type: 'file',
                     extension: 'txt',
-                    path: '/C:/Users/Guest/Documents/Project_2.txt',
-                    content: 'Project 2 details... (to be filled in Phase 6)',
+                    path: '/C:/Users/Guest/Documents/Random Prediction Game.txt',
+                    content: `🎯 Random Prediction Game (2024)
+
+Testing human bias toward randomness
+
+An experiment to see how biased humans are toward the meaning of random. Players predict 10 random numbers (1-99) and compete on a leaderboard.
+
+Uses Random.org API for true random numbers and Supabase for persistent leaderboard.
+
+**Tech Stack:**
+- Streamlit (Python web framework)
+- Supabase (database)
+- Random.org API (true randomness)
+- PostgreSQL
+
+**Links:**
+- GitHub: https://github.com/DrZuzzjen/random-prediction
+- Live Demo: https://random-prediction.streamlit.app/
+
+Try your luck and see how well you can predict randomness!`,
                     isProtected: false,
                     isSystem: false,
                     icon: 'notepad',
@@ -254,11 +278,32 @@ Key Features:
                   },
                   {
                     id: 'project-3',
-                    name: 'Project_3.txt',
+                    name: 'YouClip.txt',
                     type: 'file',
                     extension: 'txt',
-                    path: '/C:/Users/Guest/Documents/Project_3.txt',
-                    content: 'Project 3 details... (to be filled in Phase 6)',
+                    path: '/C:/Users/Guest/Documents/YouClip.txt',
+                    content: `✂️ YouClip (2024)
+
+YouTube video clipper with AI subtitles
+
+A beautiful Streamlit application that allows users to create custom clips from YouTube videos.
+
+**Features:**
+- Custom clipping with precise start/end times
+- Multiple formats: MP4, WebM, MKV
+- Quality options (1080p, 720p, 480p, 360p)
+- AI-generated subtitles using Whisper running in the browser!
+
+**Tech Stack:**
+- Streamlit
+- Python
+- Whisper AI (subtitle generation)
+- FFmpeg (video processing)
+- YouTube API
+
+**GitHub:** https://github.com/DrZuzzjen/YouCLIP
+
+Perfect for content creators and video editors!`,
                     isProtected: false,
                     isSystem: false,
                     icon: 'notepad',
@@ -267,11 +312,36 @@ Key Features:
                   },
                   {
                     id: 'project-4',
-                    name: 'Project_4.txt',
+                    name: 'LLM Arena.txt',
                     type: 'file',
                     extension: 'txt',
-                    path: '/C:/Users/Guest/Documents/Project_4.txt',
-                    content: 'Project 4 details... (to be filled in Phase 6)',
+                    path: '/C:/Users/Guest/Documents/LLM Arena.txt',
+                    content: `🚥 LLM Arena (2024)
+
+Speed benchmark for OpenAI, NVIDIA, and Groq
+
+Where the heavyweights of language models go head-to-head. Compare speed and efficiency across multiple LLM providers.
+
+**Features:**
+- Real-time streaming responses
+- Performance metrics & charts
+- Side-by-side comparison
+- Async backend powered by FastAPI + LangChain
+
+**Tech Stack:**
+- FastAPI (async Python backend)
+- LangChain (LLM orchestration)
+- Streamlit (frontend)
+- Docker (containerization)
+
+**Providers Tested:**
+- OpenAI (GPT models)
+- NVIDIA NIM
+- Groq (ultra-fast inference)
+
+**GitHub:** https://github.com/DrZuzzjen/LLM_Arena
+
+Find the fastest LLM for your use case!`,
                     isProtected: false,
                     isSystem: false,
                     icon: 'notepad',
@@ -280,11 +350,76 @@ Key Features:
                   },
                   {
                     id: 'project-5',
-                    name: 'Project_5.txt',
+                    name: 'BASF Hackathon Winner.txt',
                     type: 'file',
                     extension: 'txt',
-                    path: '/C:/Users/Guest/Documents/Project_5.txt',
-                    content: 'Project 5 details... (to be filled in Phase 6)',
+                    path: '/C:/Users/Guest/Documents/BASF Hackathon Winner.txt',
+                    content: `🏆 BASF Copilot AI Hackathon - 1st Place (2024)
+
+Real-time emotion detection from facial expressions
+
+**Achievement:** 1st Place Winner
+
+**Project: Emosnaz**
+Three-model pipeline running entirely in the browser:
+1. Face isolation from video stream
+2. Facial anchor point mapping (68 landmarks)
+3. Emotion translation (7 emotions detected)
+
+All client-side, pure front-end magic. No server needed!
+
+**Tech Stack:**
+- TensorFlow.js (browser ML)
+- Computer Vision
+- Face Detection API
+- Client-side ML (runs entirely in browser)
+
+**Emotions Detected:**
+Happy, Sad, Angry, Surprised, Fearful, Disgusted, Neutral
+
+**GitHub:** https://github.com/DrZuzzjen/emosnaz
+
+Privacy-first emotion detection!`,
+                    isProtected: false,
+                    isSystem: false,
+                    icon: 'notepad',
+                    createdAt: Date.now(),
+                    modifiedAt: Date.now(),
+                  },
+                  {
+                    id: 'project-6',
+                    name: 'Flux Fine-tuning.txt',
+                    type: 'file',
+                    extension: 'txt',
+                    path: '/C:/Users/Guest/Documents/Flux Fine-tuning.txt',
+                    content: `🎨 Fine-tuning Flux.1-dev with LoRA (2024)
+
+Custom AI image generation with personal features
+
+Fine-tuned Flux.1-dev using LoRA (Low-Rank Adaptation) to generate images with my facial features.
+
+**Training Details:**
+- Trained on A100 80GB GPU
+- Training time: 75 minutes
+- Dataset: Less than 20 images
+- Training cost: €5.50
+- Steps: 2000
+
+**What is LoRA?**
+Low-Rank Adaptation allows efficient model customization without retraining from scratch. It's like teaching the model a new "style" while keeping the base knowledge intact.
+
+**Tech Stack:**
+- Flux.1-dev (image generation model)
+- LoRA (efficient fine-tuning)
+- A100 GPU (NVIDIA)
+- Diffusion Models
+- HuggingFace (model hosting)
+
+**Links:**
+- LinkedIn Post: https://www.linkedin.com/feed/update/urn:li:activity:7231922195994718209/
+- HuggingFace Model: https://huggingface.co/FranZuzz/franzuzz
+
+Try generating your own personalized images!`,
                     isProtected: false,
                     isSystem: false,
                     icon: 'notepad',
