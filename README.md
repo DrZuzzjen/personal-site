@@ -1,9 +1,11 @@
-# Windows 3.1 Portfolio/CV 🖥️
+# Jean François Gutierrez - Windows 3.1 Portfolio 🖥️
 
-A fully functional Windows 3.1 operating system simulation built as a portfolio website. Not just a theme - a complete OS experience with draggable windows, a file system, MS Paint, Minesweeper, and more.
+A fully functional Windows 3.1 operating system simulation serving as an interactive portfolio for Jean François Gutierrez, AI Engineer and Developer Relations professional. Not just a theme - a complete OS experience with draggable windows, a file system, MS Paint, Minesweeper, and more.
 
-**🚀 Live Demo**: [https://web-indol-three-98.vercel.app](https://web-indol-three-98.vercel.app)  
+**🚀 Live Demo**: [https://fran-ai.dev](https://fran-ai.dev)
 **📋 GitHub Repository**: [https://github.com/DrZuzzjen/personal-site](https://github.com/DrZuzzjen/personal-site)
+**💼 LinkedIn**: [linkedin.com/in/jeanfrancoisgutierrez](https://linkedin.com/in/jeanfrancoisgutierrez)
+**🐙 GitHub**: [github.com/franzuzz](https://github.com/franzuzz)
 
 ## 🎯 Concept
 

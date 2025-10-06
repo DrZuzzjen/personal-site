@@ -418,7 +418,7 @@ export default function MainPage() {
 						title: 'Welcome.txt - Notepad',
 						appType: 'notepad',
 						position: { x: 120, y: 100 },
-						size: { width: 440, height: 320 },
+						size: { width: 440, height: 420 },
 						icon: 'NP',
 						content: {
 							fileName: 'Welcome.txt',
