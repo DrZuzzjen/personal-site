@@ -36,9 +36,9 @@ export const WINDOW_DEFAULTS = {
 } as const;
 
 export const DESKTOP_GRID = {
-  ICON_WIDTH: 80,
-  ICON_HEIGHT: 80,
-  ICON_SPACING: 10,
+  ICON_WIDTH: 70,
+  ICON_HEIGHT: 70,
+  ICON_SPACING: 8,
 } as const;
 
 export const Z_INDEX = {
@@ -412,7 +412,7 @@ export const INITIAL_DESKTOP_ICONS: DesktopIcon[] = [
   {
     id: 'desktop-icon-recycle-bin',
     fileSystemId: 'recycle-bin',
-    position: { x: 0, y: 1 },
+    position: { x: 1, y: 0 },
     isSelected: false,
   },
 ];
@@ -541,55 +541,55 @@ export const APP_DESKTOP_ICONS: DesktopIcon[] = [
   {
     id: 'desktop-icon-paint',
     fileSystemId: 'paint-exe',
-    position: { x: 0, y: 2 },
+    position: { x: 2, y: 0 },
     isSelected: false,
   },
   {
     id: 'desktop-icon-minesweeper',
     fileSystemId: 'minesweeper-exe',
-    position: { x: 0, y: 3 },
+    position: { x: 3, y: 0 },
     isSelected: false,
   },
   {
     id: 'desktop-icon-notepad',
     fileSystemId: 'notepad-exe',
-    position: { x: 0, y: 4 },
+    position: { x: 0, y: 1 },
     isSelected: false,
   },
   {
     id: 'desktop-icon-snake',
     fileSystemId: 'snake-exe',
-    position: { x: 0, y: 5 },
+    position: { x: 1, y: 1 },
     isSelected: false,
   },
   {
     id: 'desktop-icon-camera',
     fileSystemId: 'camera-exe',
-    position: { x: 0, y: 6 },
+    position: { x: 2, y: 1 },
     isSelected: false,
   },
   {
     id: 'desktop-icon-tv',
     fileSystemId: 'tv-exe',
-    position: { x: 0, y: 7 },
+    position: { x: 3, y: 1 },
     isSelected: false,
   },
   {
     id: 'desktop-icon-chatbot',
     fileSystemId: 'chatbot-exe',
-    position: { x: 0, y: 8 },
+    position: { x: 0, y: 2 },
     isSelected: false,
   },
   {
     id: 'desktop-icon-terminal',
     fileSystemId: 'terminal-exe',
-    position: { x: 0, y: 9 },
+    position: { x: 1, y: 2 },
     isSelected: false,
   },
   {
     id: 'desktop-icon-portfolio',
     fileSystemId: 'portfolio-exe',
-    position: { x: 0, y: 10 },
+    position: { x: 2, y: 2 },
     isSelected: false,
   },
 ];

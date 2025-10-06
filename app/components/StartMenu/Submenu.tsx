@@ -27,63 +27,63 @@ export default function Submenu({
 	const renderProgramsSubmenu = () => (
 		<>
 			<StartMenuItem
-				icon='🎨'
+				icon='/icon/file_set-0.png'
 				text='Paint.exe'
 				hasArrow={false}
 				onHover={() => {}}
 				onClick={() => handleItemClick(() => onLaunchApp('paint'))}
 			/>
 			<StartMenuItem
-				icon='💣'
+				icon='/icon/executable_sound-0.png'
 				text='Minesweeper.exe'
 				hasArrow={false}
 				onHover={() => {}}
 				onClick={() => handleItemClick(() => onLaunchApp('minesweeper'))}
 			/>
 			<StartMenuItem
-				icon='📝'
+				icon='/icon/notepad-2.png'
 				text='Notepad.exe'
 				hasArrow={false}
 				onHover={() => {}}
 				onClick={() => handleItemClick(() => onLaunchApp('notepad'))}
 			/>
 			<StartMenuItem
-				icon='🐍'
+				icon='/icon/492snake_100855.ico'
 				text='Snake.exe'
 				hasArrow={false}
 				onHover={() => {}}
 				onClick={() => handleItemClick(() => onLaunchApp('snake'))}
 			/>
 			<StartMenuItem
-				icon='📷'
+				icon='/icon/camera-0.png'
 				text='Camera.exe'
 				hasArrow={false}
 				onHover={() => {}}
 				onClick={() => handleItemClick(() => onLaunchApp('camera'))}
 			/>
 			<StartMenuItem
-				icon='📺'
+				icon='/icon/cd_audio_cd_a-3.png'
 				text='TV.exe'
 				hasArrow={false}
 				onHover={() => {}}
 				onClick={() => handleItemClick(() => onLaunchApp('tv'))}
 			/>
 			<StartMenuItem
-				icon='💬'
+				icon='/icon/MSN_messenger_user_156.png'
 				text='MSN Messenger.exe'
 				hasArrow={false}
 				onHover={() => {}}
 				onClick={() => handleItemClick(() => onLaunchApp('chatbot'))}
 			/>
 			<StartMenuItem
-				icon='📂'
+				icon='/icon/directory_open_file_mydocs-4.png'
 				text='Portfolio.exe'
 				hasArrow={false}
 				onHover={() => {}}
 				onClick={() => handleItemClick(() => onLaunchApp('portfolio'))}
 			/>
 			<StartMenuItem
-				icon='CMD'
+				icon='/icon/console_prompt-0.png'
 				text='Terminal.exe'
 				hasArrow={false}
 				onHover={() => {}}
@@ -97,7 +97,7 @@ export default function Submenu({
 				}}
 			/>
 			<StartMenuItem
-				icon='🖥️'
+				icon='/icon/desktop-2.png'
 				text='My Computer'
 				hasArrow={false}
 				onHover={() => {}}
@@ -106,7 +106,7 @@ export default function Submenu({
 				}
 			/>
 			<StartMenuItem
-				icon='📁'
+				icon='/icon/directory_open_file_mydocs-4.png'
 				text='File Explorer'
 				hasArrow={false}
 				onHover={() => {}}
@@ -307,6 +307,8 @@ const renderDocumentsSubmenu = () => (
 				left: '100%',
 				top: 0,
 				width: 180,
+				maxHeight: '80vh',
+				overflowY: 'auto',
 				backgroundColor: COLORS.WIN_GRAY,
 				border: `2px solid ${COLORS.BORDER_LIGHT}`,
 				borderTopColor: COLORS.BORDER_HIGHLIGHT,

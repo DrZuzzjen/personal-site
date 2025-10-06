@@ -69,10 +69,10 @@ const DEFAULT_SNAKE_CONFIG: SnakeWindowContent = {
 	columns: 30,
 	rows: 25,
 	initialLength: 4,
-	initialSpeedMs: 180,
-	speedIncrementMs: 12,
-	speedIncreaseEvery: 3,
-	minimumSpeedMs: 60,
+	initialSpeedMs: 36,
+	speedIncrementMs: 5,
+	speedIncreaseEvery: 1,
+	minimumSpeedMs: 15,
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -468,7 +468,7 @@ export default function MainPage() {
 			content: {
 				fileName: 'Welcome.txt',
 				filePath: null,
-				body: 'Hello! This draggable window is rendered through the new Phase 2 window system. Try dragging it around.',
+				body: 'Hello! This is my portfolio and personal website, have fun exploring it!.',
 				readOnly: true,
 			},
 		});
