@@ -1,5 +1,26 @@
 import type { Command, TerminalLineInput } from '../types';
 
+async function sendChatMessage(message: string): Promise<string> {
+  try {
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages: [{ role: 'user', content: message }],
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Chat API failed');
+    }
+
+    const data = await response.json();
+    return data.message || 'No response from AI';
+  } catch (error) {
+    return `Error: ${error instanceof Error ? error.message : 'Failed to connect to chat'}`;
+  }
+}
+
 export function createMobileCommands(): Command[] {
   return [
     {
@@ -132,6 +153,59 @@ export function createMobileCommands(): Command[] {
           { type: 'output', text: '📧 Email:      jeanfrancois@kluster.ai' },
           { type: 'output', text: '' },
           { type: 'system', text: '📱 Tap any link to open in new tab' },
+          { type: 'output', text: '' },
+        ];
+
+        return { lines };
+      },
+    },
+    {
+      name: 'chat',
+      description: 'Chat with AI assistant',
+      usage: 'chat <message>',
+      category: 'fun',
+      aliases: ['ai', 'ask'],
+      execute: async ({ parsed }) => {
+        const message = parsed.args.join(' ');
+
+        if (!message) {
+          const lines: TerminalLineInput[] = [
+            { type: 'output', text: '' },
+            { type: 'warning', text: '💬 TERMINAL CHAT' },
+            { type: 'output', text: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' },
+            { type: 'output', text: '' },
+            { type: 'output', text: 'Usage: chat <your message>' },
+            { type: 'output', text: '' },
+            { type: 'output', text: 'Examples:' },
+            { type: 'output', text: '  chat hello' },
+            { type: 'output', text: '  chat what projects do you have?' },
+            { type: 'output', text: '  chat tell me about yourself' },
+            { type: 'output', text: '' },
+            { type: 'system', text: '💡 TIP: For full chat experience, open the Chatbot app on desktop!' },
+            { type: 'output', text: '' },
+          ];
+          return { lines };
+        }
+
+        // Show "thinking..." message
+        const thinkingLines: TerminalLineInput[] = [
+          { type: 'output', text: '' },
+          { type: 'system', text: '💭 Thinking...' },
+        ];
+
+        // Get AI response
+        const reply = await sendChatMessage(message);
+
+        // Format AI response with proper line breaks
+        const replyLines = reply.split('\n').map((line) => ({
+          type: 'output' as const,
+          text: line,
+        }));
+
+        const lines: TerminalLineInput[] = [
+          { type: 'output', text: '' },
+          { type: 'success', text: '🤖 Jean Francois:' },
+          ...replyLines,
           { type: 'output', text: '' },
         ];
 
