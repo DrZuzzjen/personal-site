@@ -550,6 +550,12 @@ export const INITIAL_DESKTOP_ICONS: DesktopIcon[] = [
     position: { x: 1, y: 0 },
     isSelected: false,
   },
+  {
+    id: 'desktop-icon-documents',
+    fileSystemId: 'documents-folder',
+    position: { x: 0, y: 3 },
+    isSelected: false,
+  },
 ];
 
 // ============================================

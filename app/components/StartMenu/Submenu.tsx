@@ -112,7 +112,7 @@ export default function Submenu({
 				onHover={() => {}}
 				onClick={() =>
 					handleItemClick(() =>
-						onLaunchApp('file-explorer', { path: '/My Documents' })
+						onLaunchApp('file-explorer', { path: '/C:/Users/Guest/Documents' })
 					)
 				}
 			/>
@@ -127,7 +127,7 @@ const renderDocumentsSubmenu = () => (
 				onHover={() => {}}
 				onClick={() =>
 					handleItemClick(() =>
-						onLaunchApp('file-explorer', { path: '/My Documents' })
+						onLaunchApp('file-explorer', { path: '/C:/Users/Guest/Documents' })
 					)
 				}
 			/>
