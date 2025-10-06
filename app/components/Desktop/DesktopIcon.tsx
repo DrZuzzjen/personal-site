@@ -31,7 +31,9 @@ interface LaunchConfig {
 		| 'snake'
 		| 'camera'
 		| 'tv'
-		| 'chatbot';
+		| 'chatbot'
+		| 'terminal'
+		| 'portfolio';
 	position: { x: number; y: number };
 	size: { width: number; height: number };
 	icon?: string;
@@ -188,6 +190,17 @@ function createChatbotLaunch(): LaunchConfig {
 	};
 }
 
+function createPortfolioLaunch(): LaunchConfig {
+	return {
+		title: 'Portfolio Media Center - Jean Francois',
+		appType: 'portfolio',
+		position: { x: 120, y: 60 },
+		size: { width: 900, height: 650 },
+		icon: '📂',
+		content: {},
+	};
+}
+
 function getLaunchConfigForFile(item: FileSystemItem): LaunchConfig | null {
 	if (item.extension === 'txt') {
 		return createNotepadLaunch(item);
@@ -228,6 +241,10 @@ function getLaunchConfigForFile(item: FileSystemItem): LaunchConfig | null {
 
 		if (exeName.includes('msn') || exeName.includes('messenger')) {
 			return createChatbotLaunch();
+		}
+
+		if (exeName.includes('portfolio')) {
+			return createPortfolioLaunch();
 		}
 
 		return createUnsupportedFileLaunch(
@@ -454,6 +471,9 @@ export default function DesktopIcon({
 			}
 			if (exeName.includes('tv')) {
 				return { symbol: '📺', color: '#C0C0C0' };
+			}
+			if (exeName.includes('portfolio')) {
+				return { symbol: '📂', color: '#C0C0C0' };
 			}
 			return { symbol: 'EXE', color: '#C0C0C0' };
 		}

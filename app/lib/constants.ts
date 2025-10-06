@@ -522,6 +522,18 @@ export const APP_EXECUTABLES: FileSystemItem[] = [
     createdAt: Date.now(),
     modifiedAt: Date.now(),
   },
+  {
+    id: 'portfolio-exe',
+    name: 'Portfolio.exe',
+    type: 'file',
+    extension: 'exe',
+    path: '/C:/Program Files/Portfolio.exe',
+    isProtected: true,
+    isSystem: true,
+    icon: 'portfolio',
+    createdAt: Date.now(),
+    modifiedAt: Date.now(),
+  },
 ];
 
 // Desktop icons for executables (shortcuts to Program Files)
@@ -572,6 +584,12 @@ export const APP_DESKTOP_ICONS: DesktopIcon[] = [
     id: 'desktop-icon-terminal',
     fileSystemId: 'terminal-exe',
     position: { x: 0, y: 9 },
+    isSelected: false,
+  },
+  {
+    id: 'desktop-icon-portfolio',
+    fileSystemId: 'portfolio-exe',
+    position: { x: 0, y: 10 },
     isSelected: false,
   },
 ];

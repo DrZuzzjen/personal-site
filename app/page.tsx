@@ -13,6 +13,7 @@ import Camera from '@/app/components/Apps/Camera/Camera';
 import TV from '@/app/components/Apps/TV/TV';
 import Chatbot from '@/app/components/Apps/Chatbot/Chatbot';
 import Terminal from '@/app/components/Apps/Terminal/Terminal';
+import Portfolio from '@/app/components/Apps/Portfolio/Portfolio';
 import { BootSequence } from '@/app/components/BootSequence';
 import { ErrorDialog, BSOD } from '@/app/components/Dialogs';
 import { ShutDownScreen } from '@/app/components/StartMenu';
@@ -345,6 +346,9 @@ function renderWindowContent(
 		case 'terminal': {
 			return <Terminal />;
 		}
+		case 'portfolio': {
+			return <Portfolio />;
+		}
 		default:
 			return (
 				<div style={{ color: COLORS.TEXT_BLACK }}>
@@ -563,6 +567,18 @@ export default function MainPage() {
 					position,
 					size: { width: 820, height: 540 },
 					icon: 'CMD',
+					content: {},
+				});
+				break;
+			}
+
+			case 'portfolio': {
+				openWindow({
+					title: 'Portfolio Media Center - Jean Francois',
+					appType: 'portfolio',
+					position,
+					size: { width: 900, height: 650 },
+					icon: '📂',
 					content: {},
 				});
 				break;
