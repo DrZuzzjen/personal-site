@@ -367,36 +367,100 @@ export default function Notepad({
 				<span>{displayPath}</span>
 			</div>
 
-			<textarea
-				ref={textareaRef}
-				value={text}
-				onChange={(e) => setEditedText(e.target.value)}
-				readOnly={isReadOnly}
-				spellCheck={false}
-				wrap={isWrapped ? 'soft' : 'off'}
-				onClick={queueCursorUpdate}
-				onKeyUp={queueCursorUpdate}
-				onSelect={queueCursorUpdate}
-				onKeyDown={queueCursorUpdate}
-				style={{
-					flex: 1,
-					margin: 0,
-					padding: 4,
-					backgroundColor: COLORS.WIN_WHITE,
-					color: COLORS.TEXT_BLACK,
-					border: 'none',
-					resize: 'none',
-					fontFamily: 'var(--font-mono)',
-					fontSize: 13,
-					lineHeight: 1.3,
-					whiteSpace: isWrapped ? 'pre-wrap' : 'pre',
-					wordBreak: 'break-word',
-					overflowX: isWrapped ? 'hidden' : 'auto',
-					overflowY: 'auto',
-					outline: 'none',
-				}}
-				aria-label='Notepad text viewer'
-			/>
+			{isReadOnly ? (
+				// Read-only formatted view with support for bold and links
+				<div
+					style={{
+						flex: 1,
+						margin: 0,
+						padding: 8,
+						backgroundColor: COLORS.WIN_WHITE,
+						color: COLORS.TEXT_BLACK,
+						border: 'none',
+						fontFamily: 'var(--font-mono)',
+						fontSize: 13,
+						lineHeight: 1.5,
+						overflowY: 'auto',
+						outline: 'none',
+					}}
+					aria-label='Notepad text viewer'
+				>
+					{text.split('\n').map((line, index) => {
+						// Parse bold text **text**
+						const parts = line.split(/(\*\*[^*]+\*\*)/g);
+
+						return (
+							<div key={index}>
+								{parts.map((part, i) => {
+									// Check if bold
+									if (part.startsWith('**') && part.endsWith('**')) {
+										return <strong key={i}>{part.slice(2, -2)}</strong>;
+									}
+
+									// Check if it's a link (starts with http:// or https://)
+									const urlMatch = part.match(/(https?:\/\/[^\s]+)/g);
+									if (urlMatch) {
+										return part.split(/(https?:\/\/[^\s]+)/g).map((segment, j) => {
+											if (segment.match(/^https?:\/\//)) {
+												return (
+													<a
+														key={`${i}-${j}`}
+														href={segment}
+														target="_blank"
+														rel="noopener noreferrer"
+														style={{
+															color: '#0000FF',
+															textDecoration: 'underline',
+															cursor: 'pointer',
+														}}
+													>
+														{segment}
+													</a>
+												);
+											}
+											return <span key={`${i}-${j}`}>{segment}</span>;
+										});
+									}
+
+									return <span key={i}>{part}</span>;
+								})}
+							</div>
+						);
+					})}
+				</div>
+			) : (
+				// Editable textarea
+				<textarea
+					ref={textareaRef}
+					value={text}
+					onChange={(e) => setEditedText(e.target.value)}
+					readOnly={isReadOnly}
+					spellCheck={false}
+					wrap={isWrapped ? 'soft' : 'off'}
+					onClick={queueCursorUpdate}
+					onKeyUp={queueCursorUpdate}
+					onSelect={queueCursorUpdate}
+					onKeyDown={queueCursorUpdate}
+					style={{
+						flex: 1,
+						margin: 0,
+						padding: 4,
+						backgroundColor: COLORS.WIN_WHITE,
+						color: COLORS.TEXT_BLACK,
+						border: 'none',
+						resize: 'none',
+						fontFamily: 'var(--font-mono)',
+						fontSize: 13,
+						lineHeight: 1.3,
+						whiteSpace: isWrapped ? 'pre-wrap' : 'pre',
+						wordBreak: 'break-word',
+						overflowX: isWrapped ? 'hidden' : 'auto',
+						overflowY: 'auto',
+						outline: 'none',
+					}}
+					aria-label='Notepad text viewer'
+				/>
+			)}
 
 			<div style={statusBarStyle}>
 				<div style={statusGroupStyle}>

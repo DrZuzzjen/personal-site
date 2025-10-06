@@ -423,7 +423,7 @@ export default function MainPage() {
 						content: {
 							fileName: 'Welcome.txt',
 							filePath: null,
-							body: 'Welcome to Jean Francois Portfolio!\n\nI\'m an AI Engineer and Developer Relations professional.\n\nThis is a fully functional Windows 3.1 OS simulation showcasing my work.\n\nFeel free to explore:\n• Portfolio.exe - View my projects and demos\n• MSN Messenger - Chat with AI assistant if you need help\n• Paint.exe, Minesweeper.exe, Snake.exe - Classic games!\n• My Computer - Browse the file system\n\nConnect with me:\n• LinkedIn: linkedin.com/in/jeanfrancoisgutierrez\n• GitHub: github.com/franzuzz\n\nNote: Terminal is only available on mobile devices.\n\nEnjoy! 🎨',
+							body: 'Welcome to Jean Francois Portfolio!\n\nI\'m an AI Engineer and Developer Relations professional.\n\nThis is a fully functional Windows 3.1 OS simulation showcasing my work.\n\nFeel free to explore:\n• **Portfolio.exe** - View my projects and demos\n• **MSN Messenger** - Chat with AI assistant if you need help\n• **Paint.exe**, **Minesweeper.exe**, **Snake.exe** - Classic games!\n• **My Computer** - Browse the file system\n\nConnect with me:\n• LinkedIn: https://linkedin.com/in/jeanfrancoisgutierrez\n• GitHub: https://github.com/franzuzz\n\nNote: Terminal is only available on mobile devices.\n\nEnjoy! 🎨',
 							readOnly: true,
 						} as NotepadWindowContent,
 					});
@@ -488,12 +488,12 @@ export default function MainPage() {
 			title: 'Welcome.txt - Notepad',
 			appType: 'notepad',
 			position: { x: 120, y: 100 },
-			size: { width: 440, height: 320 },
+			size: { width: 440, height: 420 },
 			icon: 'NP',
 			content: {
 				fileName: 'Welcome.txt',
 				filePath: null,
-				body: 'Welcome to Jean Francois Portfolio!\n\nI\'m an AI Engineer and Developer Relations professional.\n\nThis is a fully functional Windows 3.1 OS simulation showcasing my work.\n\nFeel free to explore:\n• Portfolio.exe - View my projects and demos\n• MSN Messenger - Chat with AI assistant if you need help\n• Paint.exe, Minesweeper.exe, Snake.exe - Classic games!\n• My Computer - Browse the file system\n\nConnect with me:\n• LinkedIn: linkedin.com/in/jeanfrancoisgutierrez\n• GitHub: github.com/franzuzz\n\nNote: Terminal is only available on mobile devices.\n\nEnjoy! 🎨',
+				body: 'Welcome to Jean Francois Portfolio!\n\nI\'m an AI Engineer and Developer Relations professional.\n\nThis is a fully functional Windows 3.1 OS simulation showcasing my work.\n\nFeel free to explore:\n• **Portfolio.exe** - View my projects and demos\n• **MSN Messenger** - Chat with AI assistant if you need help\n• **Paint.exe**, **Minesweeper.exe**, **Snake.exe** - Classic games!\n• **My Computer** - Browse the file system\n\nConnect with me:\n• LinkedIn: https://linkedin.com/in/jeanfrancoisgutierrez\n• GitHub: https://github.com/franzuzz\n\nNote: Terminal is only available on mobile devices.\n\nEnjoy! 🎨',
 				readOnly: true,
 			},
 		});
