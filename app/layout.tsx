@@ -67,10 +67,11 @@ export const metadata: Metadata = {
 		siteName: 'Jean François Gutierrez Portfolio',
 		images: [
 			{
-				url: '/og-image.png',
+				url: '/og-image.png.webp',
 				width: 1200,
 				height: 630,
 				alt: 'Jean François Gutierrez - AI Engineer Portfolio',
+				type: 'image/webp',
 			},
 		],
 	},
@@ -79,7 +80,7 @@ export const metadata: Metadata = {
 		title: 'Jean François Gutierrez | AI Engineer & DevRel',
 		description: 'AI Consultancy, Workshops, Talks. Gen AI expert (AI, Agents, LLMs). Explore my interactive Retro-Windows portfolio.',
 		creator: '@franzuzz',
-		images: ['/og-image.png'],
+		images: ['/og-image.png.webp'],
 	},
 	robots: {
 		index: true,
