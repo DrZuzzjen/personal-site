@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
 	title: 'Jean François Gutierrez | AI Engineer & DevRel - Interactive Portfolio',
-	description: 'AI Engineer & DevRel - AI Consultancy, Workshops, Talks. Gen AI expert (RAG, Agents, LLMs). 20M+ in automation savings. Explore my interactive Windows 3.1 portfolio with real AI/ML projects.',
+	description: 'AI Engineer & DevRel - AI Consultancy, Workshops, Talks. Gen AI expert (AI, Agents, LLMs). Explore my interactive Retro-Windows portfolio.',
 	keywords: [
 		'AI Engineer', 'Developer Relations', 'DevRel', 'AI Consultancy', 'AI Workshops',
 		'Gen AI', 'RAG', 'AI Agents', 'LLM', 'GPT-4', 'Claude', 'Llama',
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
 		locale: 'en_US',
 		url: 'https://fran-ai.dev',
 		title: 'Jean François Gutierrez | AI Engineer & DevRel',
-		description: 'AI Consultancy, Workshops, Talks. Gen AI expert (RAG, Agents, LLMs). 20M+ in automation savings. Interactive Windows 3.1 portfolio.',
+		description: 'AI Consultancy, Workshops, Talks. Gen AI expert (AI, Agents, LLMs). Explore my interactive Retro-Windows portfolio.',
 		siteName: 'Jean François Gutierrez Portfolio',
 		images: [
 			{
@@ -77,7 +77,7 @@ export const metadata: Metadata = {
 	twitter: {
 		card: 'summary_large_image',
 		title: 'Jean François Gutierrez | AI Engineer & DevRel',
-		description: 'AI Consultancy, Workshops, Talks. Gen AI expert (RAG, Agents, LLMs). Interactive Windows 3.1 portfolio.',
+		description: 'AI Consultancy, Workshops, Talks. Gen AI expert (AI, Agents, LLMs). Explore my interactive Retro-Windows portfolio.',
 		creator: '@franzuzz',
 		images: ['/og-image.png'],
 	},
