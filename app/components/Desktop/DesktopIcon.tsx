@@ -179,7 +179,7 @@ function createTVLaunch(): LaunchConfig {
 
 function createChatbotLaunch(): LaunchConfig {
 	return {
-		title: 'MSN Messenger - Claude Bot',
+		title: 'MSN Messenger - Jean Francois',
 		appType: 'chatbot',
 		position: { x: 100, y: 80 },
 		size: { width: 480, height: 620 },

@@ -546,7 +546,7 @@ export default function MainPage() {
 
 			case 'chatbot': {
 				openWindow({
-					title: 'MSN Messenger - Claude Bot',
+					title: 'MSN Messenger - Jean Francois',
 					appType: 'chatbot',
 					position,
 					size: { width: 480, height: 620 },

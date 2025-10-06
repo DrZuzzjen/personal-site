@@ -181,31 +181,48 @@ This is the SAME file used by Claude Desktop app. The VS Code extension reads fr
 - ✅ Next.js project created
 - ✅ Dependencies installed
 - ✅ MCP servers configured and working
-- ✅ **Phase 1: Foundation** - COMPLETE (Steve)
-  - TypeScript types, constants, hooks, contexts
-  - Branch: `feature/phase1-foundation` (ready to merge)
-- 🟢 **Phase 2: Window System** - IN PROGRESS (Codex)
-  - Window components with drag/drop
-  - Branch: `feature/phase2-window-system` (active)
+- ✅ All phases complete - DEPLOYED TO PRODUCTION
+- ✅ **MSN Messenger Chatbot Enhanced** (Oct 2025)
+  - Personalized LLM-powered welcome messages
+  - Jean Francois personality integration
+  - Browser context detection (language, timezone, time of day)
+  - Typing sound effects (type.mp3)
+  - Context-aware AI responses with CV knowledge
 
-## Team Structure
-- **Claude** (Orchestrator) - Architecture, reviews, coordination
-- **Steve** - Phase 1 Foundation developer
-- **Codex** - Phase 2 Window System developer
+## MSN Messenger Chatbot - Technical Details
 
-## Multi-Agent Workflow
-**Challenge Discovered**: VS Code extensions share same workspace
-**Solution for Future**: Use git worktrees for true parallel development
-```bash
-git worktree add ../web-phase3 feature/phase3-desktop
-git worktree add ../web-phase4 feature/phase4-boot
-```
+### Personality System (`app/lib/personality.ts`)
+- **Jean Francois persona** derived from CV (DevRel at Kluster.ai)
+- Voice characteristics: "Direct and practical - no corporate buzzwords"
+- Technical expertise: Gen AI, RAG, Agents, Full-stack (Next.js, Python, TypeScript)
+- Achievements: 20M+ AI automation savings, 1 patent, hackathon organizer
+- Writing style: "Short sentences. Punchy. Gets to the point."
+- Signature phrases: "I'm your guy", "Let's shake things up", "Tailor-made solutions"
 
-## Next Steps
-1. Merge Steve's Phase 1 PR to master
-2. Codex completes Phase 2 (Window System)
-3. Set up git worktrees for Phase 3+ parallel work
-4. Continue with Desktop, Boot Sequence, and Apps
+### LLM Integration
+- **System Prompt**: `getPersonalityContext()` - comprehensive personality config
+- **Welcome API** (`app/api/chat/welcome/route.ts`): Generates personalized greetings
+- **Browser Context Detection**: Language, timezone, time of day, returning visitor status
+- **Model**: Groq API with Llama-4-Maverick-17b-128e-instruct
+- **Temperature**: 0.9 for welcome (creative), 0.8 for chat (balanced)
+
+### Audio Features
+- **Typing Sound**: `/sounds/type.mp3` plays on AI message received
+- **MSN Sounds**: Nudge, send, receive (authentic MSN Messenger experience)
+
+### Smart Welcome Messages
+Examples based on context:
+- Morning visitor in Spanish: Greets "¡Buenos días!" then switches to English
+- Late night returning visitor: "Back for more! What should we explore tonight?"
+- First-time visitor: Full portfolio introduction with app suggestions
+
+### Context Awareness
+Chatbot knows:
+- Jean Francois's full professional background (from CV)
+- Portfolio technical stack (Next.js 15, TypeScript, Tailwind)
+- All available apps (Paint, Minesweeper, Camera, TV, etc.)
+- Project structure and features
+- README content and achievements
 
 ## Working Directory
-`e:\code\web`
+`/Users/franzuzz/Documents/GitHub/personal-site`

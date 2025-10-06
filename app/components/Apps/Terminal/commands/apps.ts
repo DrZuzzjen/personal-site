@@ -116,7 +116,7 @@ const APP_LAUNCHERS: LaunchDefinition[] = [  {
     names: ['msn messenger.exe', 'messenger.exe', 'chatbot.exe', 'messenger'],
     description: 'MSN Messenger chat bot',
     build: () => ({
-      title: 'MSN Messenger - Claude Bot',
+      title: 'MSN Messenger - Jean Francois',
       appType: 'chatbot',
       size: { width: 500, height: 640 },
       icon: 'IM',

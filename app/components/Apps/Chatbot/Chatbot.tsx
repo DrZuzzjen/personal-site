@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
 import { useFileSystemContext } from '../../../lib/FileSystemContext';
+import { getBrowserContext } from '../../../lib/personality';
 
 // MSN Messenger color scheme
 const MSN_COLORS = {
@@ -8,7 +9,7 @@ const MSN_COLORS = {
 	HEADER_GRADIENT_END: '#2e7cbb',
 	BACKGROUND: '#ffffff',
 	USER_BUBBLE: '#e5f2ff', // Light blue
-	BOT_BUBBLE: '#f0f0f0', // Light gray
+	BOT_BUBBLE: '#d4f4dd', // Light green
 	TEXT: '#000000',
 	TEXT_META: '#666666', // Timestamps
 	ONLINE_GREEN: '#7ea04d',
@@ -53,27 +54,24 @@ const parseEmoticons = (text: string): string => {
 	return parsed;
 };
 
-// MSN Sounds (placeholder for now)
+// MSN Sounds
 const MSN_SOUNDS = {
-	messageReceived: '/sounds/msn-message.mp3',
+	messageReceived: '/sounds/type.mp3', // Typing sound for AI messages
 	messageSent: '/sounds/msn-send.mp3',
 	nudge: '/sounds/msn-nudge.mp3',
 	userOnline: '/sounds/msn-online.mp3',
 };
 
 const playSound = (soundKey: keyof typeof MSN_SOUNDS) => {
-	// For now, we'll skip sounds to avoid 404 errors
-	// Sounds can be added later by placing mp3 files in public/sounds/
-	//
-	// try {
-	//   const audio = new Audio(MSN_SOUNDS[soundKey]);
-	//   audio.volume = 0.3;
-	//   audio.play().catch(() => {
-	//     // Ignore if sound fails (user hasn't interacted yet)
-	//   });
-	// } catch (error) {
-	//   // Sound files don't exist yet - ignore silently
-	// }
+	try {
+		const audio = new Audio(MSN_SOUNDS[soundKey]);
+		audio.volume = 0.3;
+		audio.play().catch(() => {
+			// Ignore if sound fails (user hasn't interacted yet)
+		});
+	} catch (error) {
+		// Sound files don't exist - ignore silently
+	}
 };
 
 export default function Chatbot({}: ChatbotProps) {
@@ -86,7 +84,7 @@ export default function Chatbot({}: ChatbotProps) {
 
 	const { rootItems } = useFileSystemContext();
 
-	// Load chat history from localStorage
+	// Load chat history from localStorage OR generate personalized welcome
 	useEffect(() => {
 		const saved = localStorage.getItem('chatbot-history');
 		if (saved) {
@@ -100,17 +98,53 @@ export default function Chatbot({}: ChatbotProps) {
 				console.error('Error loading chat history:', error);
 			}
 		} else {
-			// Welcome message
+			// Generate LLM-powered personalized welcome message
+			generateWelcomeMessage();
+		}
+	}, []);
+
+	const generateWelcomeMessage = async () => {
+		setIsTyping(true);
+
+		try {
+			const browserContext = getBrowserContext();
+
+			const response = await fetch('/api/chat/welcome', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ browserContext }),
+			});
+
+			if (!response.ok) {
+				throw new Error('Welcome API failed');
+			}
+
+			const data = await response.json();
+
 			const welcomeMessage: Message = {
 				id: 'welcome',
 				role: 'assistant',
-				content:
-					"*Claude Bot has signed in* \n\nHey there! 😊 Welcome to this awesome retro portfolio! I'm here to help you explore all the cool features. This place is packed with working Windows 3.1 apps, easter eggs, and tons of interactive stuff! :D\n\nWhat would you like to check out first?",
+				content: data.message,
 				timestamp: new Date(),
 			};
+
 			setMessages([welcomeMessage]);
+			playSound('messageReceived');
+		} catch (error) {
+			console.error('Error generating welcome:', error);
+			// Fallback welcome message
+			const fallbackWelcome: Message = {
+				id: 'welcome',
+				role: 'assistant',
+				content:
+					"*Jean Francois has signed in*\n\nHey there! :) I'm Fran - DevRel at Kluster.ai and the dev who built this retro Windows 3.1 portfolio. This whole site is a working OS simulation with Paint, Minesweeper, and tons of easter eggs!\n\nWhat would you like to explore first?",
+				timestamp: new Date(),
+			};
+			setMessages([fallbackWelcome]);
+		} finally {
+			setIsTyping(false);
 		}
-	}, []);
+	};
 
 	// Save to localStorage when messages change
 	useEffect(() => {
@@ -301,7 +335,7 @@ Project details: ${context.projects
 							backgroundColor: isTyping ? '#fbbf24' : MSN_COLORS.ONLINE_GREEN,
 						}}
 					/>
-					<span className='font-semibold text-sm'>Claude Bot</span>
+					<span className='font-semibold text-sm'>Jean Francois</span>
 				</div>
 				<div className='text-xs opacity-90'>
 					{isTyping ? 'Typing...' : 'Online - "Ask me anything! 💻"'}
@@ -387,7 +421,7 @@ Project details: ${context.projects
 							>
 								<div className='max-w-[70%]'>
 									<div className='text-xs text-gray-600 mb-1'>
-										{message.role === 'user' ? 'You say:' : 'Claude Bot says:'}
+										{message.role === 'user' ? 'You say:' : 'Jean Francois says:'}
 									</div>
 									<div
 										className='px-3 py-2 rounded-lg text-sm'
@@ -413,7 +447,7 @@ Project details: ${context.projects
 				{isTyping && (
 					<div className='flex justify-start mb-4'>
 						<div className='text-sm text-gray-500 italic'>
-							Claude Bot is typing<span className='animate-pulse'>...</span>
+							Jean Francois is typing<span className='animate-pulse'>...</span>
 						</div>
 					</div>
 				)}
@@ -434,7 +468,7 @@ Project details: ${context.projects
 						placeholder='Type a message...'
 						maxLength={500}
 						disabled={isTyping}
-						className='flex-1 px-3 py-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-300'
+						className='flex-1 px-3 py-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 text-black'
 					/>
 					<button
 						onClick={() => sendMessage(inputValue)}
