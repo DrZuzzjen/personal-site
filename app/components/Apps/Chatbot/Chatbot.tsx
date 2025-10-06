@@ -253,7 +253,7 @@ Project details: ${context.projects
 	};
 
 	// NUDGE Feature - The star of the show!
-	const sendNudge = () => {
+	const sendNudge = async () => {
 		// Find the window element by traversing up the DOM
 		let windowElement: HTMLElement | null = chatContainerRef.current;
 		while (
@@ -291,9 +291,57 @@ Project details: ${context.projects
 			}, i * 80);
 		});
 
-		// Play sound and add system message
+		// Play sound and show system message
 		playSound('nudge');
 		addMessage({ role: 'system', content: '🔔 You sent a Nudge!' });
+
+		// Trigger AI response to the nudge
+		setIsTyping(true);
+
+		try {
+			const nudgeMessage = '**NUDGE RECEIVED** - User just sent you a nudge (shook your window). React casually/funny. Keep it 1-2 lines max.';
+
+			const context = getPortfolioContext();
+			const contextMessage = {
+				role: 'system' as const,
+				content: `Current portfolio context:
+About: ${context.about.substring(0, 300)}
+Available projects: ${context.projects.map((p) => p.name).join(', ')}`,
+			};
+
+			const conversationHistory = [
+				contextMessage,
+				...messages.map((msg) => ({
+					role: msg.role,
+					content: msg.content,
+				})),
+				{ role: 'user' as const, content: nudgeMessage },
+			];
+
+			const response = await fetch('/api/chat', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					messages: conversationHistory,
+				}),
+			});
+
+			if (!response.ok) {
+				throw new Error('API request failed');
+			}
+
+			const data = await response.json();
+			addMessage({ role: 'assistant', content: data.message });
+		} catch (error) {
+			console.error('Nudge response error:', error);
+			// Fallback nudge response
+			addMessage({
+				role: 'assistant',
+				content: 'woow! :O\naquí estoy cabrón! 😵',
+			});
+		} finally {
+			setIsTyping(false);
+		}
 	};
 
 	const sendWink = () => {
