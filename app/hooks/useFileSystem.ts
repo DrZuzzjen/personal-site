@@ -4,23 +4,23 @@ import type { FileSystemItem, DesktopIcon, FileExtension } from '../lib/types';
 import { INITIAL_FILE_SYSTEM, INITIAL_DESKTOP_ICONS, APP_EXECUTABLES, APP_DESKTOP_ICONS, PATH_SHORTCUTS } from '../lib/constants';
 
 export function useFileSystem() {
-  // Initialize filesystem with proper structure
-  const initializeFileSystem = useCallback(() => {
-    const fileSystem = [...INITIAL_FILE_SYSTEM];
-    
+  // Initialize filesystem with proper structure (only once)
+  const [rootItems, setRootItems] = useState<FileSystemItem[]>(() => {
+    // Deep clone to avoid mutating the original INITIAL_FILE_SYSTEM
+    const fileSystem = JSON.parse(JSON.stringify(INITIAL_FILE_SYSTEM)) as FileSystemItem[];
+
     // Find the Program Files folder and add APP_EXECUTABLES to it
     const cDrive = fileSystem.find(item => item.id === 'c-drive');
     if (cDrive && cDrive.children) {
       const programFiles = cDrive.children.find(item => item.id === 'program-files');
       if (programFiles && programFiles.children) {
-        programFiles.children.push(...APP_EXECUTABLES);
+        // Add executables (only happens once during initialization)
+        programFiles.children = [...APP_EXECUTABLES];
       }
     }
-    
-    return fileSystem;
-  }, []);
 
-  const [rootItems, setRootItems] = useState<FileSystemItem[]>(() => initializeFileSystem());
+    return fileSystem;
+  });
 
   const [desktopIcons, setDesktopIcons] = useState<DesktopIcon[]>([]);
 

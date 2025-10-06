@@ -21,13 +21,30 @@ function getParentPath(path: string | null): string | null {
 		return null;
 	}
 
+	// Special case: If we're at a drive root (like /C:/ or /C: or /A:/ or /A:), go back to My Computer
+	if (path.match(/^\/[A-Z]:\/?\/?$/)) {
+		return '/My Computer';
+	}
+
 	const segments = path.split('/').filter(Boolean);
 	if (segments.length <= 1) {
+		// We're at root or a single-level path
+		// If it's "My Computer", we can't go up (it's a top-level virtual folder)
+		if (path === '/My Computer') {
+			return null;
+		}
 		return null;
 	}
 
 	segments.pop();
-	return '/' + segments.join('/');
+	const parentPath = '/' + segments.join('/');
+
+	// If parent would be a drive letter (like /C:), ensure it has trailing slash
+	if (parentPath.match(/^\/[A-Z]:$/)) {
+		return parentPath + '/';
+	}
+
+	return parentPath;
 }
 
 function sortItems(items: FileSystemItem[]) {
