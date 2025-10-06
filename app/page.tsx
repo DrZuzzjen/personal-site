@@ -525,7 +525,7 @@ export default function MainPage() {
 		openWindow({
 			title: 'Welcome.txt - Notepad',
 			appType: 'notepad',
-			position: { x: 280, y: 80 },
+			position: { x: 350, y: 140 },
 			size: { width: 440, height: 490 },
 			icon: 'NP',
 			content: {
