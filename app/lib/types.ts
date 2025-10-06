@@ -2,7 +2,19 @@
 // WINDOW SYSTEM TYPES
 // ============================================
 
-export type AppType = 'notepad' | 'paint' | 'minesweeper' | 'mycomputer' | 'explorer' | 'snake' | 'camera' | 'tv' | 'chatbot' | 'terminal';
+export type AppType =
+  | 'notepad'
+  | 'paint'
+  | 'minesweeper'
+  | 'mycomputer'
+  | 'explorer'
+  | 'snake'
+  | 'camera'
+  | 'tv'
+  | 'chatbot'
+  | 'terminal'
+  | 'portfolio'
+  | 'browser';
 
 export interface WindowPosition {
   x: number;
@@ -139,6 +151,12 @@ export interface CameraWindowContent {
   error?: string | null;
 }
 
+// Browser App
+export interface BrowserWindowContent {
+  initialUrl?: string | null;
+  homeUrl?: string | null;
+}
+
 export type WindowContent =
   | NotepadWindowContent
   | PaintWindowContent
@@ -146,6 +164,7 @@ export type WindowContent =
   | SnakeWindowContent
   | ExplorerWindowContent
   | CameraWindowContent
+  | BrowserWindowContent
   | string
   | null
   | undefined;

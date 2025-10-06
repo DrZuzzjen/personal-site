@@ -11,8 +11,8 @@ import type {
 	NotepadWindowContent,
 	MinesweeperWindowContent,
 	PaintWindowContent,
-	SnakeWindowContent,
 	CameraWindowContent,
+	BrowserWindowContent,
 	WindowContent,
 } from '@/app/lib/types';
 
@@ -33,7 +33,8 @@ interface LaunchConfig {
 		| 'tv'
 		| 'chatbot'
 		| 'terminal'
-		| 'portfolio';
+		| 'portfolio'
+		| 'browser';
 	position: { x: number; y: number };
 	size: { width: number; height: number };
 	icon?: string;
@@ -46,6 +47,7 @@ const MINESWEEPER_WINDOW_SIZE = { width: 360, height: 440 };
 const PAINT_WINDOW_SIZE = { width: 800, height: 600 }; // Compact but roomy for new sidebar layout
 const CAMERA_WINDOW_SIZE = { width: 720, height: 580 }; // Good size for camera interface
 const TV_WINDOW_SIZE = { width: 880, height: 720 }; // Good size for retro TV with controls
+const BROWSER_WINDOW_SIZE = { width: 960, height: 720 }; // Wide viewport for modern browsing
 const PAINT_PALETTE = [
 	'#000000',
 	'#FFFFFF',
@@ -201,6 +203,21 @@ function createPortfolioLaunch(): LaunchConfig {
 	};
 }
 
+function createBrowserLaunch(initialUrl?: string): LaunchConfig {
+	const content: BrowserWindowContent = {
+		initialUrl: initialUrl ?? undefined,
+	};
+
+	return {
+		title: 'Microsoft Explorer',
+		appType: 'browser',
+		position: { x: 160, y: 90 },
+		size: BROWSER_WINDOW_SIZE,
+		icon: 'IE',
+		content,
+	};
+}
+
 function getLaunchConfigForFile(item: FileSystemItem): LaunchConfig | null {
 	if (item.extension === 'txt') {
 		return createNotepadLaunch(item);
@@ -211,6 +228,10 @@ function getLaunchConfigForFile(item: FileSystemItem): LaunchConfig | null {
 
 		if (exeName.includes('paint')) {
 			return createPaintLaunch();
+		}
+
+		if (exeName.includes('internet')) {
+			return createBrowserLaunch();
 		}
 
 		if (exeName.includes('minesweeper')) {
@@ -514,6 +535,13 @@ export default function DesktopIcon({
 			}
 			if (exeName.includes('portfolio')) {
 				return { symbol: '📂', color: '#C0C0C0', iconImage: '/icon/directory_open_file_mydocs-4.png' };
+			}
+			if (exeName.includes('internet')) {
+				return {
+					symbol: '🌐',
+					color: '#C0C0C0',
+					iconImage: '/icon/internet_explorer.png',
+				};
 			}
 			if (exeName.includes('terminal')) {
 				return { symbol: 'CMD', color: '#C0C0C0', iconImage: '/icon/console_prompt-0.png' };

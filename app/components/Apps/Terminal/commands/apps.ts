@@ -113,6 +113,26 @@ const APP_LAUNCHERS: LaunchDefinition[] = [  {
     }),
   },
   {
+    names: [
+      'internet explorer.exe',
+      'internet explorer',
+      'iexplore.exe',
+      'microsoft explorer',
+      'browser.exe',
+      'browser',
+    ],
+    description: 'Microsoft Explorer web browser',
+    build: () => ({
+      title: 'Microsoft Explorer',
+      appType: 'browser',
+      size: { width: 960, height: 720 },
+      icon: 'IE',
+      content: {
+        initialUrl: 'https://www.bing.com/',
+      },
+    }),
+  },
+  {
     names: ['msn messenger.exe', 'messenger.exe', 'chatbot.exe', 'messenger'],
     description: 'MSN Messenger chat bot',
     build: () => ({

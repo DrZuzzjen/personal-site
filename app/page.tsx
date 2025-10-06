@@ -14,6 +14,7 @@ import TV from '@/app/components/Apps/TV/TV';
 import Chatbot from '@/app/components/Apps/Chatbot/Chatbot';
 import Terminal from '@/app/components/Apps/Terminal/Terminal';
 import Portfolio from '@/app/components/Apps/Portfolio/Portfolio';
+import Browser from '@/app/components/Apps/Browser/Browser';
 import { BootSequence } from '@/app/components/BootSequence';
 import { ErrorDialog, BSOD } from '@/app/components/Dialogs';
 import { ShutDownScreen } from '@/app/components/StartMenu';
@@ -28,6 +29,7 @@ import type {
 	PaintWindowContent,
 	SnakeWindowContent,
 	CameraWindowContent,
+	BrowserWindowContent,
 } from '@/app/lib/types';
 
 const DEFAULT_NOTEPAD_MESSAGE =
@@ -73,6 +75,11 @@ const DEFAULT_SNAKE_CONFIG: SnakeWindowContent = {
 	speedIncrementMs: 5,
 	speedIncreaseEvery: 1,
 	minimumSpeedMs: 15,
+};
+
+const DEFAULT_BROWSER_CONFIG: BrowserWindowContent = {
+	initialUrl: 'https://infobae.com/',
+	homeUrl: 'https://fran-ai.dev/',
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -305,6 +312,35 @@ function resolveSnakeContent(
 	return { ...DEFAULT_SNAKE_CONFIG };
 }
 
+function resolveBrowserContent(
+	content: WindowContent | undefined
+): BrowserWindowContent {
+	if (typeof content === 'string') {
+		return {
+			initialUrl: content,
+			homeUrl: DEFAULT_BROWSER_CONFIG.homeUrl,
+		};
+	}
+
+	if (isRecord(content)) {
+		const initialUrl =
+			typeof content.initialUrl === 'string'
+				? (content.initialUrl as string)
+				: DEFAULT_BROWSER_CONFIG.initialUrl;
+		const homeUrl =
+			typeof content.homeUrl === 'string'
+				? (content.homeUrl as string)
+				: DEFAULT_BROWSER_CONFIG.homeUrl;
+
+		return {
+			initialUrl,
+			homeUrl,
+		};
+	}
+
+	return { ...DEFAULT_BROWSER_CONFIG };
+}
+
 function renderWindowContent(
 	windowData: WindowType,
 	onProtectedDelete?: (filePath: string, fileName: string) => void
@@ -348,6 +384,15 @@ function renderWindowContent(
 		}
 		case 'portfolio': {
 			return <Portfolio />;
+		}
+		case 'browser': {
+			const browserConfig = resolveBrowserContent(windowData.content);
+			return (
+				<Browser
+					initialUrl={browserConfig.initialUrl}
+					homeUrl={browserConfig.homeUrl}
+				/>
+			);
 		}
 		default:
 			return (
@@ -618,6 +663,38 @@ export default function MainPage() {
 					size: { width: 684, height: 863 },
 					icon: '📂',
 					content: {},
+				});
+				break;
+			}
+
+			case 'browser': {
+				let initialUrl = DEFAULT_BROWSER_CONFIG.initialUrl;
+				let homeUrl = DEFAULT_BROWSER_CONFIG.homeUrl;
+
+				if (typeof content === 'string') {
+					initialUrl = content;
+				} else if (isRecord(content)) {
+					if (typeof content.initialUrl === 'string') {
+						initialUrl = content.initialUrl as string;
+					} else if (typeof content.url === 'string') {
+						initialUrl = content.url as string;
+					}
+
+					if (typeof content.homeUrl === 'string') {
+						homeUrl = content.homeUrl as string;
+					}
+				}
+
+				openWindow({
+					title: 'Microsoft Explorer',
+					appType: 'browser',
+					position,
+					size: { width: 960, height: 720 },
+					icon: 'IE',
+					content: {
+						initialUrl,
+						homeUrl,
+					},
 				});
 				break;
 			}

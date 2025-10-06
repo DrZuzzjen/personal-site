@@ -69,6 +69,13 @@ export default function Submenu({
 				onClick={() => handleItemClick(() => onLaunchApp('tv'))}
 			/>
 			<StartMenuItem
+				icon='/icon/internet_explorer.png'
+				text='Microsoft Explorer.exe'
+				hasArrow={false}
+				onHover={() => {}}
+				onClick={() => handleItemClick(() => onLaunchApp('browser'))}
+			/>
+			<StartMenuItem
 				icon='/icon/MSN_messenger_user_156.png'
 				text='MSN Messenger.exe'
 				hasArrow={false}

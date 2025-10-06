@@ -652,6 +652,18 @@ export const APP_EXECUTABLES: FileSystemItem[] = [
     modifiedAt: Date.now(),
   },
   {
+    id: 'browser-exe',
+    name: 'Internet Explorer.exe',
+    type: 'file',
+    extension: 'exe',
+    path: '/C:/Program Files/Internet Explorer.exe',
+    isProtected: true,
+    isSystem: true,
+    icon: 'browser',
+    createdAt: Date.now(),
+    modifiedAt: Date.now(),
+  },
+  {
     id: 'terminal-exe',
     name: 'Terminal.exe',
     type: 'file',
@@ -731,6 +743,12 @@ export const APP_DESKTOP_ICONS: DesktopIcon[] = [
     id: 'desktop-icon-portfolio',
     fileSystemId: 'portfolio-exe',
     position: { x: 4, y: 1 },
+    isSelected: false,
+  },
+  {
+    id: 'desktop-icon-browser',
+    fileSystemId: 'browser-exe',
+    position: { x: 5, y: 1 },
     isSelected: false,
   },
 ];
