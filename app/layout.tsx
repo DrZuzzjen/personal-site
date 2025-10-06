@@ -5,6 +5,7 @@ import { WindowProvider } from './lib/WindowContext';
 import { FileSystemProvider } from './lib/FileSystemContext';
 import StructuredData from './components/StructuredData';
 import GoogleAnalytics from './components/GoogleAnalytics';
+import { Analytics } from '@vercel/analytics/react';
 
 const geistSans = Geist({
 	variable: '--font-geist-sans',
@@ -112,6 +113,7 @@ export default function RootLayout({
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 			>
 				<GoogleAnalytics measurementId={gaId} />
+				<Analytics />
 				<StructuredData />
 				<WindowProvider>
 					<FileSystemProvider>{children}</FileSystemProvider>
