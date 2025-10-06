@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useFileSystemContext } from '@/app/lib/FileSystemContext';
 import { useWindowContext } from '@/app/lib/WindowContext';
 import { COLORS, DESKTOP_GRID } from '@/app/lib/constants';
@@ -319,14 +319,20 @@ export default function DesktopIcon({
 		const directMatch = rootItems.find(
 			(item: FileSystemItem) => item.id === icon.fileSystemId
 		);
-		if (directMatch) return directMatch;
+		if (directMatch) {
+			console.log(`[DesktopIcon] Direct match found for ${icon.fileSystemId}:`, directMatch.path);
+			return directMatch;
+		}
 
 		// Then search recursively through all items
 		const searchRecursively = (
 			items: FileSystemItem[]
 		): FileSystemItem | null => {
 			for (const item of items) {
-				if (item.id === icon.fileSystemId) return item;
+				if (item.id === icon.fileSystemId) {
+					console.log(`[DesktopIcon] Recursive match found for ${icon.fileSystemId}:`, item.path);
+					return item;
+				}
 				if (item.children) {
 					const found = searchRecursively(item.children);
 					if (found) return found;
@@ -335,10 +341,25 @@ export default function DesktopIcon({
 			return null;
 		};
 
-		return searchRecursively(rootItems);
+		const result = searchRecursively(rootItems);
+		if (!result) {
+			console.error(`[DesktopIcon] No match found for fileSystemId: ${icon.fileSystemId}`);
+		}
+		return result;
 	};
 
 	const fileSystemItem: FileSystemItem | null = findFileSystemItem();
+
+	// Debug logging
+	useEffect(() => {
+		console.log(`[DesktopIcon] Icon config:`, {
+			iconId: icon.id,
+			fileSystemId: icon.fileSystemId,
+			position: icon.position,
+			foundPath: fileSystemItem?.path || 'NOT FOUND',
+			foundName: fileSystemItem?.name || 'NOT FOUND',
+		});
+	}, [icon, fileSystemItem]);
 
 	// Convert grid position to pixel position
 	const pixelPosition = {
