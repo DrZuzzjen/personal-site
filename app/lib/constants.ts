@@ -706,7 +706,7 @@ export const APP_DESKTOP_ICONS: DesktopIcon[] = [
   {
     id: 'desktop-icon-notepad',
     fileSystemId: 'notepad-exe',
-    position: { x: 4, y: 0 },
+    position: { x: 6, y: 0 },
     isSelected: false,
   },
   {
