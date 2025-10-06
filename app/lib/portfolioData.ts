@@ -27,141 +27,118 @@ export interface PortfolioItem {
     docs?: string;
     video?: string;
     certificate?: string;
+    linkedin?: string;
+    huggingface?: string;
   };
   year: number;
 }
 
 export const PORTFOLIO_ITEMS: PortfolioItem[] = [
   {
-    id: 'attenborough-ai',
+    id: 'narrator-ai',
     type: 'video',
     icon: '🎥',
-    title: 'David Attenborough AI',
-    tagline: 'AI narrates my coding in Attenborough\'s voice',
-    description: 'Real-time AI video description using GPT-4 Vision and ElevenLabs voice cloning. The AI watches me code and provides nature documentary-style commentary in David Attenborough\'s iconic voice.',
+    title: 'Real-Time AI Narrator',
+    tagline: 'David Attenborough narrates your life in real-time',
+    description: '"In the heart of the domestic jungle, we observe the majestic Homo sapiens in its natural habitat." A simple and tremendously fun project that narrates your life in real time as if it were the famous Sir David Attenborough.',
     media: {
-      type: 'youtube',
-      thumbnail: '/portfolio/attenborough-thumb.jpg',
-      source: 'dQw4w9WgXcQ', // Replace with actual YouTube ID
-      duration: '2:34'
+      type: 'video',
+      thumbnail: '/portoflio/narrator.mp4',
+      source: '/portoflio/narrator.mp4'
     },
-    tech: ['Python', 'GPT-4 Vision', 'ElevenLabs', 'OpenCV'],
+    tech: ['Python', 'GPT-4 Vision', 'ElevenLabs', 'OpenCV', 'Real-time Processing'],
     links: {
-      video: 'https://youtube.com/watch?v=...' // Replace with actual link
+      github: 'https://github.com/cbh123/narrator'
     },
     year: 2024
   },
   {
-    id: 'patent-2025',
-    type: 'achievement',
-    icon: '📜',
-    title: 'Invention Patent (2025)',
-    tagline: 'AI-powered innovation at BASF',
-    description: 'Received invention patent for AI automation system that generated 20M+ in savings. The system uses advanced RAG and multi-agent orchestration to automate complex workflows.',
+    id: 'random-predictor',
+    type: 'project',
+    icon: '🎯',
+    title: 'Random Prediction Game',
+    tagline: 'Testing human bias toward randomness',
+    description: 'An experiment to see how biased humans are toward the meaning of random. Players predict 10 random numbers (1-99) and compete on a leaderboard. Uses Random.org API for true random numbers and Supabase for persistent leaderboard.',
     media: {
       type: 'image',
-      thumbnail: '/portfolio/patent-certificate.jpg'
+      thumbnail: '/portoflio/random-prediction.png'
     },
-    impact: '20M+ EUR in savings',
+    tech: ['Streamlit', 'Python', 'Supabase', 'Random.org API', 'PostgreSQL'],
     links: {
-      certificate: '/portfolio/patent.pdf'
+      github: 'https://github.com/DrZuzzjen/random-prediction',
+      demo: 'https://random-prediction.streamlit.app/'
     },
-    year: 2025
+    year: 2024
   },
   {
-    id: 'hackathon-daimler',
+    id: 'youclip',
+    type: 'project',
+    icon: '✂️',
+    title: 'YouClip',
+    tagline: 'YouTube video clipper with AI subtitles',
+    description: 'A beautiful Streamlit application that allows users to create custom clips from YouTube videos. Features custom clipping, multiple formats (MP4, WebM, MKV), quality options, and AI-generated subtitles using Whisper running in the browser!',
+    media: {
+      type: 'image',
+      thumbnail: '/portoflio/youclip.png'
+    },
+    tech: ['Streamlit', 'Python', 'Whisper AI', 'FFmpeg', 'YouTube API'],
+    links: {
+      github: 'https://github.com/DrZuzzjen/YouCLIP'
+    },
+    year: 2024
+  },
+  {
+    id: 'llm-arena',
+    type: 'project',
+    icon: '🚥',
+    title: 'LLM Arena',
+    tagline: 'Speed benchmark for OpenAI, NVIDIA, and Groq',
+    description: 'Where the heavyweights of language models go head-to-head. Compare speed and efficiency across OpenAI, NVIDIA, and Groq providers. Features real-time streaming, metrics & charts, and async backend powered by FastAPI + LangChain.',
+    media: {
+      type: 'gif',
+      thumbnail: '/portoflio/llmarena.gif'
+    },
+    tech: ['FastAPI', 'Python', 'LangChain', 'Streamlit', 'Docker', 'Async'],
+    links: {
+      github: 'https://github.com/DrZuzzjen/LLM_Arena'
+    },
+    year: 2024
+  },
+  {
+    id: 'emonaz',
     type: 'achievement',
     icon: '🏆',
-    title: 'Daimler Hackathon - 1st Place',
-    tagline: 'AI-powered customer/supplier chat interface',
-    description: 'Won first prize for developing an AI-powered chat interface for customer and supplier communications. The solution was implemented across Europe and Asia divisions.',
+    title: 'BASF Copilot AI Hackathon - 1st Place',
+    tagline: 'Real-time emotion detection from facial expressions',
+    description: 'AI Copilot Hackathon Winner. Three-model pipeline: (1) Face isolation, (2) Facial anchor point mapping, (3) Emotion translation. All client-side, pure front-end magic running entirely in the browser.',
     media: {
       type: 'image',
-      thumbnail: '/portfolio/daimler-hackathon.jpg'
+      thumbnail: '/portoflio/emonaz.jpeg'
     },
-    impact: 'Deployed across Europe & Asia',
-    tech: ['Python', 'NLP', 'Machine Learning'],
-    year: 2019
-  },
-  {
-    id: 'kluster-mcp',
-    type: 'project',
-    icon: '💻',
-    title: 'Kluster MCP Server',
-    tagline: 'AI code review for Claude Desktop & Cursor',
-    description: 'MCP (Model Context Protocol) server that provides AI-powered code review, security scanning, and compliance checks directly in Claude Desktop and Cursor IDE. Integrates with Langchain, Dify, and n8n.',
-    media: {
-      type: 'gif',
-      thumbnail: '/portfolio/kluster-demo.gif'
-    },
-    tech: ['TypeScript', 'Node.js', 'MCP Protocol', 'AI'],
+    impact: '1st Place Winner',
+    tech: ['TensorFlow.js', 'Computer Vision', 'Client-side ML', 'Face Detection'],
     links: {
-      github: 'https://github.com/klusterai/kluster-mcp',
-      npm: 'https://www.npmjs.com/package/@klusterai/kluster-verify-code-mcp',
-      docs: 'https://docs.kluster.ai'
+      github: 'https://github.com/DrZuzzjen/emosnaz'
     },
-    year: 2025
-  },
-  {
-    id: 'windows31-portfolio',
-    type: 'project',
-    icon: '🖥️',
-    title: 'Windows 3.1 Portfolio (This Site!)',
-    tagline: 'Full OS simulation as portfolio website',
-    description: 'A fully functional Windows 3.1 operating system simulation serving as a portfolio. Features working apps (Paint, Minesweeper, Camera, TV), file system, boot sequence, and easter eggs. Built as a technical flex showcasing advanced frontend engineering.',
-    media: {
-      type: 'gif',
-      thumbnail: '/portfolio/windows31-demo.gif'
-    },
-    tech: ['Next.js 15', 'TypeScript', 'Tailwind CSS', 'HTML5 Canvas', 'Groq AI'],
-    links: {
-      github: 'https://github.com/DrZuzzjen/personal-site',
-      demo: 'https://web-indol-three-98.vercel.app'
-    },
-    year: 2025
-  },
-  {
-    id: 'ai-hackathon-organizer',
-    type: 'talk',
-    icon: '🎤',
-    title: 'AI Automation Hackathon Organizer',
-    tagline: 'Multi-country hackathon across 3 countries',
-    description: 'Organized and led AI Automation Hackathon with participants from 3 countries at BASF. Identified high-potential use cases and provided resources for developers to explore Gen AI potential.',
-    media: {
-      type: 'image',
-      thumbnail: '/portfolio/hackathon-organizer.jpg'
-    },
-    impact: 'Participants from Germany, Spain, and Belgium',
     year: 2024
   },
   {
-    id: 'rag-implementation',
+    id: 'flux-finetuning',
     type: 'project',
-    icon: '🤖',
-    title: 'Advanced RAG System',
-    tagline: 'Production-grade retrieval augmented generation',
-    description: 'Built enterprise-grade RAG (Retrieval Augmented Generation) system with advanced chunking strategies, semantic search, and multi-modal support. Used for internal knowledge base at BASF.',
+    icon: '🎨',
+    title: 'Fine-tuning Flux.1-dev with LoRA',
+    tagline: 'Custom AI image generation with personal features',
+    description: 'Fine-tuned Flux.1-dev using LoRA (Low-Rank Adaptation) to generate images with my facial features. Trained on A100 80GB for 75 minutes with less than 20 images. LoRA allows efficient model customization without retraining from scratch.',
     media: {
       type: 'image',
-      thumbnail: '/portfolio/rag-system.jpg'
+      thumbnail: '/portoflio/finetuning.jpeg'
     },
-    tech: ['Python', 'Langchain', 'LlamaIndex', 'ChromaDB', 'OpenAI'],
-    impact: 'Deployed to 500+ internal users',
-    year: 2024
-  },
-  {
-    id: 'workshop-gen-ai',
-    type: 'talk',
-    icon: '👨‍🏫',
-    title: 'Gen AI Workshops & Training',
-    tagline: 'Teaching AI to developers worldwide',
-    description: 'Delivered comprehensive workshops on Gen AI, prompt engineering, RAG, and agentic systems. Topics include advanced prompting techniques, building AI agents, and best practices for production AI systems.',
-    media: {
-      type: 'image',
-      thumbnail: '/portfolio/workshop.jpg'
+    tech: ['Flux.1-dev', 'LoRA', 'A100 GPU', 'Diffusion Models', 'HuggingFace'],
+    impact: '€5.50 training cost, 2000 steps',
+    links: {
+      linkedin: 'https://www.linkedin.com/feed/update/urn:li:activity:7231922195994718209/',
+      huggingface: 'https://huggingface.co/FranZuzz/franzuzz'
     },
-    impact: '200+ developers trained',
-    tech: ['Langchain', 'Autogen', 'Crew AI', 'LlamaIndex'],
     year: 2024
   }
 ];
