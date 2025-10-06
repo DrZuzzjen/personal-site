@@ -19,24 +19,21 @@ const containerStyle: CSSProperties = {
 	height: '100%',
 	backgroundColor: COLORS.WIN_GRAY,
 	color: COLORS.TEXT_BLACK,
-	borderTop: `2px solid ${COLORS.BORDER_LIGHT}`,
-	borderLeft: `2px solid ${COLORS.BORDER_HIGHLIGHT}`,
-	borderBottom: `2px solid ${COLORS.BORDER_SHADOW}`,
-	borderRight: `2px solid ${COLORS.BORDER_DARK}`,
 	fontFamily: 'var(--font-sans)',
 };
 
 const menuBarStyle: CSSProperties = {
 	display: 'flex',
-	gap: 12,
-	padding: '6px 8px',
-	borderBottom: `1px solid ${COLORS.BORDER_SHADOW}`,
+	gap: 0,
+	backgroundColor: COLORS.WIN_GRAY,
+	borderBottom: `1px solid ${COLORS.BORDER_DARK}`,
 	fontSize: 12,
+	padding: 0,
 };
 
 const menuItemStyle: CSSProperties = {
-	fontWeight: 700,
-	padding: '2px 6px',
+	fontWeight: 400,
+	padding: '4px 12px',
 	cursor: 'pointer',
 	userSelect: 'none',
 	position: 'relative',
@@ -65,21 +62,11 @@ const fileMenuItemStyle: CSSProperties = {
 };
 
 const infoBarStyle: CSSProperties = {
-	display: 'flex',
-	justifyContent: 'space-between',
-	padding: '4px 8px',
-	fontSize: 11,
-	borderBottom: `1px solid ${COLORS.BORDER_SHADOW}`,
-	fontFamily: 'var(--font-mono)',
+	display: 'none', // Hidden in authentic Windows 3.1 Notepad
 };
 
 const statusBarStyle: CSSProperties = {
-	display: 'flex',
-	alignItems: 'center',
-	justifyContent: 'space-between',
-	padding: '4px 8px',
-	borderTop: `1px solid ${COLORS.BORDER_SHADOW}`,
-	fontSize: 11,
+	display: 'none', // Hidden in authentic Windows 3.1 Notepad
 };
 
 const statusGroupStyle: CSSProperties = {
@@ -393,22 +380,20 @@ export default function Notepad({
 				onKeyDown={queueCursorUpdate}
 				style={{
 					flex: 1,
-					margin: 8,
-					padding: 8,
+					margin: 0,
+					padding: 4,
 					backgroundColor: COLORS.WIN_WHITE,
 					color: COLORS.TEXT_BLACK,
-					borderTop: `2px solid ${COLORS.BORDER_LIGHT}`,
-					borderLeft: `2px solid ${COLORS.BORDER_HIGHLIGHT}`,
-					borderBottom: `2px solid ${COLORS.BORDER_SHADOW}`,
-					borderRight: `2px solid ${COLORS.BORDER_DARK}`,
+					border: 'none',
 					resize: 'none',
 					fontFamily: 'var(--font-mono)',
-					fontSize: 12,
-					lineHeight: 1.4,
+					fontSize: 13,
+					lineHeight: 1.3,
 					whiteSpace: isWrapped ? 'pre-wrap' : 'pre',
 					wordBreak: 'break-word',
 					overflowX: isWrapped ? 'hidden' : 'auto',
 					overflowY: 'auto',
+					outline: 'none',
 				}}
 				aria-label='Notepad text viewer'
 			/>

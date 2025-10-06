@@ -13,6 +13,7 @@ import Camera from '@/app/components/Apps/Camera/Camera';
 import TV from '@/app/components/Apps/TV/TV';
 import Chatbot from '@/app/components/Apps/Chatbot/Chatbot';
 import Terminal from '@/app/components/Apps/Terminal/Terminal';
+import Portfolio from '@/app/components/Apps/Portfolio/Portfolio';
 import { BootSequence } from '@/app/components/BootSequence';
 import { ErrorDialog, BSOD } from '@/app/components/Dialogs';
 import { ShutDownScreen } from '@/app/components/StartMenu';
@@ -68,10 +69,10 @@ const DEFAULT_SNAKE_CONFIG: SnakeWindowContent = {
 	columns: 30,
 	rows: 25,
 	initialLength: 4,
-	initialSpeedMs: 180,
-	speedIncrementMs: 12,
-	speedIncreaseEvery: 3,
-	minimumSpeedMs: 60,
+	initialSpeedMs: 36,
+	speedIncrementMs: 5,
+	speedIncreaseEvery: 1,
+	minimumSpeedMs: 15,
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -345,6 +346,9 @@ function renderWindowContent(
 		case 'terminal': {
 			return <Terminal />;
 		}
+		case 'portfolio': {
+			return <Portfolio />;
+		}
 		default:
 			return (
 				<div style={{ color: COLORS.TEXT_BLACK }}>
@@ -402,8 +406,61 @@ export default function MainPage() {
 	useEffect(() => {
 		if (bootComplete && typeof window !== 'undefined') {
 			localStorage.setItem('hasBooted', 'true');
+
+			// Launch startup apps after boot
+			const shouldLaunchStartupApps = localStorage.getItem('launchStartupApps');
+			if (shouldLaunchStartupApps === 'true') {
+				localStorage.removeItem('launchStartupApps');
+
+				// Launch Notepad with Welcome message
+				setTimeout(() => {
+					openWindow({
+						title: 'Welcome.txt - Notepad',
+						appType: 'notepad',
+						position: { x: 120, y: 100 },
+						size: { width: 440, height: 320 },
+						icon: 'NP',
+						content: {
+							fileName: 'Welcome.txt',
+							filePath: null,
+							body: 'Welcome to Jean Francois Portfolio!\n\nThis is a fully functional Windows 3.1 OS simulation.\n\nFeel free to explore:\n• MSN Messenger - Chat with the AI assistant\n• Portfolio.exe - View my projects\n• Paint.exe, Minesweeper.exe, Snake.exe - Games!\n• My Computer - Browse the file system\n\nEnjoy! 🎨',
+							readOnly: true,
+						} as NotepadWindowContent,
+					});
+				}, 300);
+			}
 		}
-	}, [bootComplete]);
+	}, [bootComplete, openWindow]);
+
+	// Auto-launch MSN Messenger after 5 seconds if user hasn't opened it
+	useEffect(() => {
+		if (!bootComplete) return;
+
+		const timer = setTimeout(() => {
+			// Check if MSN Messenger is already open
+			const msnAlreadyOpen = windows.some(
+				(w) => w.appType === 'chatbot' || w.title.includes('MSN')
+			);
+
+			if (!msnAlreadyOpen) {
+				// Center MSN window on screen
+				const msnWidth = 380;
+				const msnHeight = 520;
+				const centerX = (window.innerWidth - msnWidth) / 2;
+				const centerY = (window.innerHeight - msnHeight) / 2;
+
+				openWindow({
+					title: 'MSN Messenger - Jean Francois',
+					appType: 'chatbot',
+					position: { x: centerX, y: centerY },
+					size: { width: msnWidth, height: msnHeight },
+					icon: '💬',
+				});
+			}
+		}, 5000); // 5 seconds
+
+		return () => clearTimeout(timer);
+	}, [bootComplete, windows, openWindow]);
 
 	// Apply saved background color on load
 	useEffect(() => {
@@ -436,7 +493,7 @@ export default function MainPage() {
 			content: {
 				fileName: 'Welcome.txt',
 				filePath: null,
-				body: 'Hello! This draggable window is rendered through the new Phase 2 window system. Try dragging it around.',
+				body: 'Hello! This is my portfolio and personal website, have fun exploring it!.',
 				readOnly: true,
 			},
 		});
@@ -563,6 +620,18 @@ export default function MainPage() {
 					position,
 					size: { width: 820, height: 540 },
 					icon: 'CMD',
+					content: {},
+				});
+				break;
+			}
+
+			case 'portfolio': {
+				openWindow({
+					title: 'Portfolio Media Center - Jean Francois',
+					appType: 'portfolio',
+					position,
+					size: { width: 900, height: 650 },
+					icon: '📂',
 					content: {},
 				});
 				break;

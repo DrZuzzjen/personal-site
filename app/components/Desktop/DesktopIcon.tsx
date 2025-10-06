@@ -31,7 +31,9 @@ interface LaunchConfig {
 		| 'snake'
 		| 'camera'
 		| 'tv'
-		| 'chatbot';
+		| 'chatbot'
+		| 'terminal'
+		| 'portfolio';
 	position: { x: number; y: number };
 	size: { width: number; height: number };
 	icon?: string;
@@ -188,6 +190,17 @@ function createChatbotLaunch(): LaunchConfig {
 	};
 }
 
+function createPortfolioLaunch(): LaunchConfig {
+	return {
+		title: 'Portfolio Media Center - Jean Francois',
+		appType: 'portfolio',
+		position: { x: 120, y: 60 },
+		size: { width: 900, height: 650 },
+		icon: '📂',
+		content: {},
+	};
+}
+
 function getLaunchConfigForFile(item: FileSystemItem): LaunchConfig | null {
 	if (item.extension === 'txt') {
 		return createNotepadLaunch(item);
@@ -228,6 +241,10 @@ function getLaunchConfigForFile(item: FileSystemItem): LaunchConfig | null {
 
 		if (exeName.includes('msn') || exeName.includes('messenger')) {
 			return createChatbotLaunch();
+		}
+
+		if (exeName.includes('portfolio')) {
+			return createPortfolioLaunch();
 		}
 
 		return createUnsupportedFileLaunch(
@@ -419,41 +436,50 @@ export default function DesktopIcon({
 
 	const getIconDisplay = (
 		item: FileSystemItem
-	): { symbol: string; color: string } => {
+	): { symbol: string; color: string; iconImage?: string } => {
 		if (item.isSystem) {
 			if (item.name === 'My Computer')
-				return { symbol: '🖥️', color: '#000080' };
+				return { symbol: '🖥️', color: '#000080', iconImage: '/icon/desktop-2.png' };
 			if (item.name === 'Recycle Bin')
-				return { symbol: '🗑️', color: '#808080' };
+				return { symbol: '🗑️', color: '#808080', iconImage: '/icon/recycle_bin_empty_cool-3.png' };
 		}
 
 		if (item.type === 'folder') {
-			return { symbol: '📁', color: '#FFD700' };
+			return { symbol: '📁', color: '#FFD700', iconImage: '/icon/directory_open_file_mydocs-4.png' };
 		}
 
 		if (item.extension === 'txt') {
-			return { symbol: '📄', color: '#FFFFFF' };
+			return { symbol: '📄', color: '#FFFFFF', iconImage: '/icon/notepad-2.png' };
 		}
 
 		if (item.extension === 'exe') {
 			const exeName = item.name.toLowerCase();
 			if (exeName.includes('paint')) {
-				return { symbol: '🎨', color: '#C0C0C0' };
+				return { symbol: '🎨', color: '#C0C0C0', iconImage: '/icon/file_set-0.png' };
 			}
 			if (exeName.includes('minesweeper')) {
-				return { symbol: '💣', color: '#C0C0C0' };
+				return { symbol: '💣', color: '#C0C0C0', iconImage: '/icon/Microsoft_Minesweeper_(1990).svg' };
 			}
 			if (exeName.includes('notepad')) {
-				return { symbol: '📝', color: '#C0C0C0' };
+				return { symbol: '📝', color: '#C0C0C0', iconImage: '/icon/notepad-2.png' };
 			}
 			if (exeName.includes('snake')) {
-				return { symbol: '🐍', color: '#C0C0C0' };
+				return { symbol: '🐍', color: '#C0C0C0', iconImage: '/icon/492snake_100855.ico' };
 			}
 			if (exeName.includes('camera')) {
-				return { symbol: '📷', color: '#C0C0C0' };
+				return { symbol: '📷', color: '#C0C0C0', iconImage: '/icon/camera-0.png' };
 			}
 			if (exeName.includes('tv')) {
-				return { symbol: '📺', color: '#C0C0C0' };
+				return { symbol: '📺', color: '#C0C0C0', iconImage: '/icon/cd_audio_cd_a-3.png' };
+			}
+			if (exeName.includes('msn') || exeName.includes('messenger')) {
+				return { symbol: '💬', color: '#C0C0C0', iconImage: '/icon/MSN_messenger_user_156.png' };
+			}
+			if (exeName.includes('portfolio')) {
+				return { symbol: '📂', color: '#C0C0C0', iconImage: '/icon/directory_open_file_mydocs-4.png' };
+			}
+			if (exeName.includes('terminal')) {
+				return { symbol: 'CMD', color: '#C0C0C0', iconImage: '/icon/console_prompt-0.png' };
 			}
 			return { symbol: 'EXE', color: '#C0C0C0' };
 		}
@@ -494,10 +520,10 @@ export default function DesktopIcon({
 					style={{
 						width: 32,
 						height: 32,
-						backgroundColor: iconDisplay.color,
-						border: `2px solid ${COLORS.BORDER_SHADOW}`,
-						borderTopColor: COLORS.BORDER_LIGHT,
-						borderLeftColor: COLORS.BORDER_LIGHT,
+						backgroundColor: iconDisplay.iconImage ? 'transparent' : iconDisplay.color,
+						border: iconDisplay.iconImage ? 'none' : `2px solid ${COLORS.BORDER_SHADOW}`,
+						borderTopColor: iconDisplay.iconImage ? 'transparent' : COLORS.BORDER_LIGHT,
+						borderLeftColor: iconDisplay.iconImage ? 'transparent' : COLORS.BORDER_LIGHT,
 						display: 'flex',
 						alignItems: 'center',
 						justifyContent: 'center',
@@ -505,7 +531,20 @@ export default function DesktopIcon({
 						marginBottom: 4,
 					}}
 				>
-					{iconDisplay.symbol}
+					{iconDisplay.iconImage ? (
+						<img
+							src={iconDisplay.iconImage}
+							alt={fileSystemItem.name}
+							style={{
+								width: '100%',
+								height: '100%',
+								objectFit: 'contain',
+								imageRendering: 'pixelated',
+							}}
+						/>
+					) : (
+						iconDisplay.symbol
+					)}
 				</div>
 
 				{/* Label */}

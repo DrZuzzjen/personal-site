@@ -47,10 +47,26 @@ export default function StartMenuItem({
 					marginRight: 8,
 					fontSize: 16,
 					width: 20,
-					textAlign: 'center',
+					height: 20,
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'center',
 				}}
 			>
-				{icon}
+				{icon.startsWith('/') || icon.startsWith('http') ? (
+					<img
+						src={icon}
+						alt=""
+						style={{
+							width: 16,
+							height: 16,
+							objectFit: 'contain',
+							imageRendering: 'pixelated',
+						}}
+					/>
+				) : (
+					icon
+				)}
 			</span>
 
 			<span style={{ flex: 1 }}>{text}</span>
