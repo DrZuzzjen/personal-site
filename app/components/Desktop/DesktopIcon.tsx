@@ -492,7 +492,7 @@ export default function DesktopIcon({
 		if (item.extension === 'exe') {
 			const exeName = item.name.toLowerCase();
 			if (exeName.includes('paint')) {
-				return { symbol: '🎨', color: '#C0C0C0', iconImage: '/icon/file_set-0.png' };
+				return { symbol: '🎨', color: '#C0C0C0' };
 			}
 			if (exeName.includes('minesweeper')) {
 				return { symbol: '💣', color: '#C0C0C0', iconImage: '/icon/Microsoft_Minesweeper_(1990).svg' };

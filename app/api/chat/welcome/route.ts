@@ -3,103 +3,106 @@ import { getPersonalityContext } from '@/app/lib/personality.server';
 
 export async function POST(req: NextRequest) {
   try {
-    const { browserContext } = await req.json();
+    const body = await req.json();
+
+    // Health check mode
+    if (body.test === true) {
+      return NextResponse.json({ status: 'ok' });
+    }
+
+    const { browserContext } = body;
 
     // Log browser context for debugging
+    console.log('=== WELCOME API ===');
     console.log('Browser context:', browserContext);
 
-    const welcomePrompt = `You're Jean Francois (Fran), greeting someone who just opened your MSN Messenger on your Windows 3.1 portfolio site.
+    // Infer language from timezone (more reliable than browser language)
+    const timezone = browserContext.timezone || '';
+    const city = browserContext.city?.toLowerCase() || '';
 
-Browser Context:
-- Language: ${browserContext.languageCode} (full: ${browserContext.language})
-- City: ${browserContext.city || 'unknown'}
-- Time of day: ${browserContext.timeOfDay}
-- Device: ${browserContext.deviceType} (${browserContext.screenWidth}px wide)
-- Is mobile: ${browserContext.isMobile}
-- Is returning visitor: ${browserContext.isReturning}
+    let detectedLang = 'en'; // default
 
-CRITICAL RULES - FOLLOW EXACTLY:
+    // Spanish timezones and cities
+    if (timezone.includes('Madrid') || timezone.includes('Europe/Madrid') ||
+        city.includes('madrid') || city.includes('barcelona') || city.includes('valencia') ||
+        city.includes('sevilla') || city.includes('malaga') || city.includes('bilbao')) {
+      detectedLang = 'es';
+    }
+    // French timezones and cities
+    else if (timezone.includes('Paris') ||
+        city.includes('paris') || city.includes('lyon') || city.includes('marseille')) {
+      detectedLang = 'fr';
+    }
+    // German timezones and cities
+    else if (timezone.includes('Berlin') ||
+        city.includes('berlin') || city.includes('munich') || city.includes('hamburg')) {
+      detectedLang = 'de';
+    }
+    // Fallback to browser language if no timezone match
+    else {
+      const browserLang = browserContext.languageCode?.toLowerCase() || 'en';
+      detectedLang = browserLang.split('-')[0]; // es-ES -> es
+    }
 
-1. **LANGUAGE DETECTION** - Use this priority:
-   a) If languageCode is NOT "en" → use that language
-   b) If city suggests language (Madrid/Valencia/Barcelona = Spanish, Paris/Lyon = French, Berlin/Munich = German) → use that language
-   c) Otherwise use English
+    console.log('Timezone:', timezone);
+    console.log('City:', city);
+    console.log('Detected language:', detectedLang);
 
-   - Spanish cities (Madrid, Valencia, Barcelona, Sevilla, etc.) → TODO en español
-   - French cities (Paris, Lyon, Marseille, etc.) → TOUT en français
-   - German cities (Berlin, Munich, Hamburg, etc.) → ALLES auf Deutsch
-   - NO MIXING LANGUAGES!
+    const isSpanish = detectedLang === 'es';
+    const isFrench = detectedLang === 'fr';
+    const isGerman = detectedLang === 'de';
+    const timeOfDay = browserContext.timeOfDay || 'afternoon';
+    const isReturning = browserContext.isReturning || false;
 
-2. **LOCATION**: ALWAYS mention their city if you know it
-   - Ask about weather/location
-   - Use relevant emoji for the city
+    const welcomePrompt = `You are Jean Francois greeting someone on MSN Messenger.
 
-3. **MOBILE**: If isMobile is true, joke about it (OPTIONAL - only if it fits naturally)
+CONTEXT:
+- Language: ${isSpanish ? 'Spanish ONLY' : isFrench ? 'French ONLY' : isGerman ? 'German ONLY' : 'English ONLY'}
+- Time: ${timeOfDay}
+- Location: ${city ? city : 'unknown'}
+- Timezone: ${timezone}
+- Returning: ${isReturning ? 'yes' : 'no'}
 
-4. **RETURNING**: If isReturning is true
-   - "de vuelta? :D" (Spanish)
-   - "back for more? :D" (English)
+RULES:
+1. Write ONLY in ${isSpanish ? 'Spanish' : isFrench ? 'French' : isGerman ? 'German' : 'English'}
+2. Be clever about their location! Make a casual comment about their city/country
+3. Use time-appropriate greeting
+4. Keep it 2-3 lines max
+5. Use emoticons: :) :D ;)
+6. NO forbidden words: "check out", "explore", "portfolio", "Windows"
 
-5. **MULTI-LINE CHAT STYLE**: Write like you're hitting Enter between thoughts
-   - Line 1: greeting + question
-   - Line 2: (optional) short follow-up
-   - THAT'S IT. STOP.
+LOCATION EXAMPLES:
 
-6. **FORBIDDEN PHRASES** (NEVER USE THESE):
-   - "check out"
-   - "retro site"
-   - "Windows 3.1"
-   - "explore"
-   - "portfolio"
-   - "feel free to"
+Buenos Aires (Spanish):
+"hola che! :)
+¿todavía por Argentina?
+¿qué tal la noche?"
 
-7. Use emoticons: :) :D ;) :P
-8. END AFTER THE QUESTION. Don't add suggestions or explanations.
+Madrid (Spanish):
+"buenas noches! :)
+¿qué tal Madrid hoy?"
 
-PERFECT EXAMPLES (MULTI-LINE CHAT STYLE):
+London (English):
+"hey mate! :)
+how's the weather in the UK?"
 
-Visitor from Madrid (Spanish city → speak Spanish):
-"ey! :)
-¿qué tal la tarde en Madrid? 🌤️"
+New York (English):
+"hey! :)
+NYC at night?
+can't sleep? jaja"
 
-Visitor from Valencia at night (Spanish city → speak Spanish):
-"buenas! :D
-tarde en Valencia eh?
-¿no puedes dormir? jaja"
-
-Visitor from Barcelona (Spanish city → speak Spanish):
-"hola! :)
-¿cómo va Barcelona hoy?"
-
-Visitor from New York (English):
-"hey from NYC! :)
-2am on your phone?
-brave lol"
-
-Visitor from Paris (French city → speak French):
+Paris (French):
 "salut! :)
-comment ça va à Paris? 🗼"
+comment ça va à Paris?"
 
-Visitor from Berlin (German city → speak German):
-"hey!
-wie geht's in Berlin? :D"
+Generic (no location):
+"hey! :)
+what brings you here?"
 
-Returning Spanish visitor:
-"de vuelta! :D
-¿qué buscas esta vez?"
+Now write your greeting:`;
 
-BAD EXAMPLES (DON'T DO THIS):
-❌ "¡hola! ¿qué tal el clima en Madrid? Check out my retro Windows 3.1 site - try Paint or Minesweeper 😊" (TOO LONG, forbidden phrases, cringe)
-❌ "Welcome to my portfolio" (corporate speak)
-❌ "¡Hola! Welcome to..." (MIXING LANGUAGES)
-❌ "hey! you checking out the retro site?" (suggesting content = cringe)
-
-REMEMBER:
-- Short lines like texting
-- ONE question max
-- STOP after question
-- Match their language 100%
-- No site descriptions`;
+    console.log('=== PROMPT BEING SENT ===');
+    console.log(welcomePrompt);
 
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
@@ -123,8 +126,14 @@ REMEMBER:
     }
 
     const data = await response.json();
-    const welcomeMessage = data.choices[0]?.message?.content ||
+    let welcomeMessage = data.choices[0]?.message?.content ||
       "hey! :)\nwhat's up?";
+
+    // Remove quotes that LLM sometimes adds
+    welcomeMessage = welcomeMessage.replace(/^["']|["']$/g, '').trim();
+
+    console.log('=== LLM RESPONSE ===');
+    console.log('Welcome message:', welcomeMessage);
 
     return NextResponse.json({ message: welcomeMessage });
   } catch (error) {

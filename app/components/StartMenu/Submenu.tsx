@@ -118,140 +118,56 @@ export default function Submenu({
 			/>
 		</>
 	);
-const renderDocumentsSubmenu = () => (
-		<>
-			<StartMenuItem
-				icon='📁'
-				text='My Documents'
-				hasArrow={false}
-				onHover={() => {}}
-				onClick={() =>
-					handleItemClick(() =>
-						onLaunchApp('file-explorer', { path: '/C:/Users/Guest/Documents' })
-					)
-				}
-			/>
-			<div
-				style={{
-					height: 1,
-					margin: '4px 0',
-					borderTop: `1px solid ${COLORS.BORDER_SHADOW}`,
-				}}
-			/>
-			<StartMenuItem
-				icon='📄'
-				text='Project_1.txt'
-				hasArrow={false}
-				onHover={() => {}}
-				onClick={() =>
-					handleItemClick(() => {
-						const filePath = '/C:/Users/Guest/Documents/Project_1.txt';
-						const currentContent = getFileContent(filePath);
-						onLaunchApp('notepad', {
-							fileName: 'Project_1.txt',
-							filePath: filePath,
-							content: currentContent,
-						});
-					})
-				}
-			/>
-			<StartMenuItem
-				icon='📄'
-				text='Project_2.txt'
-				hasArrow={false}
-				onHover={() => {}}
-				onClick={() =>
-					handleItemClick(() => {
-						const filePath = '/C:/Users/Guest/Documents/Project_2.txt';
-						const currentContent = getFileContent(filePath);
-						onLaunchApp('notepad', {
-							fileName: 'Project_2.txt',
-							filePath: filePath,
-							content: currentContent,
-						});
-					})
-				}
-			/>
-			<StartMenuItem
-				icon='📄'
-				text='Project_3.txt'
-				hasArrow={false}
-				onHover={() => {}}
-				onClick={() =>
-					handleItemClick(() => {
-						const filePath = '/C:/Users/Guest/Documents/Project_3.txt';
-						const currentContent = getFileContent(filePath);
-						onLaunchApp('notepad', {
-							fileName: 'Project_3.txt',
-							filePath: filePath,
-							content: currentContent,
-						});
-					})
-				}
-			/>
-			<StartMenuItem
-				icon='📄'
-				text='Project_4.txt'
-				hasArrow={false}
-				onHover={() => {}}
-				onClick={() =>
-					handleItemClick(() => {
-						const filePath = '/C:/Users/Guest/Documents/Project_4.txt';
-						const currentContent = getFileContent(filePath);
-						onLaunchApp('notepad', {
-							fileName: 'Project_4.txt',
-							filePath: filePath,
-							content: currentContent,
-						});
-					})
-				}
-			/>
-			<StartMenuItem
-				icon='📄'
-				text='Project_5.txt'
-				hasArrow={false}
-				onHover={() => {}}
-				onClick={() =>
-					handleItemClick(() => {
-						const filePath = '/C:/Users/Guest/Documents/Project_5.txt';
-						const currentContent = getFileContent(filePath);
-						onLaunchApp('notepad', {
-							fileName: 'Project_5.txt',
-							filePath: filePath,
-							content: currentContent,
-						});
-					})
-				}
-			/>
-			<div
-				style={{
-					height: 1,
-					margin: '4px 0',
-					borderTop: `1px solid ${COLORS.BORDER_SHADOW}`,
-				}}
-			/>
-			<StartMenuItem
-				icon='📋'
-				text='About.txt'
-				hasArrow={false}
-				onHover={() => {}}
-				onClick={() =>
-					handleItemClick(() => {
-						const filePath = '/C:/Users/Guest/Documents/About.txt';
-						const currentContent =
-							getFileContent(filePath) ||
-							'Windows 3.1 Portfolio Prototype\n\nBuilt with Next.js and TypeScript\nMade by Steve (AI Assistant)\n\nFeatures:\n- Window Management\n- File System\n- Classic Applications\n- Boot Sequence\n- Easter Eggs';
-						onLaunchApp('notepad', {
-							fileName: 'About.txt',
-							filePath: filePath,
-							content: currentContent,
-							readOnly: true,
-						});
-					})
-				}
-			/>
-		</>
-	);
+const renderDocumentsSubmenu = () => {
+		// Get Documents folder from file system
+		const documentsFolder = getItemByPath('/C:/Users/Guest/Documents');
+		const documentFiles =
+			documentsFolder && documentsFolder.type === 'folder' && documentsFolder.children
+				? documentsFolder.children.filter((item) => item.type === 'file')
+				: [];
+
+		return (
+			<>
+				<StartMenuItem
+					icon='📁'
+					text='My Documents'
+					hasArrow={false}
+					onHover={() => {}}
+					onClick={() =>
+						handleItemClick(() =>
+							onLaunchApp('file-explorer', { path: '/C:/Users/Guest/Documents' })
+						)
+					}
+				/>
+				<div
+					style={{
+						height: 1,
+						margin: '4px 0',
+						borderTop: `1px solid ${COLORS.BORDER_SHADOW}`,
+					}}
+				/>
+				{documentFiles.map((file) => (
+					<StartMenuItem
+						key={file.id}
+						icon='📄'
+						text={file.name}
+						hasArrow={false}
+						onHover={() => {}}
+						onClick={() =>
+							handleItemClick(() => {
+								const currentContent = getFileContent(file.path);
+								onLaunchApp('notepad', {
+									fileName: file.name,
+									filePath: file.path,
+									content: currentContent,
+								});
+							})
+						}
+					/>
+				))}
+			</>
+		);
+	};
 
 	const renderSettingsSubmenu = () => (
 		<>

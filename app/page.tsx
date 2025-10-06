@@ -409,30 +409,45 @@ export default function MainPage() {
 		}
 	}, [bootComplete]);
 
-	// Auto-launch MSN Messenger after 5 seconds if user hasn't opened it
+	// Auto-launch MSN Messenger after 5 seconds (only if API is healthy)
 	useEffect(() => {
 		if (!bootComplete) return;
 
-		const timer = setTimeout(() => {
+		const timer = setTimeout(async () => {
 			// Check if MSN Messenger is already open
 			const msnAlreadyOpen = windows.some(
 				(w) => w.appType === 'chatbot' || w.title.includes('MSN')
 			);
 
 			if (!msnAlreadyOpen) {
-				// Center MSN window on screen
-				const msnWidth = 380;
-				const msnHeight = 520;
-				const centerX = (window.innerWidth - msnWidth) / 2;
-				const centerY = (window.innerHeight - msnHeight) / 2;
+				// Health check: Test if chat API is working
+				try {
+					const healthCheck = await fetch('/api/chat/welcome', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ test: true }),
+					});
 
-				openWindow({
-					title: 'MSN Messenger - Jean Francois',
-					appType: 'chatbot',
-					position: { x: centerX, y: centerY },
-					size: { width: msnWidth, height: msnHeight },
-					icon: '💬',
-				});
+					// Only open MSN if API is healthy
+					if (healthCheck.ok) {
+						const msnWidth = 380;
+						const msnHeight = 520;
+						const centerX = (window.innerWidth - msnWidth) / 2;
+						const centerY = (window.innerHeight - msnHeight) / 2;
+
+						openWindow({
+							title: 'MSN Messenger - Jean Francois',
+							appType: 'chatbot',
+							position: { x: centerX, y: centerY },
+							size: { width: msnWidth, height: msnHeight },
+							icon: '💬',
+						});
+					} else {
+						console.log('MSN Messenger not opened: API health check failed');
+					}
+				} catch (error) {
+					console.log('MSN Messenger not opened: API unavailable', error);
+				}
 			}
 		}, 5000); // 5 seconds
 
