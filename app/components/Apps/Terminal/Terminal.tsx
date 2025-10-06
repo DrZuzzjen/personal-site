@@ -90,7 +90,20 @@ export default function Terminal({ isMobile = false, className }: TerminalProps)
     textShadow: '0 0 6px rgba(0, 255, 0, 0.45)',
   }), [isMobile]);
 
-  const promptPrefix = useMemo(() => `${currentPath}>`, [currentPath]);
+  // Format path for Windows-style display (C:\Users\Guest instead of /C:/Users/Guest)
+  const formatPathForDisplay = useCallback((path: string): string => {
+    // Convert /C:/... to C:\...
+    // Convert /A:/... to A:\...
+    const windowsPath = path
+      .replace(/^\/([A-Z]:)\//, '$1\\') // Replace /C:/ with C:\
+      .replace(/^\/([A-Z]:)$/, '$1\\') // Replace /C: with C:\
+      .replace(/\//g, '\\'); // Replace all remaining / with \
+
+    return windowsPath;
+  }, []);
+
+  const displayPath = useMemo(() => formatPathForDisplay(currentPath), [currentPath, formatPathForDisplay]);
+  const promptPrefix = useMemo(() => `${displayPath}>`, [displayPath]);
 
   const focusInput = useCallback(() => {
     inputRef.current?.focus();

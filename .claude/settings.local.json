@@ -25,7 +25,8 @@
       "Bash(npm run lint:*)",
       "Bash(git checkout:*)",
       "Bash(git log:*)",
-      "Bash(git mv:*)"
+      "Bash(git mv:*)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []
