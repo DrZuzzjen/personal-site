@@ -373,13 +373,13 @@ export default function Notepad({
 					style={{
 						flex: 1,
 						margin: 0,
-						padding: 8,
+						padding: 12,
 						backgroundColor: COLORS.WIN_WHITE,
 						color: COLORS.TEXT_BLACK,
 						border: 'none',
 						fontFamily: 'var(--font-mono)',
 						fontSize: 13,
-						lineHeight: 1.5,
+						lineHeight: 1.6,
 						overflowY: 'auto',
 						outline: 'none',
 					}}
@@ -389,8 +389,12 @@ export default function Notepad({
 						// Parse bold text **text**
 						const parts = line.split(/(\*\*[^*]+\*\*)/g);
 
+						// Add extra spacing for empty lines and after certain sections
+						const isEmptyLine = line.trim() === '';
+						const marginBottom = isEmptyLine ? '8px' : '4px';
+
 						return (
-							<div key={index}>
+							<div key={index} style={{ marginBottom }}>
 								{parts.map((part, i) => {
 									// Check if bold
 									if (part.startsWith('**') && part.endsWith('**')) {
