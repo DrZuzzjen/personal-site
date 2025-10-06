@@ -201,9 +201,9 @@ export const INITIAL_FILE_SYSTEM: FileSystemItem[] = [
                     content: `Jean-François Gutierrez
 Software Developer | Full-Stack Engineer
 
-LinkedIn: [your-linkedin-url]
-GitHub: [your-github-url]
-X/Twitter: [your-x-url]
+LinkedIn: https://www.linkedin.com/in/gutierrezfrancois/
+GitHub: https://github.com/DrZuzzjen
+X/Twitter: https://x.com/Farmacod
 
 ---
 
