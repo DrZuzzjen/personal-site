@@ -1,7 +1,7 @@
 'use client';
 import { useState, useCallback, useEffect } from 'react';
 import type { FileSystemItem, DesktopIcon, FileExtension } from '../lib/types';
-import { INITIAL_FILE_SYSTEM, INITIAL_DESKTOP_ICONS, APP_EXECUTABLES, APP_DESKTOP_ICONS } from '../lib/constants';
+import { INITIAL_FILE_SYSTEM, INITIAL_DESKTOP_ICONS, APP_EXECUTABLES, APP_DESKTOP_ICONS, PATH_SHORTCUTS } from '../lib/constants';
 
 export function useFileSystem() {
   // Initialize filesystem with proper structure
@@ -66,8 +66,42 @@ export function useFileSystem() {
     }
   }, [desktopIcons]);
 
-  // Helper: Find item by path (recursive)
+  /**
+   * Resolves shortcut/symlink paths to actual paths
+   * Examples:
+   *   '/My Computer/C:' -> '/C:/'
+   *   '/My Computer/C:/Windows' -> '/C:/Windows'
+   */
+  const resolvePath = useCallback((path: string): string => {
+    // Direct shortcut match
+    if (PATH_SHORTCUTS[path]) {
+      return PATH_SHORTCUTS[path];
+    }
+
+    // Handle nested paths like '/My Computer/C:/Windows/System32'
+    // We need to check if the beginning of the path is a shortcut
+    const parts = path.split('/').filter(Boolean);
+
+    if (parts.length >= 2) {
+      // Try matching progressively longer prefixes
+      // Start with longest possible match (e.g., '/My Computer/C:')
+      for (let i = Math.min(parts.length, 3); i >= 2; i--) {
+        const prefix = '/' + parts.slice(0, i).join('/');
+        if (PATH_SHORTCUTS[prefix]) {
+          const resolvedBase = PATH_SHORTCUTS[prefix];
+          const remaining = parts.slice(i).join('/');
+          return remaining ? `${resolvedBase}${remaining}` : resolvedBase;
+        }
+      }
+    }
+
+    return path;
+  }, []);
+
+  // Helper: Find item by path (recursive) - automatically resolves shortcuts
   const getItemByPath = useCallback((path: string): FileSystemItem | null => {
+    const resolvedPath = resolvePath(path);
+
     const findInTree = (items: FileSystemItem[], targetPath: string): FileSystemItem | null => {
       for (const item of items) {
         if (item.path === targetPath) return item;
@@ -78,8 +112,8 @@ export function useFileSystem() {
       }
       return null;
     };
-    return findInTree(rootItems, path);
-  }, [rootItems]);
+    return findInTree(rootItems, resolvedPath);
+  }, [rootItems, resolvePath]);
 
   // Create a file
   const createFile = useCallback((parentPath: string, name: string, content: string = '') => {
@@ -336,6 +370,7 @@ export function useFileSystem() {
     deleteItem,
     moveItem,
     getItemByPath,
+    resolvePath,
     updateIconPosition,
     selectIcon,
     deselectAllIcons,

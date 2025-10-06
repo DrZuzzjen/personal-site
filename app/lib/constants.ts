@@ -739,6 +739,19 @@ export const APP_DESKTOP_ICONS: DesktopIcon[] = [
 // ERROR MESSAGES
 // ============================================
 
+// ============================================
+// PATH SHORTCUTS & SYMLINKS
+// ============================================
+
+/**
+ * Maps virtual/shortcut paths to actual file system paths
+ * Used to resolve "My Computer" shortcuts to actual drives
+ */
+export const PATH_SHORTCUTS: Record<string, string> = {
+  '/My Computer/C:': '/C:/',
+  '/My Computer/A:': '/A:/',
+} as const;
+
 export const ERROR_MESSAGES = {
   DELETE_PROTECTED: 'Cannot delete this item. It is a protected system file or folder.',
   DELETE_MY_DOCUMENTS: 'Error: Cannot delete critical system folder. Nice try! 😏',

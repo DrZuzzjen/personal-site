@@ -57,7 +57,7 @@ export default function FileExplorer({
 }: FileExplorerProps & {
 	onProtectedDelete?: (filePath: string, fileName: string) => void;
 } = {}) {
-	const { rootItems, getItemByPath, deleteItem } = useFileSystemContext();
+	const { rootItems, getItemByPath, deleteItem, resolvePath } = useFileSystemContext();
 	const { openWindow } = useWindowContext();
 
 	const [currentPath, setCurrentPath] = useState<string | null>(() =>
@@ -149,7 +149,9 @@ export default function FileExplorer({
 
 	const handleNavigate = (item: FileSystemItem) => {
 		if (item.type === 'folder') {
-			setCurrentPath(item.path);
+			// Resolve shortcuts (e.g., '/My Computer/C:' -> '/C:/')
+			const resolvedPath = resolvePath(item.path);
+			setCurrentPath(resolvedPath);
 			return;
 		}
 

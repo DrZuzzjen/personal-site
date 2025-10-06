@@ -174,6 +174,7 @@ export interface FileSystemContext {
   deleteItem: (path: string) => boolean; // Returns false if protected
   moveItem: (fromPath: string, toPath: string) => boolean;
   getItemByPath: (path: string) => FileSystemItem | null;
+  resolvePath: (path: string) => string; // Resolves shortcuts/symlinks to actual paths
   updateFileContent: (path: string, content: string) => boolean;
   updateIconPosition: (iconId: string, position: { x: number; y: number }) => void;
   selectIcon: (iconId: string) => void;
