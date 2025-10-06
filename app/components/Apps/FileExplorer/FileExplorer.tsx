@@ -99,6 +99,22 @@ export default function FileExplorer({
 
 	const parentPath = useMemo(() => getParentPath(currentPath), [currentPath]);
 
+	// Format path for Windows-style display (C:\Users\Guest instead of /C:/Users/Guest)
+	const formatPathForDisplay = (path: string | null): string => {
+		if (!path) return 'Root';
+
+		// Convert /C:/... to C:\...
+		// Convert /A:/... to A:\...
+		const windowsPath = path
+			.replace(/^\/([A-Z]:)\//, '$1\\') // Replace /C:/ with C:\
+			.replace(/^\/([A-Z]:)$/, '$1\\') // Replace /C: with C:\
+			.replace(/\//g, '\\'); // Replace all remaining / with \
+
+		return windowsPath;
+	};
+
+	const displayPath = formatPathForDisplay(currentPath);
+
 	const handleOpenFile = (item: FileSystemItem) => {
 		if (item.type !== 'file') {
 			return;
@@ -224,7 +240,7 @@ export default function FileExplorer({
 				</button>
 				<span>Path:</span>
 				<input
-					value={currentPath ?? 'Root'}
+					value={displayPath}
 					readOnly
 					style={{
 						flex: 1,
