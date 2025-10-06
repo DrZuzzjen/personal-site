@@ -86,13 +86,13 @@ export default function Desktop({
 		const folderName = prompt('Enter folder name:', 'New Folder');
 
 		if (folderName && folderName.trim()) {
-			// Create the folder with the user-provided name
-			createFolder('/Desktop', folderName.trim());
+			// Create the folder with the user-provided name in the user's Desktop directory
+			createFolder('/C:/Users/Guest/Desktop', folderName.trim());
 
 			// Get the created folder and create a desktop icon for it
 			// Use setTimeout to ensure the folder is created first
 			setTimeout(() => {
-				const createdFolder = getItemByPath(`/Desktop/${folderName.trim()}`);
+				const createdFolder = getItemByPath(`/C:/Users/Guest/Desktop/${folderName.trim()}`);
 				if (createdFolder) {
 					// Find a good position for the new icon
 					const position = findNextAvailablePosition();
@@ -109,10 +109,10 @@ export default function Desktop({
 
 		if (fileName && fileName.trim()) {
 			const finalFileName = fileName.trim();
-			const filePath = `/Desktop/${finalFileName}`;
+			const filePath = `/C:/Users/Guest/Desktop/${finalFileName}`;
 
 			// Create the file on desktop with empty content
-			const newFile = createFile('/Desktop', finalFileName, '');
+			const newFile = createFile('/C:/Users/Guest/Desktop', finalFileName, '');
 
 			if (newFile) {
 				// Create a desktop icon for the new file

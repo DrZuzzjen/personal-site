@@ -35,7 +35,7 @@ export default function TestFoundation() {
         <h2 className="text-xl font-semibold mb-2">File System Test</h2>
         <button
           className="bg-green-500 px-4 py-2 rounded mr-2"
-          onClick={() => createFile('/My Computer', 'test.txt', 'Hello World')}
+          onClick={() => createFile('/C:/Users/Guest/Documents', 'test.txt', 'Hello World')}
         >
           Create Test File
         </button>

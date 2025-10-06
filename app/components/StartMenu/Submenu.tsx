@@ -103,7 +103,7 @@ const renderDocumentsSubmenu = () => (
 				onHover={() => {}}
 				onClick={() =>
 					handleItemClick(() => {
-						const filePath = '/My Computer/My Documents/Project_1.txt';
+						const filePath = '/C:/Users/Guest/Documents/Project_1.txt';
 						const currentContent = getFileContent(filePath);
 						onLaunchApp('notepad', {
 							fileName: 'Project_1.txt',
@@ -120,7 +120,7 @@ const renderDocumentsSubmenu = () => (
 				onHover={() => {}}
 				onClick={() =>
 					handleItemClick(() => {
-						const filePath = '/My Computer/My Documents/Project_2.txt';
+						const filePath = '/C:/Users/Guest/Documents/Project_2.txt';
 						const currentContent = getFileContent(filePath);
 						onLaunchApp('notepad', {
 							fileName: 'Project_2.txt',
@@ -137,7 +137,7 @@ const renderDocumentsSubmenu = () => (
 				onHover={() => {}}
 				onClick={() =>
 					handleItemClick(() => {
-						const filePath = '/My Computer/My Documents/Project_3.txt';
+						const filePath = '/C:/Users/Guest/Documents/Project_3.txt';
 						const currentContent = getFileContent(filePath);
 						onLaunchApp('notepad', {
 							fileName: 'Project_3.txt',
@@ -154,7 +154,7 @@ const renderDocumentsSubmenu = () => (
 				onHover={() => {}}
 				onClick={() =>
 					handleItemClick(() => {
-						const filePath = '/My Computer/My Documents/Project_4.txt';
+						const filePath = '/C:/Users/Guest/Documents/Project_4.txt';
 						const currentContent = getFileContent(filePath);
 						onLaunchApp('notepad', {
 							fileName: 'Project_4.txt',
@@ -171,7 +171,7 @@ const renderDocumentsSubmenu = () => (
 				onHover={() => {}}
 				onClick={() =>
 					handleItemClick(() => {
-						const filePath = '/My Computer/My Documents/Project_5.txt';
+						const filePath = '/C:/Users/Guest/Documents/Project_5.txt';
 						const currentContent = getFileContent(filePath);
 						onLaunchApp('notepad', {
 							fileName: 'Project_5.txt',
@@ -195,7 +195,7 @@ const renderDocumentsSubmenu = () => (
 				onHover={() => {}}
 				onClick={() =>
 					handleItemClick(() => {
-						const filePath = '/My Computer/My Documents/About.txt';
+						const filePath = '/C:/Users/Guest/Documents/About.txt';
 						const currentContent =
 							getFileContent(filePath) ||
 							'Windows 3.1 Portfolio Prototype\n\nBuilt with Next.js and TypeScript\nMade by Steve (AI Assistant)\n\nFeatures:\n- Window Management\n- File System\n- Classic Applications\n- Boot Sequence\n- Easter Eggs';

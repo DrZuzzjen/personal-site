@@ -115,7 +115,7 @@ async function handleHackCommand(context: CommandContext): Promise<void | { erro
     await delay(300);
     runtime.clearSessionKey('hack');
     runtime.setMode('normal');
-    runtime.setCurrentPath(hackSession.previousPath || '/Desktop');
+    runtime.setCurrentPath(hackSession.previousPath || '/C:/Users/Guest');
     runtime.print({ text: 'Back in the safe zone.', type: 'success' });
     return;
   }

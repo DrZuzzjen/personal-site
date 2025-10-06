@@ -236,7 +236,7 @@ export default function Notepad({
 		const finalName = filename.endsWith('.txt') ? filename : filename + '.txt';
 
 		// Create file in My Documents - use the correct path structure
-		const parentPath = '/My Computer/My Documents';
+		const parentPath = '/C:/Users/Guest/Documents';
 		const newFilePath = `${parentPath}/${finalName}`;
 
 		// Check if file already exists

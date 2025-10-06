@@ -28,7 +28,7 @@ function getDirectoryListing(fileSystem: FileSystemContext, path: string): Direc
   if (target.type === 'folder') {
     return {
       path: normalized,
-      label: target.name,
+      label: normalized, // Show the full path instead of just the folder name
       entries: target.children ?? [],
     };
   }
@@ -68,7 +68,7 @@ function ensureDesktopIcon(fileSystem: FileSystemContext, item: FileSystemItem |
     return;
   }
 
-  if (!item.path.startsWith('/Desktop')) {
+  if (!item.path.startsWith('/C:/Users/Guest/Desktop')) {
     return;
   }
 

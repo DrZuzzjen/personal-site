@@ -137,7 +137,7 @@ export default function Chatbot({}: ChatbotProps) {
 				id: 'welcome',
 				role: 'assistant',
 				content:
-					"*Jean Francois has signed in*\n\nHey there! :) I'm Fran - DevRel at Kluster.ai and the dev who built this retro Windows 3.1 portfolio. This whole site is a working OS simulation with Paint, Minesweeper, and tons of easter eggs!\n\nWhat would you like to explore first?",
+					"hey :) you found my retro portfolio. everything here actually works - Paint, Minesweeper, even the Camera app",
 				timestamp: new Date(),
 			};
 			setMessages([fallbackWelcome]);
@@ -366,43 +366,8 @@ Project details: ${context.projects
 					)}
 				{messages.length === 0 && (
 					<div className='text-center text-gray-500 mt-8'>
-						<div className='mb-4'>
-							<div className='text-lg mb-2'>💬 Welcome to MSN Messenger!</div>
-							<p className='text-sm'>
-								I'm your friendly portfolio guide. Try asking:
-							</p>
-						</div>
-						<div className='space-y-2 text-sm'>
-							<button
-								onClick={() => sendMessage("What's cool about this portfolio?")}
-								className='block mx-auto px-4 py-2 bg-blue-100 hover:bg-blue-200 rounded transition-colors'
-							>
-								💻 "What's cool about this portfolio?"
-							</button>
-							<button
-								onClick={() => sendMessage('Show me the best features')}
-								className='block mx-auto px-4 py-2 bg-blue-100 hover:bg-blue-200 rounded transition-colors'
-							>
-								✨ "Show me the best features"
-							</button>
-							<button
-								onClick={() => sendMessage('What apps can I try?')}
-								className='block mx-auto px-4 py-2 bg-blue-100 hover:bg-blue-200 rounded transition-colors'
-							>
-								🎮 "What apps can I try?"
-							</button>
-							<button
-								onClick={() => sendMessage('Tell me about the tech stack')}
-								className='block mx-auto px-4 py-2 bg-blue-100 hover:bg-blue-200 rounded transition-colors'
-							>
-								🔧 "Tell me about the tech stack"
-							</button>
-							<button
-								onClick={() => sendMessage('Any easter eggs? ;)')}
-								className='block mx-auto px-4 py-2 bg-blue-100 hover:bg-blue-200 rounded transition-colors'
-							>
-								🥚 "Any easter eggs? ;)"
-							</button>
+						<div className='text-sm italic'>
+							Loading chat...
 						</div>
 					</div>
 				)}
@@ -420,9 +385,6 @@ Project details: ${context.projects
 								}`}
 							>
 								<div className='max-w-[70%]'>
-									<div className='text-xs text-gray-600 mb-1'>
-										{message.role === 'user' ? 'You say:' : 'Jean Francois says:'}
-									</div>
 									<div
 										className='px-3 py-2 rounded-lg text-sm'
 										style={{

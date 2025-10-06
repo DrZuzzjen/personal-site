@@ -92,6 +92,254 @@ export const BOOT_SEQUENCE = {
 
 export const INITIAL_FILE_SYSTEM: FileSystemItem[] = [
   {
+    id: 'c-drive',
+    name: 'C:',
+    type: 'folder',
+    extension: 'folder',
+    path: '/C:',
+    isProtected: true,
+    isSystem: true,
+    icon: 'computer',
+    createdAt: Date.now(),
+    modifiedAt: Date.now(),
+    children: [
+      {
+        id: 'windows-folder',
+        name: 'Windows',
+        type: 'folder',
+        extension: 'folder',
+        path: '/C:/Windows',
+        isProtected: true,
+        isSystem: true,
+        icon: 'folder',
+        createdAt: Date.now(),
+        modifiedAt: Date.now(),
+        children: [
+          {
+            id: 'system32-folder',
+            name: 'System32',
+            type: 'folder',
+            extension: 'folder',
+            path: '/C:/Windows/System32',
+            isProtected: true,
+            isSystem: true,
+            icon: 'folder',
+            createdAt: Date.now(),
+            modifiedAt: Date.now(),
+            children: [],
+          },
+        ],
+      },
+      {
+        id: 'program-files',
+        name: 'Program Files',
+        type: 'folder',
+        extension: 'folder',
+        path: '/C:/Program Files',
+        isProtected: true,
+        isSystem: true,
+        icon: 'folder',
+        createdAt: Date.now(),
+        modifiedAt: Date.now(),
+        children: [], // Will be populated with APP_EXECUTABLES
+      },
+      {
+        id: 'users-folder',
+        name: 'Users',
+        type: 'folder',
+        extension: 'folder',
+        path: '/C:/Users',
+        isProtected: true,
+        isSystem: true,
+        icon: 'folder',
+        createdAt: Date.now(),
+        modifiedAt: Date.now(),
+        children: [
+          {
+            id: 'guest-user',
+            name: 'Guest',
+            type: 'folder',
+            extension: 'folder',
+            path: '/C:/Users/Guest',
+            isProtected: true,
+            isSystem: false,
+            icon: 'folder',
+            createdAt: Date.now(),
+            modifiedAt: Date.now(),
+            children: [
+              {
+                id: 'desktop-folder',
+                name: 'Desktop',
+                type: 'folder',
+                extension: 'folder',
+                path: '/C:/Users/Guest/Desktop',
+                isProtected: true,
+                isSystem: false,
+                icon: 'folder',
+                createdAt: Date.now(),
+                modifiedAt: Date.now(),
+                children: [], // Desktop files will be created here
+              },
+              {
+                id: 'documents-folder',
+                name: 'Documents',
+                type: 'folder',
+                extension: 'folder',
+                path: '/C:/Users/Guest/Documents',
+                isProtected: true,
+                isSystem: false,
+                icon: 'folder',
+                createdAt: Date.now(),
+                modifiedAt: Date.now(),
+                children: [
+                  {
+                    id: 'about-txt',
+                    name: 'About.txt',
+                    type: 'file',
+                    extension: 'txt',
+                    path: '/C:/Users/Guest/Documents/About.txt',
+                    content: `Jean-François Gutierrez
+Software Developer | Full-Stack Engineer
+
+LinkedIn: [your-linkedin-url]
+GitHub: [your-github-url]
+X/Twitter: [your-x-url]
+
+---
+
+Welcome to my Windows 3.1 portfolio! This entire site is a functional OS simulation built with Next.js, TypeScript, and Tailwind CSS.
+
+Check out My Documents for project details, or play some Minesweeper while you're here!`,
+                    isProtected: true,
+                    isSystem: false,
+                    icon: 'notepad',
+                    createdAt: Date.now(),
+                    modifiedAt: Date.now(),
+                  },
+                  {
+                    id: 'project-1',
+                    name: 'Project_1.txt',
+                    type: 'file',
+                    extension: 'txt',
+                    path: '/C:/Users/Guest/Documents/Project_1.txt',
+                    content: `Project Name: [Your Project]
+Tech Stack: Next.js, TypeScript, Tailwind
+GitHub: [repo-url]
+
+Description:
+[Your project description here]
+
+Key Features:
+- Feature 1
+- Feature 2
+- Feature 3`,
+                    isProtected: false,
+                    isSystem: false,
+                    icon: 'notepad',
+                    createdAt: Date.now(),
+                    modifiedAt: Date.now(),
+                  },
+                  {
+                    id: 'project-2',
+                    name: 'Project_2.txt',
+                    type: 'file',
+                    extension: 'txt',
+                    path: '/C:/Users/Guest/Documents/Project_2.txt',
+                    content: 'Project 2 details... (to be filled in Phase 6)',
+                    isProtected: false,
+                    isSystem: false,
+                    icon: 'notepad',
+                    createdAt: Date.now(),
+                    modifiedAt: Date.now(),
+                  },
+                  {
+                    id: 'project-3',
+                    name: 'Project_3.txt',
+                    type: 'file',
+                    extension: 'txt',
+                    path: '/C:/Users/Guest/Documents/Project_3.txt',
+                    content: 'Project 3 details... (to be filled in Phase 6)',
+                    isProtected: false,
+                    isSystem: false,
+                    icon: 'notepad',
+                    createdAt: Date.now(),
+                    modifiedAt: Date.now(),
+                  },
+                  {
+                    id: 'project-4',
+                    name: 'Project_4.txt',
+                    type: 'file',
+                    extension: 'txt',
+                    path: '/C:/Users/Guest/Documents/Project_4.txt',
+                    content: 'Project 4 details... (to be filled in Phase 6)',
+                    isProtected: false,
+                    isSystem: false,
+                    icon: 'notepad',
+                    createdAt: Date.now(),
+                    modifiedAt: Date.now(),
+                  },
+                  {
+                    id: 'project-5',
+                    name: 'Project_5.txt',
+                    type: 'file',
+                    extension: 'txt',
+                    path: '/C:/Users/Guest/Documents/Project_5.txt',
+                    content: 'Project 5 details... (to be filled in Phase 6)',
+                    isProtected: false,
+                    isSystem: false,
+                    icon: 'notepad',
+                    createdAt: Date.now(),
+                    modifiedAt: Date.now(),
+                  },
+                ],
+              },
+              {
+                id: 'downloads-folder',
+                name: 'Downloads',
+                type: 'folder',
+                extension: 'folder',
+                path: '/C:/Users/Guest/Downloads',
+                isProtected: true,
+                isSystem: false,
+                icon: 'folder',
+                createdAt: Date.now(),
+                modifiedAt: Date.now(),
+                children: [],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'a-drive',
+    name: 'A:',
+    type: 'folder',
+    extension: 'folder',
+    path: '/A:',
+    isProtected: true,
+    isSystem: true,
+    icon: 'floppy',
+    createdAt: Date.now(),
+    modifiedAt: Date.now(),
+    children: [
+      {
+        id: 'resume-pdf',
+        name: 'Resume.pdf',
+        type: 'file',
+        extension: 'pdf',
+        path: '/A:/Resume.pdf',
+        content: '[PDF download link - to be added in Phase 6]',
+        isProtected: true,
+        isSystem: false,
+        icon: 'pdf',
+        createdAt: Date.now(),
+        modifiedAt: Date.now(),
+      },
+    ],
+  },
+  {
     id: 'my-computer',
     name: 'My Computer',
     type: 'folder',
@@ -104,144 +352,30 @@ export const INITIAL_FILE_SYSTEM: FileSystemItem[] = [
     modifiedAt: Date.now(),
     children: [
       {
-        id: 'about-txt',
-        name: 'About.txt',
-        type: 'file',
-        extension: 'txt',
-        path: '/My Computer/About.txt',
-        content: `[Your Name]
-Software Developer | Full-Stack Engineer
-
-LinkedIn: [your-linkedin-url]
-GitHub: [your-github-url]
-X/Twitter: [your-x-url]
-
----
-
-Welcome to my Windows 3.1 portfolio! This entire site is a functional OS simulation built with Next.js, TypeScript, and Tailwind CSS.
-
-Check out My Documents for project details, or play some Minesweeper while you're here!`,
-        isProtected: true,
-        isSystem: false,
-        icon: 'notepad',
-        createdAt: Date.now(),
-        modifiedAt: Date.now(),
-      },
-      {
-        id: 'my-documents',
-        name: 'My Documents',
+        id: 'c-drive-shortcut',
+        name: 'C:',
         type: 'folder',
         extension: 'folder',
-        path: '/My Computer/My Documents',
+        path: '/C:',
         isProtected: true,
-        isSystem: false,
-        icon: 'folder',
+        isSystem: true,
+        icon: 'computer',
         createdAt: Date.now(),
         modifiedAt: Date.now(),
-        children: [
-          {
-            id: 'project-1',
-            name: 'Project_1.txt',
-            type: 'file',
-            extension: 'txt',
-            path: '/My Computer/My Documents/Project_1.txt',
-            content: `Project Name: [Your Project]
-Tech Stack: Next.js, TypeScript, Tailwind
-GitHub: [repo-url]
-
-Description:
-[Your project description here]
-
-Key Features:
-- Feature 1
-- Feature 2
-- Feature 3`,
-            isProtected: false,
-            isSystem: false,
-            icon: 'notepad',
-            createdAt: Date.now(),
-            modifiedAt: Date.now(),
-          },
-          {
-            id: 'project-2',
-            name: 'Project_2.txt',
-            type: 'file',
-            extension: 'txt',
-            path: '/My Computer/My Documents/Project_2.txt',
-            content: 'Project 2 details... (to be filled in Phase 6)',
-            isProtected: false,
-            isSystem: false,
-            icon: 'notepad',
-            createdAt: Date.now(),
-            modifiedAt: Date.now(),
-          },
-          {
-            id: 'project-3',
-            name: 'Project_3.txt',
-            type: 'file',
-            extension: 'txt',
-            path: '/My Computer/My Documents/Project_3.txt',
-            content: 'Project 3 details... (to be filled in Phase 6)',
-            isProtected: false,
-            isSystem: false,
-            icon: 'notepad',
-            createdAt: Date.now(),
-            modifiedAt: Date.now(),
-          },
-          {
-            id: 'project-4',
-            name: 'Project_4.txt',
-            type: 'file',
-            extension: 'txt',
-            path: '/My Computer/My Documents/Project_4.txt',
-            content: 'Project 4 details... (to be filled in Phase 6)',
-            isProtected: false,
-            isSystem: false,
-            icon: 'notepad',
-            createdAt: Date.now(),
-            modifiedAt: Date.now(),
-          },
-          {
-            id: 'project-5',
-            name: 'Project_5.txt',
-            type: 'file',
-            extension: 'txt',
-            path: '/My Computer/My Documents/Project_5.txt',
-            content: 'Project 5 details... (to be filled in Phase 6)',
-            isProtected: false,
-            isSystem: false,
-            icon: 'notepad',
-            createdAt: Date.now(),
-            modifiedAt: Date.now(),
-          },
-        ],
+        children: [], // References the actual C: drive
       },
       {
-        id: 'floppy-drive',
-        name: 'A:\\',
+        id: 'a-drive-shortcut',
+        name: 'A:',
         type: 'folder',
         extension: 'folder',
-        path: '/My Computer/A:',
+        path: '/A:',
         isProtected: true,
         isSystem: true,
         icon: 'floppy',
         createdAt: Date.now(),
         modifiedAt: Date.now(),
-        children: [
-          {
-            id: 'resume-pdf',
-            name: 'Resume.pdf',
-            type: 'file',
-            extension: 'pdf',
-            path: '/My Computer/A:/Resume.pdf',
-            content: '[PDF download link - to be added in Phase 6]',
-            isProtected: true,
-            isSystem: false,
-            icon: 'pdf',
-            createdAt: Date.now(),
-            modifiedAt: Date.now(),
-          },
-        ],
+        children: [], // References the actual A: drive
       },
     ],
   },
@@ -258,20 +392,11 @@ Key Features:
     modifiedAt: Date.now(),
     children: [],
   },
-  {
-    id: 'desktop',
-    name: 'Desktop',
-    type: 'folder',
-    extension: 'folder',
-    path: '/Desktop',
-    isProtected: true,
-    isSystem: true,
-    icon: 'folder',
-    createdAt: Date.now(),
-    modifiedAt: Date.now(),
-    children: [],
-  },
 ];
+
+// ============================================
+// INITIAL DESKTOP ICONS
+// ============================================
 
 // ============================================
 // INITIAL DESKTOP ICONS
@@ -296,13 +421,17 @@ export const INITIAL_DESKTOP_ICONS: DesktopIcon[] = [
 // APP EXECUTABLES (Desktop Icons)
 // ============================================
 
+// ============================================
+// APP EXECUTABLES (Desktop Icons)
+// ============================================
+
 export const APP_EXECUTABLES: FileSystemItem[] = [
   {
     id: 'paint-exe',
     name: 'Paint.exe',
     type: 'file',
     extension: 'exe',
-    path: '/Desktop/Paint.exe',
+    path: '/C:/Program Files/Paint.exe',
     isProtected: true,
     isSystem: true,
     icon: 'paint',
@@ -314,7 +443,7 @@ export const APP_EXECUTABLES: FileSystemItem[] = [
     name: 'Minesweeper.exe',
     type: 'file',
     extension: 'exe',
-    path: '/Desktop/Minesweeper.exe',
+    path: '/C:/Program Files/Minesweeper.exe',
     isProtected: true,
     isSystem: true,
     icon: 'minesweeper',
@@ -326,7 +455,7 @@ export const APP_EXECUTABLES: FileSystemItem[] = [
     name: 'Notepad.exe',
     type: 'file',
     extension: 'exe',
-    path: '/Desktop/Notepad.exe',
+    path: '/C:/Program Files/Notepad.exe',
     isProtected: true,
     isSystem: true,
     icon: 'notepad',
@@ -338,7 +467,7 @@ export const APP_EXECUTABLES: FileSystemItem[] = [
     name: 'Snake.exe',
     type: 'file',
     extension: 'exe',
-    path: '/Desktop/Snake.exe',
+    path: '/C:/Program Files/Snake.exe',
     isProtected: true,
     isSystem: true,
     icon: 'snake',
@@ -350,7 +479,7 @@ export const APP_EXECUTABLES: FileSystemItem[] = [
     name: 'Camera.exe',
     type: 'file',
     extension: 'exe',
-    path: '/Desktop/Camera.exe',
+    path: '/C:/Program Files/Camera.exe',
     isProtected: true,
     isSystem: true,
     icon: 'camera',
@@ -362,7 +491,7 @@ export const APP_EXECUTABLES: FileSystemItem[] = [
     name: 'TV.exe',
     type: 'file',
     extension: 'exe',
-    path: '/Desktop/TV.exe',
+    path: '/C:/Program Files/TV.exe',
     isProtected: true,
     isSystem: true,
     icon: 'tv',
@@ -374,7 +503,7 @@ export const APP_EXECUTABLES: FileSystemItem[] = [
     name: 'MSN Messenger.exe',
     type: 'file',
     extension: 'exe',
-    path: '/Desktop/MSN Messenger.exe',
+    path: '/C:/Program Files/MSN Messenger.exe',
     isProtected: true,
     isSystem: true,
     icon: 'chatbot',
@@ -386,7 +515,7 @@ export const APP_EXECUTABLES: FileSystemItem[] = [
     name: 'Terminal.exe',
     type: 'file',
     extension: 'exe',
-    path: '/Desktop/Terminal.exe',
+    path: '/C:/Program Files/Terminal.exe',
     isProtected: true,
     isSystem: true,
     icon: 'terminal',
@@ -395,7 +524,7 @@ export const APP_EXECUTABLES: FileSystemItem[] = [
   },
 ];
 
-// Desktop icons for executables
+// Desktop icons for executables (shortcuts to Program Files)
 export const APP_DESKTOP_ICONS: DesktopIcon[] = [
   {
     id: 'desktop-icon-paint',

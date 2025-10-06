@@ -4,10 +4,23 @@ import type { FileSystemItem, DesktopIcon, FileExtension } from '../lib/types';
 import { INITIAL_FILE_SYSTEM, INITIAL_DESKTOP_ICONS, APP_EXECUTABLES, APP_DESKTOP_ICONS } from '../lib/constants';
 
 export function useFileSystem() {
-  const [rootItems, setRootItems] = useState<FileSystemItem[]>([
-    ...INITIAL_FILE_SYSTEM,
-    ...APP_EXECUTABLES,
-  ]);
+  // Initialize filesystem with proper structure
+  const initializeFileSystem = useCallback(() => {
+    const fileSystem = [...INITIAL_FILE_SYSTEM];
+    
+    // Find the Program Files folder and add APP_EXECUTABLES to it
+    const cDrive = fileSystem.find(item => item.id === 'c-drive');
+    if (cDrive && cDrive.children) {
+      const programFiles = cDrive.children.find(item => item.id === 'program-files');
+      if (programFiles && programFiles.children) {
+        programFiles.children.push(...APP_EXECUTABLES);
+      }
+    }
+    
+    return fileSystem;
+  }, []);
+
+  const [rootItems, setRootItems] = useState<FileSystemItem[]>(() => initializeFileSystem());
 
   const [desktopIcons, setDesktopIcons] = useState<DesktopIcon[]>([]);
 
@@ -290,7 +303,7 @@ export function useFileSystem() {
     });
 
     // If saving to Desktop, also create a desktop icon
-    if (parentPath === '/Desktop') {
+    if (parentPath === '/C:/Users/Guest/Desktop') {
       // Find next available position
       const existingPositions = desktopIcons.map(icon => `${icon.position.x},${icon.position.y}`);
       let positionY = 0;

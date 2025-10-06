@@ -24,7 +24,7 @@ export interface UseTerminalStateOptions {
 }
 
 export function useTerminalState(options: UseTerminalStateOptions = {}) {
-  const { initialPath = '/Desktop' } = options;
+  const { initialPath = '/C:/Users/Guest' } = options;
   const [lines, setLines] = useState<TerminalLine[]>([]);
   const [currentInput, setCurrentInput] = useState('');
   const [history, setHistory] = useState<string[]>([]);

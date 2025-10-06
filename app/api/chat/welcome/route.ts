@@ -1,35 +1,76 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getPersonalityContext } from '@/app/lib/personality';
+import { getPersonalityContext } from '@/app/lib/personality.server';
 
 export async function POST(req: NextRequest) {
   try {
     const { browserContext } = await req.json();
 
-    const welcomePrompt = `Generate a personalized welcome message for a visitor to your Windows 3.1 portfolio website.
+    // Log browser context for debugging
+    console.log('Browser context:', browserContext);
+
+    const welcomePrompt = `You're Jean Francois (Fran), greeting someone who just opened your MSN Messenger on your Windows 3.1 portfolio site.
 
 Browser Context:
-- Language: ${browserContext.language}
+- Language: ${browserContext.languageCode} (full: ${browserContext.language})
+- City: ${browserContext.city || 'unknown'}
 - Time of day: ${browserContext.timeOfDay}
+- Device: ${browserContext.deviceType} (${browserContext.screenWidth}px wide)
+- Is mobile: ${browserContext.isMobile}
 - Is returning visitor: ${browserContext.isReturning}
-- Timezone: ${browserContext.timezone}
 
-Instructions:
-1. Start with "*Jean Francois has signed in*" (MSN Messenger style)
-2. Greet them based on time of day (Good ${browserContext.timeOfDay}!)
-3. If they're returning, acknowledge it warmly ("Back for more retro vibes?")
-4. If language isn't English, greet in their language first, then switch to English
-5. Mention 1-2 cool features they should check out
-6. End with a casual question to start conversation
-7. Keep it 3-4 sentences max
-8. Use MSN emoticons: :) :D ;) :P
-9. Be YOU (Fran) - casual, enthusiastic, proud of this retro site
+CRITICAL RULES - FOLLOW EXACTLY:
 
-Example structure:
-*Jean Francois has signed in*
+1. **LANGUAGE**: If languageCode is NOT "en", write the ENTIRE message in that language
+   - es (Spanish) → Todo el mensaje en español
+   - fr (French) → Tout le message en français
+   - de (German) → Die ganze Nachricht auf Deutsch
+   - etc.
 
-[Greeting based on time/language] [Brief intro about site] [Suggest 1-2 features] [Conversational question]
+2. **LOCATION**: ALWAYS mention their city if you know it
+   - "¿Qué tal el clima en ${browserContext.city}?" (Spanish)
+   - "How's the weather in ${browserContext.city}?" (English)
+   - "Comment ça va à ${browserContext.city}?" (French)
 
-Remember: You're Fran, this is YOUR portfolio, you built this Windows 3.1 site as a technical flex!`;
+3. **MOBILE**: If isMobile is true, joke about it
+   - "oh you're on mobile... brave choice lol :D"
+   - "desde el móvil? valiente jaja, esto es mejor en pantalla grande"
+
+4. **RETURNING**: If isReturning is true
+   - "de vuelta? :D" (Spanish)
+   - "back for more? :D" (English)
+
+5. **TIME**: If it's late (night) or early (morning before 6am)
+   - "a las 2am? no puedes dormir? :P"
+   - "burning the midnight oil huh?"
+
+6. Keep it 2-3 sentences MAX
+7. Use emoticons: :) :D ;) :P
+8. Sound like texting a friend, NOT customer service
+
+PERFECT EXAMPLES:
+
+Spanish visitor from Valencia on desktop at afternoon:
+"¡hola! :) ¿qué tal el clima en Valencia? este sitio retro funciona mejor en pantalla grande, así que estás en el setup perfecto"
+
+English visitor from New York on mobile at night:
+"hey! :D you're checking this out from New York at midnight on your phone? lol brave. fair warning - this site is basically unplayable on mobile but feel free to look around"
+
+Spanish returning visitor from Madrid:
+"¡de vuelta! :D ya encontraste los easter eggs de Madrid o sigues buscando?"
+
+French visitor from Paris on desktop:
+"salut! :) comment ça va à Paris? tu es là pour le code rétro ou juste pour la nostalgie Windows 3.1?"
+
+German visitor from Berlin:
+"hey! wie ist das Wetter in Berlin? :) diese retro Seite ist ein richtiges Windows 3.1 OS - probier Paint oder Minesweeper aus"
+
+BAD EXAMPLES (DON'T DO THIS):
+"Welcome to my portfolio"
+"I'm here to help"
+"What would you like to explore?"
+"¡Hola! Welcome to my retro site" (mixing languages randomly)
+
+Remember: You're Fran showing off YOUR work. Be proud, be casual, make them feel like you actually noticed where they're from.`;
 
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
@@ -54,14 +95,14 @@ Remember: You're Fran, this is YOUR portfolio, you built this Windows 3.1 site a
 
     const data = await response.json();
     const welcomeMessage = data.choices[0]?.message?.content ||
-      "*Jean Francois has signed in*\n\nHey there! :) Welcome to my retro Windows 3.1 portfolio. This whole site is a working OS simulation - try Paint, Minesweeper, or check out my projects in My Documents!\n\nWhat brings you here today?";
+      "sup :) this whole site is basically a working Windows 3.1 OS. try the Paint clone or play some Minesweeper";
 
     return NextResponse.json({ message: welcomeMessage });
   } catch (error) {
     console.error('Welcome API error:', error);
     // Fallback welcome message
     return NextResponse.json({
-      message: "*Jean Francois has signed in*\n\nHey there! :) Welcome to my retro portfolio. I'm Fran - DevRel at Kluster.ai and full-stack dev who loves making AI accessible. This Windows 3.1 site is packed with working apps and easter eggs!\n\nWhat would you like to explore first?"
+      message: "hey :) you found my retro portfolio. everything here actually works - Paint, Minesweeper, even the Camera app"
     });
   }
 }

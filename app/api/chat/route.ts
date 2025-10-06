@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getPersonalityContext } from '@/app/lib/personality';
+import { getPersonalityContext } from '@/app/lib/personality.server';
 
 const SYSTEM_PROMPT = getPersonalityContext();
 

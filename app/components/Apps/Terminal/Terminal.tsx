@@ -55,7 +55,7 @@ export default function Terminal({ isMobile = false, className }: TerminalProps)
     session,
     setSessionValue,
     clearSessionKey,
-  } = useTerminalState({ initialPath: '/Desktop' });
+  } = useTerminalState({ initialPath: '/C:/Users/Guest' });
 
   useEffect(() => {
     appendLine({ text: 'Initializing MS-DOS compatible shell...', type: 'system' });
