@@ -137,7 +137,7 @@ export default function Chatbot({}: ChatbotProps) {
 				id: 'welcome',
 				role: 'assistant',
 				content:
-					"hey :) you found my retro portfolio. everything here actually works - Paint, Minesweeper, even the Camera app",
+					"hey! :)\nwhat's up?",
 				timestamp: new Date(),
 			};
 			setMessages([fallbackWelcome]);
