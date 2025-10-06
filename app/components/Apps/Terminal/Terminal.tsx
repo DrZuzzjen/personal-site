@@ -60,11 +60,39 @@ export default function Terminal({ isMobile = false, className }: TerminalProps)
 
   useEffect(() => {
     if (!initializedRef.current) {
-      appendLine({ text: 'Initializing MS-DOS compatible shell...', type: 'system' });
-      appendLine({ text: 'Type "help" to list available commands.', type: 'system' });
       initializedRef.current = true;
+
+      if (isMobile) {
+        // Mobile: Show colorful boot sequence in terminal
+        appendLine({ text: 'System Check...', type: 'success' });
+        appendLine({ text: 'OK', type: 'success' });
+        appendLine({ text: '', type: 'output' });
+        appendLine({ text: 'Detecting device...', type: 'warning' });
+        appendLine({ text: `${typeof navigator !== 'undefined' ? navigator.userAgent.includes('iPhone') ? 'iPhone' : navigator.userAgent.includes('Android') ? 'Android' : 'Mobile device' : 'Mobile device'} detected`, type: 'warning' });
+        appendLine({ text: '', type: 'output' });
+        appendLine({ text: '⚠️  Desktop UI disabled on mobile', type: 'error' });
+        appendLine({ text: 'Loading Terminal Mode...', type: 'success' });
+        appendLine({ text: '', type: 'output' });
+        appendLine({ text: '═══════════════════════════════════════', type: 'output' });
+        appendLine({ text: 'Welcome to Jean Francois Portfolio!', type: 'success' });
+        appendLine({ text: 'Mobile Terminal Edition', type: 'output' });
+        appendLine({ text: '═══════════════════════════════════════', type: 'output' });
+        appendLine({ text: '', type: 'output' });
+        appendLine({ text: '🚀 QUICK START', type: 'success' });
+        appendLine({ text: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', type: 'output' });
+        appendLine({ text: '', type: 'output' });
+        appendLine({ text: '  portfolio  - Main menu', type: 'output' });
+        appendLine({ text: '  about      - About me', type: 'output' });
+        appendLine({ text: '  contact    - Get in touch', type: 'output' });
+        appendLine({ text: '  help       - All commands', type: 'output' });
+        appendLine({ text: '', type: 'output' });
+      } else {
+        // Desktop: Show traditional MS-DOS welcome
+        appendLine({ text: 'Initializing MS-DOS compatible shell...', type: 'system' });
+        appendLine({ text: 'Type "help" to list available commands.', type: 'system' });
+      }
     }
-  }, [appendLine]);
+  }, [isMobile, appendLine]);
 
   useEffect(() => {
     if (viewportRef.current) {

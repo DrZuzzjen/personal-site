@@ -4,6 +4,7 @@ import { createNavigationCommands } from './navigation';
 import { createSystemCommands } from './system';
 import { createAppCommands } from './apps';
 import { createEasterEggCommands } from './easterEggs';
+import { createMobileCommands } from './mobile';
 
 const registry: Command[] = [];
 
@@ -15,6 +16,7 @@ register(createNavigationCommands());
 register(createFilesystemCommands());
 register(createAppCommands());
 register(createEasterEggCommands());
+register(createMobileCommands());
 register(createSystemCommands(() => registry));
 
 export function getCommands(): Command[] {
