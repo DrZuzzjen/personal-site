@@ -170,8 +170,15 @@ function handleCowsay(message: string) {
   const bubbleWidth = text.length + 2;
   const borderTop = ' ' + '_'.repeat(bubbleWidth);
   const borderBottom = ' ' + '-'.repeat(bubbleWidth);
-  const messageLine = <  >;
-  return [borderTop, messageLine, borderBottom, ...COW_ART];
+  const messageLine = `< ${text} >`;
+  const cowArt = [
+    '        \\   ^__^',
+    '         \\  (oo)\\_______',
+    '            (__)\\       )\\/\\',
+    '                ||----w |',
+    '                ||     ||',
+  ];
+  return [borderTop, messageLine, borderBottom, ...cowArt];
 }
 
 function handleFortune(): string {
@@ -345,10 +352,11 @@ const credits: Command = {
         { text: '+----------------------------+' },
         { text: '  Neon grids engaged.        ' },
         { text: '  Synthwave levels: MAX.     ' },
-        { text: '  Enjoy the retro vibes! ??? ' },
+        { text: '  Enjoy the retro vibes! 🎵 ' },
         { text: '+----------------------------+' },
       ],
     }),
   };
-\n  return [hack, matrix, cowsay, fortune, sudo, konami, rickroll, vibe, credits];
+
+  return [hack, matrix, cowsay, fortune, sudo, konami, rickroll, vibe, credits];
 }

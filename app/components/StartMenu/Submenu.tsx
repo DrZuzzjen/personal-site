@@ -27,21 +27,21 @@ export default function Submenu({
 	const renderProgramsSubmenu = () => (
 		<>
 			<StartMenuItem
-				icon='?Y-????'
+				icon='🎨'
 				text='Paint.exe'
 				hasArrow={false}
 				onHover={() => {}}
 				onClick={() => handleItemClick(() => onLaunchApp('paint'))}
 			/>
 			<StartMenuItem
-				icon='?Y'?'
+				icon='💣'
 				text='Minesweeper.exe'
 				hasArrow={false}
 				onHover={() => {}}
 				onClick={() => handleItemClick(() => onLaunchApp('minesweeper'))}
 			/>
 			<StartMenuItem
-				icon='?Y"?'
+				icon='📝'
 				text='Notepad.exe'
 				hasArrow={false}
 				onHover={() => {}}
@@ -55,7 +55,7 @@ export default function Submenu({
 				onClick={() => handleItemClick(() => onLaunchApp('terminal'))}
 			/>
 			<StartMenuItem
-				icon='?Y-????'
+				icon='🖥️'
 				text='My Computer'
 				hasArrow={false}
 				onHover={() => {}}
@@ -64,7 +64,7 @@ export default function Submenu({
 				}
 			/>
 			<StartMenuItem
-				icon='?Y-'???'
+				icon='📁'
 				text='File Explorer'
 				hasArrow={false}
 				onHover={() => {}}
