@@ -412,30 +412,55 @@ export default function MainPage() {
 			if (shouldLaunchStartupApps === 'true') {
 				localStorage.removeItem('launchStartupApps');
 
-				// Launch Portfolio
+				// Launch Notepad with Welcome message
 				setTimeout(() => {
 					openWindow({
-						title: 'Portfolio Media Center - Jean Francois',
-						appType: 'portfolio',
-						position: { x: 80, y: 60 },
-						size: { width: 900, height: 650 },
-						icon: '📂',
+						title: 'Welcome.txt - Notepad',
+						appType: 'notepad',
+						position: { x: 120, y: 100 },
+						size: { width: 440, height: 320 },
+						icon: 'NP',
+						content: {
+							fileName: 'Welcome.txt',
+							filePath: null,
+							body: 'Welcome to Jean Francois Portfolio!\n\nThis is a fully functional Windows 3.1 OS simulation.\n\nFeel free to explore:\n• MSN Messenger - Chat with the AI assistant\n• Portfolio.exe - View my projects\n• Paint.exe, Minesweeper.exe, Snake.exe - Games!\n• My Computer - Browse the file system\n\nEnjoy! 🎨',
+							readOnly: true,
+						} as NotepadWindowContent,
 					});
 				}, 300);
-
-				// Launch MSN Messenger
-				setTimeout(() => {
-					openWindow({
-						title: 'MSN Messenger - Jean Francois',
-						appType: 'chatbot',
-						position: { x: 150, y: 120 },
-						size: { width: 380, height: 520 },
-						icon: '💬',
-					});
-				}, 600);
 			}
 		}
 	}, [bootComplete, openWindow]);
+
+	// Auto-launch MSN Messenger after 5 seconds if user hasn't opened it
+	useEffect(() => {
+		if (!bootComplete) return;
+
+		const timer = setTimeout(() => {
+			// Check if MSN Messenger is already open
+			const msnAlreadyOpen = windows.some(
+				(w) => w.appType === 'chatbot' || w.title.includes('MSN')
+			);
+
+			if (!msnAlreadyOpen) {
+				// Center MSN window on screen
+				const msnWidth = 380;
+				const msnHeight = 520;
+				const centerX = (window.innerWidth - msnWidth) / 2;
+				const centerY = (window.innerHeight - msnHeight) / 2;
+
+				openWindow({
+					title: 'MSN Messenger - Jean Francois',
+					appType: 'chatbot',
+					position: { x: centerX, y: centerY },
+					size: { width: msnWidth, height: msnHeight },
+					icon: '💬',
+				});
+			}
+		}, 5000); // 5 seconds
+
+		return () => clearTimeout(timer);
+	}, [bootComplete, windows, openWindow]);
 
 	// Apply saved background color on load
 	useEffect(() => {

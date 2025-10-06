@@ -238,7 +238,7 @@ export default function Desktop({
 				width: '100vw',
 				height: '100vh',
 				backgroundColor: isDragOver ? '#e6f3ff' : COLORS.DESKTOP_TEAL,
-				backgroundImage: 'url(/background.png)',
+				backgroundImage: 'url(/fran_background.png)',
 				backgroundSize: 'cover',
 				backgroundPosition: 'center',
 				backgroundRepeat: 'no-repeat',

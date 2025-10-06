@@ -458,7 +458,7 @@ export default function DesktopIcon({
 				return { symbol: '🎨', color: '#C0C0C0', iconImage: '/icon/file_set-0.png' };
 			}
 			if (exeName.includes('minesweeper')) {
-				return { symbol: '💣', color: '#C0C0C0', iconImage: '/icon/executable_sound-0.png' };
+				return { symbol: '💣', color: '#C0C0C0', iconImage: '/icon/Microsoft_Minesweeper_(1990).svg' };
 			}
 			if (exeName.includes('notepad')) {
 				return { symbol: '📝', color: '#C0C0C0', iconImage: '/icon/notepad-2.png' };

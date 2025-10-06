@@ -34,7 +34,7 @@ export default function Submenu({
 				onClick={() => handleItemClick(() => onLaunchApp('paint'))}
 			/>
 			<StartMenuItem
-				icon='/icon/executable_sound-0.png'
+				icon='/icon/Microsoft_Minesweeper_(1990).svg'
 				text='Minesweeper.exe'
 				hasArrow={false}
 				onHover={() => {}}
