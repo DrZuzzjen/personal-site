@@ -125,8 +125,8 @@ export default function Desktop({
 					title: `${finalFileName} - Notepad`,
 					appType: 'notepad',
 					position: {
-						x: 120 + Math.random() * 100,
-						y: 100 + Math.random() * 100,
+						x: 320 + Math.random() * 80,
+						y: 140 + Math.random() * 80,
 					},
 					size: { width: 440, height: 320 },
 					icon: 'NP',

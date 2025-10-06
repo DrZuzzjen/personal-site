@@ -140,7 +140,7 @@ export default function FileExplorer({
 		openWindow({
 			title: `${item.name} - Notepad`,
 			appType: 'notepad',
-			position: { x: 180, y: 140 },
+			position: { x: 340, y: 160 },
 			size: { width: 460, height: 320 },
 			icon: 'NP',
 			content: {

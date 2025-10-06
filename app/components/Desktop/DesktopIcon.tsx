@@ -41,7 +41,7 @@ interface LaunchConfig {
 	content?: WindowContent;
 }
 
-const DEFAULT_LAUNCH_POSITION = { x: 140, y: 110 };
+const DEFAULT_LAUNCH_POSITION = { x: 320, y: 160 };
 const NOTEPAD_WINDOW_SIZE = { width: 520, height: 380 };
 const MINESWEEPER_WINDOW_SIZE = { width: 360, height: 440 };
 const PAINT_WINDOW_SIZE = { width: 800, height: 600 }; // Compact but roomy for new sidebar layout
@@ -106,7 +106,7 @@ function createPaintLaunch(): LaunchConfig {
 	return {
 		title: 'Paint',
 		appType: 'paint',
-		position: { x: 180, y: 120 },
+		position: { x: 340, y: 140 },
 		size: PAINT_WINDOW_SIZE,
 		icon: 'PT',
 		content,
@@ -125,7 +125,7 @@ function createMinesweeperLaunch(): LaunchConfig {
 	return {
 		title: 'Minesweeper',
 		appType: 'minesweeper',
-		position: { x: 220, y: 160 },
+		position: { x: 360, y: 180 },
 		size: MINESWEEPER_WINDOW_SIZE,
 		icon: 'MS',
 		content,
@@ -136,7 +136,7 @@ function createTerminalLaunch(): LaunchConfig {
 	return {
 		title: 'Terminal',
 		appType: 'terminal',
-		position: { x: 180, y: 120 },
+		position: { x: 340, y: 140 },
 		size: { width: 800, height: 600 },
 		icon: 'CMD',
 		content: {},
@@ -147,7 +147,7 @@ function createSnakeLaunch(): LaunchConfig {
 	return {
 		title: 'Snake.exe',
 		appType: 'snake',
-		position: { x: 200, y: 140 },
+		position: { x: 350, y: 160 },
 		size: { width: 850, height: 580 },
 		icon: 'SN',
 		content: {},
@@ -164,7 +164,7 @@ function createCameraLaunch(): LaunchConfig {
 	return {
 		title: 'Camera',
 		appType: 'camera',
-		position: { x: 160, y: 80 },
+		position: { x: 330, y: 120 },
 		size: CAMERA_WINDOW_SIZE,
 		icon: '📹',
 		content,
@@ -175,7 +175,7 @@ function createTVLaunch(): LaunchConfig {
 	return {
 		title: 'TV',
 		appType: 'tv',
-		position: { x: 120, y: 60 },
+		position: { x: 310, y: 100 },
 		size: TV_WINDOW_SIZE,
 		icon: '📺',
 	};
@@ -185,7 +185,7 @@ function createChatbotLaunch(): LaunchConfig {
 	return {
 		title: 'MSN Messenger - Jean Francois',
 		appType: 'chatbot',
-		position: { x: 100, y: 80 },
+		position: { x: 300, y: 120 },
 		size: { width: 480, height: 620 },
 		icon: '💬',
 		content: {},
@@ -196,7 +196,7 @@ function createPortfolioLaunch(): LaunchConfig {
 	return {
 		title: 'Portfolio Media Center - Jean Francois',
 		appType: 'portfolio',
-		position: { x: 120, y: 60 },
+		position: { x: 310, y: 100 },
 		size: { width: 750, height: 863 },
 		icon: '📂',
 		content: {},
@@ -211,7 +211,7 @@ function createBrowserLaunch(initialUrl?: string): LaunchConfig {
 	return {
 		title: 'Microsoft Explorer',
 		appType: 'browser',
-		position: { x: 160, y: 90 },
+		position: { x: 330, y: 130 },
 		size: BROWSER_WINDOW_SIZE,
 		icon: 'IE',
 		content,
@@ -292,7 +292,7 @@ function getLaunchConfigForFile(item: FileSystemItem): LaunchConfig | null {
 		return {
 			title: `${item.name} - Paint`,
 			appType: 'paint',
-			position: { x: 180, y: 120 },
+			position: { x: 340, y: 140 },
 			size: PAINT_WINDOW_SIZE,
 			icon: 'PT',
 			content,
@@ -449,7 +449,7 @@ export default function DesktopIcon({
 			openWindow({
 				title: fileSystemItem.name,
 				appType: 'explorer',
-				position: { x: 100, y: 100 },
+				position: { x: 300, y: 140 },
 				size: { width: 400, height: 300 },
 				content: { folderPath: fileSystemItem.path },
 			});
