@@ -67,6 +67,7 @@ export function useWindowManager() {
             ? {
               ...w,
               isMinimized: false,
+              isFlashing: false, // Stop flashing when window is focused
               zIndex: shouldRaise ? nextZIndex : w.zIndex,
             }
             : w,
@@ -105,6 +106,13 @@ export function useWindowManager() {
     );
   }, []);
 
+  // Set window flashing state (for taskbar notifications)
+  const setWindowFlashing = useCallback((id: string, isFlashing: boolean) => {
+    setWindows((prev) =>
+      prev.map((w) => (w.id === id ? { ...w, isFlashing } : w)),
+    );
+  }, []);
+
   return {
     windows,
     openWindow,
@@ -116,5 +124,6 @@ export function useWindowManager() {
     updateWindowSize,
     updateWindowContent,
     updateWindowTitle,
+    setWindowFlashing,
   };
 }

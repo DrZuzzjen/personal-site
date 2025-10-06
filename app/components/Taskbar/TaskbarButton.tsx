@@ -55,11 +55,20 @@ const iconStyle: CSSProperties = {
 };
 
 export function TaskbarButton({ window, isActive, onClick }: TaskbarButtonProps) {
-  const { title, icon } = window;
+  const { title, icon, isFlashing } = window;
+
+  // Debug logging
+  if (isFlashing) {
+    console.log('💡 TaskbarButton flashing:', { title, isFlashing, isActive });
+  }
 
   const buttonStyle: CSSProperties = {
     ...baseButtonStyle,
     ...(isActive ? sunkenBorderStyle : raisedBorderStyle),
+    ...(isFlashing && !isActive ? {
+      animation: 'taskbar-flash 0.8s ease-in-out infinite',
+      // Don't set backgroundColor here - let CSS animation handle it
+    } : {}),
   };
 
   return (

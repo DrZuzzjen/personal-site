@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
 import { useFileSystemContext } from '../../../lib/FileSystemContext';
+import { useWindowContext } from '../../../lib/WindowContext';
 import { getBrowserContext } from '../../../lib/personality';
 
 // MSN Messenger color scheme
@@ -41,7 +42,7 @@ interface Message {
 }
 
 interface ChatbotProps {
-	// No props needed for now
+	windowId?: string; // Window ID to check minimized state and trigger notifications
 }
 
 const parseEmoticons = (text: string): string => {
@@ -74,15 +75,17 @@ const playSound = (soundKey: keyof typeof MSN_SOUNDS) => {
 	}
 };
 
-export default function Chatbot({}: ChatbotProps) {
+export default function Chatbot({ windowId }: ChatbotProps) {
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [inputValue, setInputValue] = useState('');
 	const [isTyping, setIsTyping] = useState(false);
 	const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 	const messagesEndRef = useRef<HTMLDivElement>(null);
 	const chatContainerRef = useRef<HTMLDivElement>(null);
+	const flashingTimerRef = useRef<NodeJS.Timeout | null>(null);
 
 	const { rootItems } = useFileSystemContext();
+	const { windows, setWindowFlashing } = useWindowContext();
 
 	// Load chat history from localStorage OR generate personalized welcome
 	useEffect(() => {
@@ -158,6 +161,15 @@ export default function Chatbot({}: ChatbotProps) {
 		messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
 	}, [messages, isTyping]);
 
+	// Cleanup flashing timer on unmount
+	useEffect(() => {
+		return () => {
+			if (flashingTimerRef.current) {
+				clearTimeout(flashingTimerRef.current);
+			}
+		};
+	}, []);
+
 	// Build portfolio context for AI
 	const getPortfolioContext = () => {
 		const myComputerItem = rootItems.find(
@@ -190,10 +202,47 @@ export default function Chatbot({}: ChatbotProps) {
 		};
 		setMessages((prev) => [...prev, newMessage]);
 
+		// Check if window is minimized for notification
+		const currentWindow = windowId ? windows.find(w => w.id === windowId) : null;
+		const isMinimized = currentWindow?.isMinimized ?? false;
+
+		console.log('🔔 Chatbot addMessage:', {
+			role: message.role,
+			windowId,
+			currentWindow: currentWindow ? { id: currentWindow.id, title: currentWindow.title, isMinimized: currentWindow.isMinimized } : null,
+			isMinimized,
+		});
+
 		if (message.role === 'assistant') {
 			playSound('messageReceived');
+
+			// If window is minimized, start flashing taskbar
+			if (isMinimized && windowId) {
+				console.log('🚨 MSN NOTIFICATION: Starting taskbar flash');
+				setWindowFlashing(windowId, true);
+
+				// Stop flashing after 10 seconds
+				if (flashingTimerRef.current) {
+					clearTimeout(flashingTimerRef.current);
+				}
+				flashingTimerRef.current = setTimeout(() => {
+					console.log('⏰ Stopping taskbar flash after 10s');
+					setWindowFlashing(windowId, false);
+				}, 10000);
+			} else {
+				console.log('ℹ️ No notification: window is not minimized or no windowId');
+			}
 		} else if (message.role === 'user') {
 			playSound('messageSent');
+
+			// Stop flashing when user sends a message (window is active)
+			if (windowId) {
+				setWindowFlashing(windowId, false);
+				if (flashingTimerRef.current) {
+					clearTimeout(flashingTimerRef.current);
+					flashingTimerRef.current = null;
+				}
+			}
 		}
 	};
 

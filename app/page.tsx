@@ -341,7 +341,7 @@ function renderWindowContent(
 			return <TV />;
 		}
 		case 'chatbot': {
-			return <Chatbot />;
+			return <Chatbot windowId={windowData.id} />;
 		}
 		case 'terminal': {
 			return <Terminal />;
@@ -441,6 +441,7 @@ export default function MainPage() {
 							position: { x: centerX, y: centerY },
 							size: { width: msnWidth, height: msnHeight },
 							icon: '💬',
+							minimizeOnClose: true, // Don't close MSN, just minimize it
 						});
 					} else {
 						console.log('MSN Messenger not opened: API health check failed');
@@ -592,6 +593,7 @@ export default function MainPage() {
 					size: { width: 480, height: 620 },
 					icon: 'IM',
 					content: {},
+					minimizeOnClose: true, // Don't close MSN, just minimize it
 				});
 				break;
 			}
