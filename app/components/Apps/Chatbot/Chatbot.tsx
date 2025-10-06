@@ -83,6 +83,8 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 	const messagesEndRef = useRef<HTMLDivElement>(null);
 	const chatContainerRef = useRef<HTMLDivElement>(null);
 	const flashingTimerRef = useRef<NodeJS.Timeout | null>(null);
+	const proactiveMessageSentRef = useRef<boolean>(false); // Track if we already sent proactive message
+	const lastNotifiedMessageIdRef = useRef<string | null>(null); // Track last message we notified about
 
 	const { rootItems } = useFileSystemContext();
 	const { windows, setWindowFlashing } = useWindowContext();
@@ -176,22 +178,20 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 
 		const lastMessage = messages[messages.length - 1];
 
-		// Only check for assistant messages
-		if (lastMessage.role !== 'assistant') return;
+		// Only check for assistant messages (skip welcome message with id 'welcome')
+		if (lastMessage.role !== 'assistant' || lastMessage.id === 'welcome') return;
+
+		// Skip if we already notified about this message
+		if (lastNotifiedMessageIdRef.current === lastMessage.id) {
+			return;
+		}
 
 		// Check if window is minimized
 		const currentWindow = windows.find(w => w.id === windowId);
 		const isMinimized = currentWindow?.isMinimized ?? false;
 
-		console.log('🔔 Message watcher triggered:', {
-			messageId: lastMessage.id,
-			windowId,
-			isMinimized,
-			currentWindow: currentWindow ? { id: currentWindow.id, title: currentWindow.title, isMinimized: currentWindow.isMinimized } : null,
-		});
-
 		if (isMinimized) {
-			console.log('🚨 MSN NOTIFICATION: Starting taskbar flash');
+			lastNotifiedMessageIdRef.current = lastMessage.id; // Mark as notified
 			setWindowFlashing(windowId, true);
 
 			// Stop flashing after 10 seconds
@@ -199,11 +199,81 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 				clearTimeout(flashingTimerRef.current);
 			}
 			flashingTimerRef.current = setTimeout(() => {
-				console.log('⏰ Stopping taskbar flash after 10s');
 				setWindowFlashing(windowId, false);
 			}, 10000);
 		}
 	}, [messages, windows, windowId, setWindowFlashing]);
+
+	// Proactive message timer - sends message after random delay if minimized
+	useEffect(() => {
+		if (!windowId) return;
+
+		const currentWindow = windows.find(w => w.id === windowId);
+		const isMinimized = currentWindow?.isMinimized ?? false;
+
+		// Reset proactive flag when window is restored
+		if (!isMinimized && proactiveMessageSentRef.current) {
+			proactiveMessageSentRef.current = false;
+		}
+
+		// Only start timer if:
+		// 1. Window is minimized
+		// 2. We have at least welcome message
+		// 3. Haven't sent proactive message yet this session
+		if (!isMinimized || messages.length === 0 || proactiveMessageSentRef.current) return;
+
+		// Random delay between 25-60 seconds (testing: 10-15s)
+		const randomDelay = Math.floor(Math.random() * (15000 - 10000 + 1)) + 10000;
+
+		const timer = setTimeout(async () => {
+			// Double-check still minimized
+			const currentWindow = windows.find(w => w.id === windowId);
+			if (currentWindow?.isMinimized) {
+				proactiveMessageSentRef.current = true; // Mark as sent
+
+				// Find currently active (focused) window
+				const focusedWindow = windows
+					.filter(w => !w.isMinimized && w.id !== windowId)
+					.sort((a, b) => b.zIndex - a.zIndex)[0];
+
+				const currentApp = focusedWindow?.appType || null;
+
+				try {
+					// Call proactive message API
+					const browserContext = getBrowserContext();
+					const conversationHistory = messages.map(msg => ({
+						role: msg.role,
+						content: msg.content,
+					}));
+
+					const response = await fetch('/api/chat/proactive', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({
+							browserContext,
+							conversationHistory,
+							currentApp,
+						}),
+					});
+
+					const data = await response.json();
+					addMessage({
+						role: 'assistant',
+						content: data.message || 'hey! :)\nstill there?',
+					});
+				} catch (error) {
+					console.error('Proactive message error:', error);
+					// Fallback message
+					addMessage({
+						role: 'assistant',
+						content: 'hey! :)\nstill there?',
+					});
+				}
+			}
+		}, randomDelay);
+
+		return () => clearTimeout(timer);
+	}, [windows, windowId, messages.length]);
 
 	// Build portfolio context for AI
 	const getPortfolioContext = () => {
@@ -242,6 +312,9 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 			playSound('messageReceived');
 		} else if (message.role === 'user') {
 			playSound('messageSent');
+
+			// Reset proactive message flag when user responds (allows new proactive message later)
+			proactiveMessageSentRef.current = false;
 
 			// Stop flashing when user sends a message (window is active)
 			if (windowId) {

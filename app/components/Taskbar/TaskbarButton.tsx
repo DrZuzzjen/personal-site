@@ -57,15 +57,10 @@ const iconStyle: CSSProperties = {
 export function TaskbarButton({ window, isActive, onClick }: TaskbarButtonProps) {
   const { title, icon, isFlashing } = window;
 
-  // Debug logging
-  if (isFlashing) {
-    console.log('💡 TaskbarButton flashing:', { title, isFlashing, isActive });
-  }
-
   const buttonStyle: CSSProperties = {
     ...baseButtonStyle,
     ...(isActive ? sunkenBorderStyle : raisedBorderStyle),
-    // DEBUG: Force red background when flashing to test if state is working
+    // Keep red background for debugging
     ...(isFlashing && !isActive ? { backgroundColor: 'red' } : {}),
   };
 
