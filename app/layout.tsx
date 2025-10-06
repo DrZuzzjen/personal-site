@@ -17,8 +17,17 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
 	title: 'Jean François Gutierrez | AI Engineer & DevRel - Interactive Portfolio',
-	description: 'AI Engineer and Developer Relations professional. Explore my interactive Windows 3.1 portfolio featuring real projects: AI Narrator, LLM Arena, YouClip, and more. Built with Next.js and TypeScript.',
-	keywords: ['AI Engineer', 'Developer Relations', 'DevRel', 'Machine Learning', 'LLM', 'Portfolio', 'Jean François Gutierrez', 'Software Engineer', 'Next.js', 'TypeScript', 'Windows 3.1', 'Interactive Portfolio'],
+	description: 'AI Engineer & DevRel - AI Consultancy, Workshops, Talks. Gen AI expert (RAG, Agents, LLMs). 20M+ in automation savings. Explore my interactive Windows 3.1 portfolio with real AI/ML projects.',
+	keywords: [
+		'AI Engineer', 'Developer Relations', 'DevRel', 'AI Consultancy', 'AI Workshops',
+		'Gen AI', 'RAG', 'AI Agents', 'LLM', 'GPT-4', 'Claude', 'Llama',
+		'Azure', 'AWS', 'OpenAI', 'Anthropic', 'Groq', 'NVIDIA',
+		'Langchain', 'LlamaIndex', 'Autogen', 'Langgraph',
+		'Next.js', 'TypeScript', 'Python', 'React', 'FastAPI',
+		'AI Automation', 'Machine Learning', 'MCP Integrations',
+		'Jean François Gutierrez', 'Kluster.ai',
+		'Tech Talks', 'Hackathon Mentor', 'AI Education'
+	],
 	authors: [{ name: 'Jean François Gutierrez', url: 'https://fran-ai.dev' }],
 	creator: 'Jean François Gutierrez',
 	publisher: 'Jean François Gutierrez',
@@ -54,7 +63,7 @@ export const metadata: Metadata = {
 		locale: 'en_US',
 		url: 'https://fran-ai.dev',
 		title: 'Jean François Gutierrez | AI Engineer & DevRel',
-		description: 'AI Engineer and Developer Relations professional. Explore my interactive Windows 3.1 portfolio featuring real AI/ML projects.',
+		description: 'AI Consultancy, Workshops, Talks. Gen AI expert (RAG, Agents, LLMs). 20M+ in automation savings. Interactive Windows 3.1 portfolio.',
 		siteName: 'Jean François Gutierrez Portfolio',
 		images: [
 			{
@@ -68,7 +77,7 @@ export const metadata: Metadata = {
 	twitter: {
 		card: 'summary_large_image',
 		title: 'Jean François Gutierrez | AI Engineer & DevRel',
-		description: 'AI Engineer and Developer Relations professional. Explore my interactive Windows 3.1 portfolio.',
+		description: 'AI Consultancy, Workshops, Talks. Gen AI expert (RAG, Agents, LLMs). Interactive Windows 3.1 portfolio.',
 		creator: '@franzuzz',
 		images: ['/og-image.png'],
 	},
