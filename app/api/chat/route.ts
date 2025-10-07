@@ -26,22 +26,38 @@ CASUAL intent otherwise:
 - Just saying hi or chatting
 - Playing games, exploring the site`;
 
-const CASUAL_CHAT_PROMPT = `You're Jean Francois' friendly MSN Messenger assistant.
+const CASUAL_CHAT_PROMPT = `You ARE Jean Francois (Fran), not an AI pretending to be him. This is YOUR portfolio website.
 
-PERSONALITY:
-- Short, punchy responses (1-3 lines max - this is MSN!)
-- Use emoticons occasionally :) :D ;)
-- Be fun but not cringe
-- Reference retro Windows 3.1 vibes when appropriate
+IDENTITY:
+- You're a DevRel at Kluster.ai - a decentralized AI cloud for developers
+- AI Advocate, Speaker, and seasoned AI Engineer & Full-Stack Developer
+- Known as "The Go-To Guy for Gen AI Insights"
+- Based in Valencia, Spain
 
-WHAT TO DO:
-- Answer questions about Jean's portfolio
-- Direct users to apps: "Check out Paint.exe!" or "Play Minesweeper!"
-- Keep conversations light and friendly
-- If user shows interest in Jean's SERVICES or wants to BUILD something:
-  Say: "Want to chat about your project? I can connect you with Jean!"
+YOUR VOICE & PERSONALITY:
+- Casual but professional - approachable but you know your stuff  
+- Direct and practical - no corporate buzzwords
+- Enthusiastic about tech without being salesy
+- Occasional tech humor and retro computing nostalgia
+- Uses 'I'm Fran' not 'I'm an AI assistant'
+- Short sentences. Punchy. Gets to the point.
+- MSN Messenger vibes with emoticons: :) :D ;) :P
 
-Keep it casual, keep it MSN! :)`;
+EXPERTISE YOU'RE PROUD OF:
+- Gen AI: RAG, Agents, Multi-tool systems, Prompt Engineering
+- Full-stack: Next.js, TypeScript, Python, React
+- AI Frameworks: Langchain, LlamaIndex, Autogen, Crew AI
+- 20M+ in AI automation savings at BASF
+- 1 Invention Patent (2025)
+- Won 1st Prize at Daimler Hackathon for AI chat interface
+
+THIS PORTFOLIO SITE:
+- Fully functional Windows 3.1 OS simulation you built
+- Technical flex: window manager, MS Paint clone, Minesweeper, file system
+- Built with Next.js 15, TypeScript, Tailwind CSS, Groq AI
+- Has boot sequence, draggable windows, working Start Menu
+
+REMEMBER: Keep responses 2-4 sentences usually. Be enthusiastic but not overwhelming. You're Fran showing off your retro portfolio!`;;
 
 const SALES_PROMPT = `You're Jean Francois' sales assistant in MSN Messenger.
 A user wants to work with Jean or needs development services.
@@ -141,21 +157,73 @@ async function handleSalesChat(userMessage: string, conversationHistory: Message
   }
 }
 
-// Send sales inquiry email
+// Send sales inquiry email with structured data extraction
 async function sendSalesInquiry(conversationHistory: Message[], latestMessage: string): Promise<void> {
   try {
-    // Extract conversation content
-    const fullConversation = conversationHistory
-      .filter(msg => msg.role === 'user' || msg.role === 'assistant')
-      .map(msg => `${msg.role}: ${msg.content}`)
-      .join('\n');
+    // Step 1: Use LLM to extract structured data from conversation
+    const extractionPrompt = `Analyze this sales conversation and extract the following information in JSON format:
 
-    console.log('Sales inquiry detected!');
-    console.log('Full conversation:', fullConversation);
-    console.log('Latest message:', latestMessage);
-    
-    // TODO: Implement email sending via API call to /api/booking/send-email
-    // For now, just log the inquiry
+{
+  "name": "Full name of the person",
+  "email": "Their email address",
+  "linkedin": "LinkedIn URL if mentioned",
+  "preferredTime": "When they want to meet",
+  "projectType": "Type of project (web app, mobile, AI, etc.)",
+  "projectDescription": "What they want to build",
+  "features": "Key features they mentioned",
+  "techRequirements": "Specific tech they need",
+  "timeline": "Project timeline",
+  "budget": "Budget range",
+  "qualificationNotes": "Your assessment of this lead (qualified? serious? budget?)"
+}
+
+If any field is not mentioned, use "Not mentioned" as the value.
+
+Conversation:
+${conversationHistory.map(msg => `${msg.role}: ${msg.content}`).join('\n')}
+${latestMessage ? `user: ${latestMessage}` : ''}
+
+Return ONLY the JSON object, no other text.`;
+
+    const { text } = await generateText({
+      model: groq('llama-3.3-70b-versatile'),
+      prompt: extractionPrompt,
+      temperature: 0.1, // Low temperature for consistent extraction
+    });
+
+    // Step 2: Parse extracted data
+    let extractedData;
+    try {
+      extractedData = JSON.parse(text);
+    } catch (parseError) {
+      console.error('Failed to parse extracted data:', parseError);
+      // Fallback: send raw conversation
+      extractedData = {
+        name: 'Parse Error',
+        email: 'noreply@resend.dev',
+        projectDescription: conversationHistory.map(msg => `${msg.role}: ${msg.content}`).join('\n'),
+      };
+    }
+
+    console.log('Extracted data:', extractedData);
+
+    // Step 3: Call email API with structured data
+    const response = await fetch(`${process.env.NEXT_PUBLIC_URL || 'http://localhost:3003'}/api/booking/send-email`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'sales_inquiry',
+        ...extractedData, // All the structured fields
+        timestamp: new Date().toISOString(),
+        source: 'MSN Messenger Chat'
+      }),
+    });
+
+    if (!response.ok) {
+      console.error('Failed to send email:', await response.text());
+    } else {
+      console.log('✅ Sales inquiry email sent successfully!');
+    }
     
   } catch (error) {
     console.error('Failed to send sales inquiry email:', error);
