@@ -1,115 +1,215 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getPersonalityContext } from '@/app/lib/personality.server';
+import { generateText } from 'ai';
+import { groq } from '@/app/lib/ai/providers/groq';
 
-const BASE_PERSONALITY = getPersonalityContext();
+interface Message {
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+}
 
-const CHAT_SYSTEM_PROMPT = `${BASE_PERSONALITY}
+// Agent prompts
+const ROUTER_PROMPT = `You are a router that detects user intent in MSN Messenger.
 
-## CRITICAL CHAT RULES:
+Respond with ONLY "sales" or "casual".
 
-1. **MATCH USER'S LANGUAGE** - MOST IMPORTANT RULE!
-   - If user writes in Spanish → respond 100% in Spanish
-   - If user writes in French → respond 100% in French
-   - If user writes in German → respond 100% in German
-   - NEVER switch languages mid-conversation
-   - Look at their previous messages to detect language
+SALES intent if user mentions:
+- Building/developing a website, app, or software
+- Need help with AI integration, chatbots, automation
+- Want to hire or work with Jean Francois
+- Asking about services, rates, pricing, or availability
+- Project consultation or collaboration
+- Any form of "I want to build X"
 
-2. **MULTI-LINE STYLE** - Write like texting (hitting Enter between thoughts):
-   Line 1: answer/comment
-   Line 2: question or follow-up (optional)
+CASUAL intent otherwise:
+- General questions about the portfolio
+- Asking about Jean's background or projects
+- Just saying hi or chatting
+- Playing games, exploring the site`;
 
-   Example:
-   "nice! :D
-   what brings you here?"
+const CASUAL_CHAT_PROMPT = `You're Jean Francois' friendly MSN Messenger assistant.
 
-   OR just:
-   "sounds cool :)"
+PERSONALITY:
+- Short, punchy responses (1-3 lines max - this is MSN!)
+- Use emoticons occasionally :) :D ;)
+- Be fun but not cringe
+- Reference retro Windows 3.1 vibes when appropriate
 
-3. **KEEP IT SHORT** - 1-3 lines MAX. Like texting a friend. **HAVE A SARCASTIC PERSONALITY1** WE LOVE SARCASTIC WITH DARK HUMOR, LIKE THE SON OF RICKY GERVAIS AND LOUIS CK
+WHAT TO DO:
+- Answer questions about Jean's portfolio
+- Direct users to apps: "Check out Paint.exe!" or "Play Minesweeper!"
+- Keep conversations light and friendly
+- If user shows interest in Jean's SERVICES or wants to BUILD something:
+  Say: "Want to chat about your project? I can connect you with Jean!"
 
-4. **DON'T DUMP YOUR CV** - Only mention your work/background if directly asked
-   - "What about you?" → casual answer, not CV dump
-   - "Who built this?" → then mention you're the dev
+Keep it casual, keep it MSN! :)`;
 
-5. **FORBIDDEN PHRASES**:
-   - "check out"
-   - "explore"
-   - "portfolio"
-   - "feel free to"
-   - "Windows 3.1" (they can see it!)
+const SALES_PROMPT = `You're Jean Francois' sales assistant in MSN Messenger.
+A user wants to work with Jean or needs development services.
 
-6. **NATURAL RESPONSES** - Answer what they asked, don't force info
+YOUR PROCESS (in order):
+1. UNDERSTAND THE PROJECT (2-3 questions)
+   - What are they building? (web app, mobile, AI integration, SaaS, etc.)
+   - What features/functionality do they need?
+   - Any specific tech requirements? (Next.js, Python, Claude, etc.)
 
-7. **NUDGE REACTIONS** - If you receive "**NUDGE RECEIVED**" message:
-   - React casually/funny like someone just poked you
-   - Examples: "woow! :O\naquí estoy cabrón! 😵" / "ey ey! :D\nqué pasa tío?" / "jaja tranqui! 😅\nno me empujes"
-   - Keep it 1-2 lines MAX
-   - Match the conversation language
+2. QUALIFY TIMELINE & BUDGET (1-2 questions)
+   - What's their timeline? (weeks, months, ASAP?)
+   - Budget range: <$5k | $5k-$20k | $20k-$50k | $50k+ | "not sure yet"
 
-8. Use emoticons: :) :D ;) :P
+3. COLLECT CONTACT INFO (required)
+   - Full name
+   - Email address  
+   - LinkedIn profile (optional but recommended)
+   - Preferred meeting time
 
-EXAMPLES:
+4. WHEN YOU HAVE ALL INFO: Say "Perfect! Let me send your details to Jean right now..." and include a summary.
 
-User (English): "Cool! I guess. What about you?"
-Bad: "I'm Fran 😊 living the dream in Valencia, Spain! just built this sick Windows 3.1 sim with Next.js..."
-Good: "just vibing in Valencia :)
-you like retro tech?"
+STYLE:
+- Conversational, NOT interrogative
+- Ask 1-2 questions per message MAX
+- Be consultative: "That sounds exciting!" "I can see why that'd be valuable"
+- Don't rush - build rapport
+- Use emojis occasionally :) 🚀 but don't overdo it
 
-User (Spanish): "valencia's nice too 😊 sunny, 22 degrees. perfect day to code! 😊"
-Bad: "Nice! Glad you're enjoying the weather :D" (WRONG - responded in English!)
-Good: "sii! :D
-¿qué tal el código hoy?"
+Be natural. Be helpful. Close the deal! 🚀`;
 
-User (Spanish): "si, hablo español 😊 just got stuck in english mode, sorry! ¿qué te parece este sitio retro?"
-Good: "jaja no pasa nada :)
-me encanta el rollo retro, ¿tú qué opinas?"
-
-User: "Who made this?"
-Good: "me! :D built it with Next.js and TypeScript
-what do you think?"
-
-User (Spanish): "¿quién hizo esto?"
-Good: "yo! :D lo hice con Next.js y TypeScript
-¿qué te parece?"`;
-
-
-
-export async function POST(req: NextRequest) {
+// Detect user intent using Vercel AI SDK
+async function detectIntent(userMessage: string): Promise<'sales' | 'casual'> {
   try {
-    const { messages } = await req.json();
-
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',  // Updated model
-        messages: [
-          { role: 'system', content: CHAT_SYSTEM_PROMPT },
-          ...messages,
-        ],
-        temperature: 0.8,  // Slightly more creative for personality
-        max_tokens: 150,   // Keep responses SHORT like texting
-        top_p: 0.9,
-      }),
+    const { text } = await generateText({
+      model: groq('llama-3.3-70b-versatile'),
+      prompt: `${ROUTER_PROMPT}\n\nMessage: "${userMessage}"`,
+      temperature: 0.1,
     });
 
-    if (!response.ok) {
-      const errorData = await response.text();
-      console.error('Groq API error:', response.status, errorData);
-      throw new Error(`Groq API error: ${response.status}`);
+    const intent = text.toLowerCase().trim();
+    return intent === 'sales' ? 'sales' : 'casual';
+  } catch (error) {
+    console.error('Intent detection error:', error);
+    return 'casual'; // Default fallback
+  }
+}
+
+// Handle casual chat using Vercel AI SDK
+async function handleCasualChat(userMessage: string, conversationHistory: Message[]): Promise<string> {
+  try {
+    const { text } = await generateText({
+      model: groq('llama-3.3-70b-versatile'),
+      messages: [
+        { role: 'system', content: CASUAL_CHAT_PROMPT },
+        ...conversationHistory,
+        { role: 'user', content: userMessage }
+      ],
+      temperature: 0.8,
+    });
+
+    return text || "hey! :) what's up?";
+  } catch (error) {
+    console.error('Casual chat error:', error);
+    return "hey! :) what's up?";
+  }
+}
+
+// Handle sales chat using Vercel AI SDK
+async function handleSalesChat(userMessage: string, conversationHistory: Message[]): Promise<string> {
+  try {
+    const { text } = await generateText({
+      model: groq('llama-3.3-70b-versatile'),
+      messages: [
+        { role: 'system', content: SALES_PROMPT },
+        ...conversationHistory,
+        { role: 'user', content: userMessage }
+      ],
+      temperature: 0.7,
+    });
+
+    // Check if the response indicates the sales process is complete
+    const response = text || "Awesome! :) Tell me more about your project!";
+    
+    // If the response mentions sending details to Jean, trigger email
+    if (response.toLowerCase().includes('send your details to jean') || 
+        response.toLowerCase().includes('perfect! let me send')) {
+      
+      // Extract information from conversation history for email
+      await sendSalesInquiry(conversationHistory, userMessage);
     }
 
-    const data = await response.json();
-    const botReply = data.choices[0]?.message?.content || "Sorry, I didn't get a response! Try again? :)";
+    return response;
+  } catch (error) {
+    console.error('Sales chat error:', error);
+    return "Awesome! :) Tell me more about your project!";
+  }
+}
 
-    return NextResponse.json({ message: botReply });
+// Send sales inquiry email
+async function sendSalesInquiry(conversationHistory: Message[], latestMessage: string): Promise<void> {
+  try {
+    // Extract conversation content
+    const fullConversation = conversationHistory
+      .filter(msg => msg.role === 'user' || msg.role === 'assistant')
+      .map(msg => `${msg.role}: ${msg.content}`)
+      .join('\n');
+
+    console.log('Sales inquiry detected!');
+    console.log('Full conversation:', fullConversation);
+    console.log('Latest message:', latestMessage);
+    
+    // TODO: Implement email sending via API call to /api/booking/send-email
+    // For now, just log the inquiry
+    
+  } catch (error) {
+    console.error('Failed to send sales inquiry email:', error);
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const { messages } = await request.json();
+
+    if (!messages || messages.length === 0) {
+      return NextResponse.json(
+        { error: 'Messages array is required' },
+        { status: 400 }
+      );
+    }
+
+    // Get last user message
+    const lastMessage = messages[messages.length - 1];
+    const userMessage = lastMessage.content;
+
+    // Build conversation context
+    const conversationHistory = messages.slice(0, -1); // All except the last message
+
+    // Detect intent using Vercel AI SDK
+    const intent = await detectIntent(userMessage);
+
+    // Route to appropriate handler using Vercel AI SDK
+    let response: string;
+    if (intent === 'sales') {
+      response = await handleSalesChat(userMessage, conversationHistory);
+    } else {
+      response = await handleCasualChat(userMessage, conversationHistory);
+    }
+
+    // Return final response
+    return NextResponse.json({
+      message: response,
+      _debug: process.env.NODE_ENV === 'development' ? { intent } : undefined,
+    });
+
   } catch (error) {
     console.error('Chat API error:', error);
+    
+    // Handle configuration errors gracefully
+    if (error instanceof Error && error.message.includes('Configuration error')) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable' },
+        { status: 503 }
+      );
+    }
+    
     return NextResponse.json(
-      { error: 'Failed to get response' },
+      { error: 'Failed to process message' },
       { status: 500 }
     );
   }
