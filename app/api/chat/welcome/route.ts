@@ -12,9 +12,9 @@ export async function POST(req: NextRequest) {
 
     const { browserContext } = body;
 
-    // Log browser context for debugging
-    console.log('=== WELCOME API ===');
-    console.log('Browser context:', browserContext);
+    // Remove sensitive logging for production security
+    // console.log('=== WELCOME API ===');
+    // console.log('Browser context:', browserContext);
 
     // Infer language from timezone (more reliable than browser language)
     const timezone = browserContext.timezone || '';
@@ -44,9 +44,10 @@ export async function POST(req: NextRequest) {
       detectedLang = browserLang.split('-')[0]; // es-ES -> es
     }
 
-    console.log('Timezone:', timezone);
-    console.log('City:', city);
-    console.log('Detected language:', detectedLang);
+    // Remove sensitive logging for production security
+    // console.log('Timezone:', timezone);
+    // console.log('City:', city);
+    // console.log('Detected language:', detectedLang);
 
     const isSpanish = detectedLang === 'es';
     const isFrench = detectedLang === 'fr';
@@ -107,8 +108,9 @@ what brings you here?"
 
 Now write your greeting:`;
 
-    console.log('=== PROMPT BEING SENT ===');
-    console.log(welcomePrompt);
+    // Remove sensitive logging for production security
+    // console.log('=== PROMPT BEING SENT ===');
+    // console.log(welcomePrompt);
 
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
@@ -138,8 +140,9 @@ Now write your greeting:`;
     // Remove quotes that LLM sometimes adds
     welcomeMessage = welcomeMessage.replace(/^["']|["']$/g, '').trim();
 
-    console.log('=== LLM RESPONSE ===');
-    console.log('Welcome message:', welcomeMessage);
+    // Remove sensitive logging for production security
+    // console.log('=== LLM RESPONSE ===');
+    // console.log('Welcome message:', welcomeMessage);
 
     return NextResponse.json({ message: welcomeMessage });
   } catch (error) {
