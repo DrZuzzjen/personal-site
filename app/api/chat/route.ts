@@ -271,8 +271,6 @@ Return ONLY the JSON object, no other text.`;
       };
     }
 
-    console.log('Extracted data for email processing');
-
     // Step 3: Call email API with structured data
     const response = await fetch(`${process.env.NEXT_PUBLIC_URL || 'http://localhost:3003'}/api/booking/send-email`, {
       method: 'POST',
@@ -287,8 +285,6 @@ Return ONLY the JSON object, no other text.`;
 
     if (!response.ok) {
       console.error('Failed to send email:', await response.text());
-    } else {
-      console.log('Sales inquiry email sent successfully');
     }
     
   } catch (error) {
