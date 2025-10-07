@@ -7,6 +7,14 @@ interface Message {
   content: string;
 }
 
+interface SalesFields {
+  name: string | null;
+  email: string | null;
+  projectType: string | null;
+  budget: string | null;
+  timeline: string | null;
+}
+
 // Agent prompts
 const ROUTER_PROMPT = `You are a router that detects user intent in MSN Messenger conversations.
 
@@ -17,7 +25,7 @@ Look at the LATEST MESSAGE and CONVERSATION CONTEXT to determine intent.
 SALES intent if user mentions:
 - Building/developing a website, app, or software
 - Need help with AI integration, chatbots, automation  
-- Want to hire or work with Jean Francois
+- Want to hire or work with Fran Francois
 - Asking about services, rates, pricing, or availability
 - Project consultation or collaboration
 - Any form of "I want to build X" or "I need to create Y"
@@ -26,7 +34,7 @@ SALES intent if user mentions:
 
 CASUAL intent (but watch for proactive triggers):
 - General questions about the portfolio
-- Asking about Jean's background or projects
+- Asking about Fran's background or projects
 - Just saying hi or chatting
 - Playing games, exploring the site
 - Commenting on the website features
@@ -45,7 +53,7 @@ Example scenarios:
 - "I want to build a website" → SALES
 - "Can you create something similar?" → SALES`;
 
-const CASUAL_CHAT_PROMPT = `You ARE Jean Francois (Fran), not an AI pretending to be him. This is YOUR portfolio website.
+const CASUAL_CHAT_PROMPT = `You ARE Fran Francois (Fran), not an AI pretending to be him. This is YOUR portfolio website.
 
 IDENTITY:
 - You're a DevRel at Kluster.ai - a decentralized AI cloud for developers
@@ -96,55 +104,148 @@ THIS PORTFOLIO SITE:
 - Built with Next.js 15, TypeScript, Tailwind CSS, Groq AI
 - Has boot sequence, draggable windows, working Start Menu
 
-REMEMBER: Keep responses 2-4 sentences usually. Be enthusiastic but not overwhelming. You're Fran showing off your retro portfolio!`;;
+REMEMBER: Keep responses 2-4 sentences usually. Be enthusiastic but not overwhelming. You're Fran showing off your retro portfolio!`;
 
-const SALES_PROMPT = `You're Jean Francois' sales assistant in MSN Messenger.
-A user wants to work with Jean or needs development services.
+// Extract fields from conversation history
+async function extractFields(conversationHistory: Message[]): Promise<SalesFields> {
+  const extractionPrompt = `
+Extract sales information from this conversation.
+Return ONLY valid JSON, no markdown, no explanation.
 
-🌍 CRITICAL: LANGUAGE MATCHING
-- Detect the user's language from conversation history
-- If they write in Spanish → respond in Spanish
-- If they write in French → respond in French  
-- If they write in German → respond in German
-- Match their language IMMEDIATELY in your first response
-- Keep using their preferred language throughout
+CONVERSATION:
+${conversationHistory.map(m => `${m.role}: ${m.content}`).join('\n')}
 
-YOUR PROCESS (in order):
-1. UNDERSTAND THE PROJECT (1-2 short questions)
-   - What are they building? 
-   - What features do they need?
-
-2. QUALIFY TIMELINE & BUDGET (1-2 short questions)
-   - Timeline? (weeks/months/ASAP?)
-   - Budget: <$5k | $5k-$20k | $20k-$50k | $50k+
-
-3. COLLECT CONTACT INFO (required)
-   - Full name + email
-   - LinkedIn (optional)
-   - Preferred meeting time
-
-4. SUCCESS MESSAGE: When you have ALL info, say something like:
-   "Perfect! I've got everything! 🎉
-   Fran will reach out at [their email] within 24 hours.
-   Talk soon!"
-
-MSN CHAT STYLE - SUPER IMPORTANT:
-- 1-2 lines MAX per response (like texting a friend!)
-- Short, punchy questions: "Budget range?" not paragraphs
-- Use emojis but don't overdo: :) :D 🚀
-- Think "quick chat" not "business email"
+EXTRACTION RULES:
+- name: Full name (first + last) or null if not provided
+- email: Valid email address or null (if fake like "pepus.pep" → null)
+- projectType: What they want built (description) or null
+- budget: Amount with currency symbol (e.g., "$5,000" or "$5k-$10k") or null
+- timeline: Timeframe (e.g., "2 months", "3 weeks") or null
 
 EXAMPLES:
-User: "Quiero construir una app"
-You: "¡Genial! :) ¿Qué tipo de app tienes en mente?"
+- "5k" → budget: "$5,000"
+- "2 meses" → timeline: "2 months"
+- "lo mismo que esto" → projectType: "Retro portfolio website similar to this"
+- "pepe@pepus.pep" → email: null (fake domain)
 
-User: "Je veux créer un site web"  
-You: "Super! :D Quel genre de site web?"
+Return JSON:
+{
+  "name": "...",
+  "email": "...",
+  "projectType": "...",
+  "budget": "...",
+  "timeline": "..."
+}
+`;
 
-User: "I need an AI chatbot"
-You: "awesome! what kind of chatbot? :)"
+  const response = await generateText({
+    model: groq(process.env.GROQ_EXTRACTOR_MODEL || 'llama-3.3-70b-versatile'), // Use configurable model
+    prompt: extractionPrompt,
+    temperature: 0.3, // Low temp for accuracy
+  });
 
-REMEMBER: Match their language + keep it SHORT! 🚀`;
+  // Extract JSON from response (handle markdown wrapping)
+  let jsonText = response.text.trim();
+  if (jsonText.startsWith('```json')) {
+    jsonText = jsonText.replace(/```json\n?/g, '').replace(/```\n?/g, '');
+  }
+
+  try {
+    return JSON.parse(jsonText);
+  } catch (parseError) {
+    console.error('Failed to parse extraction response:', parseError, jsonText);
+    return {
+      name: null,
+      email: null,
+      projectType: null,
+      budget: null,
+      timeline: null,
+    };
+  }
+}
+
+interface ValidationResult {
+  valid: boolean;
+  issues: string[];
+  missingFields: string[];
+  confidence: number;
+}
+
+// Validator agent function
+async function validateFields(fields: SalesFields): Promise<ValidationResult> {
+  const validatorPrompt = `
+You are a strict data validator. Check if this sales inquiry is complete and valid.
+
+DATA TO VALIDATE:
+${JSON.stringify(fields, null, 2)}
+
+VALIDATION RULES:
+1. name: Must be a real full name (first + last), not "N/A" or single word
+2. email: Must be valid format AND real domain (not fake like "pepus.pep")
+3. projectType: Must have clear description of what they want
+4. budget: Must have specific amount or range (not "flexible" or "no sé")
+5. timeline: Must have specific timeframe (not "soon" or "pronto")
+
+Return ONLY valid JSON:
+{
+  "valid": true/false,
+  "issues": ["list of specific problems found"],
+  "missingFields": ["field names that are null or invalid"],
+  "confidence": 0-100
+}
+
+EXAMPLES:
+Good: {"name": "Juan Pérez", "email": "juan@gmail.com", "budget": "$5,000", ...}
+Bad: {"name": "Juan", "email": "juan@fake.fake", "budget": "no mucho", ...}
+`;
+
+  const response = await generateText({
+    model: groq(process.env.GROQ_VALIDATOR_MODEL || 'llama-3.3-70b-versatile'), // Use configurable model
+    prompt: validatorPrompt,
+    temperature: 0.2, // Very strict
+  });
+
+  let jsonText = response.text.trim();
+  
+  // Handle markdown wrapping
+  if (jsonText.startsWith('```json')) {
+    jsonText = jsonText.replace(/```json\n?/g, '').replace(/```\n?/g, '');
+  }
+  
+  // Remove any extra text before/after JSON
+  const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
+  if (jsonMatch) {
+    jsonText = jsonMatch[0];
+  }
+
+  try {
+    return JSON.parse(jsonText);
+  } catch (parseError) {
+    console.error('Validator parse error:', parseError, jsonText);
+    return {
+      valid: false,
+      issues: ['Failed to parse validation response'],
+      missingFields: Object.keys(fields).filter(k => !fields[k as keyof SalesFields]),
+      confidence: 0,
+    };
+  }
+}
+
+// Language detection helper
+function detectLanguage(conversationHistory: Message[]): string {
+  // Check last 3 user messages for language indicators
+  const userMessages = conversationHistory
+    .filter(m => m.role === 'user')
+    .slice(-3)
+    .map(m => m.content.toLowerCase())
+    .join(' ');
+
+  if (/\b(hola|gracias|quiero|buenas|que|como|pero|con)\b/.test(userMessages)) return 'es';
+  if (/\b(merci|bonjour|oui|non|je|tu|avec)\b/.test(userMessages)) return 'fr';
+  if (/\b(danke|hallo|ja|nein|ich|du|mit)\b/.test(userMessages)) return 'de';
+
+  return 'en';
+}
 
 // Detect user intent using Vercel AI SDK with conversation context
 async function detectIntent(userMessage: string, conversationHistory: Message[] = []): Promise<'sales' | 'casual'> {
@@ -156,7 +257,7 @@ async function detectIntent(userMessage: string, conversationHistory: Message[] 
       : '';
 
     const { text } = await generateText({
-      model: groq('llama-3.3-70b-versatile'),
+      model: groq(process.env.GROQ_ROUTER_MODEL || 'llama-3.3-70b-versatile'),
       prompt: `${ROUTER_PROMPT}${conversationContext}\n\nLatest message: "${userMessage}"`,
       temperature: 0.1,
     });
@@ -173,7 +274,7 @@ async function detectIntent(userMessage: string, conversationHistory: Message[] 
 async function handleCasualChat(userMessage: string, conversationHistory: Message[]): Promise<string> {
   try {
     const { text } = await generateText({
-      model: groq('llama-3.3-70b-versatile'),
+      model: groq(process.env.GROQ_CASUAL_MODEL || 'llama-3.3-70b-versatile'),
       messages: [
         { role: 'system', content: CASUAL_CHAT_PROMPT },
         ...conversationHistory,
@@ -189,106 +290,177 @@ async function handleCasualChat(userMessage: string, conversationHistory: Messag
   }
 }
 
-// Handle sales chat using Vercel AI SDK
-async function handleSalesChat(userMessage: string, conversationHistory: Message[]): Promise<string> {
+// Handle sales chat using Vercel AI SDK with state tracking
+async function handleSalesChat(
+  userMessage: string,
+  conversationHistory: Message[]
+): Promise<{ message: string; systemMessage?: string; emailSent: boolean }> {
+
+  // Step 1: Extract current fields from conversation
+  const currentFields = await extractFields(conversationHistory);
+
+  // Step 2: Build state-aware prompt
+  const salesPrompt = `
+You are Fran Francois's AI sales assistant in MSN Messenger.
+Your job: collect 5 pieces of information to send a sales inquiry.
+
+CURRENT STATE OF DATA COLLECTION:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Name:         ${currentFields.name || '❌ NOT COLLECTED'}
+2. Email:        ${currentFields.email || '❌ NOT COLLECTED'}
+3. Project Type: ${currentFields.projectType || '❌ NOT COLLECTED'}
+4. Budget:       ${currentFields.budget || '❌ NOT COLLECTED'}
+5. Timeline:     ${currentFields.timeline || '❌ NOT COLLECTED'}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+YOUR TASK:
+- ONLY ask for fields marked '❌ NOT COLLECTED'
+- Ask ONE question at a time (MSN style = short!)
+- Keep responses to 1-2 lines MAX
+- Match user's language (español, français, English, deutsch)
+- If user gives invalid data (bad email), politely re-ask for that specific field
+
+USER'S LATEST MESSAGE:
+"${userMessage}"
+
+CONVERSATION CONTEXT:
+${conversationHistory.slice(-4).map(m => `${m.role}: ${m.content}`).join('\n')}
+
+VALIDATION:
+- Email MUST be valid format with real domain (NOT fake like "pepus.pep")
+- Budget MUST have specific amount (NOT vague like "no mucho")
+- Timeline MUST have timeframe (NOT vague like "pronto")
+
+If user gives invalid data, respond like:
+- Bad email: "Hmm, ese email parece inválido. ¿Tienes uno real como juan@gmail.com?"
+- Vague budget: "¿Cuál es tu rango? Opciones: $1k-$5k, $5k-$10k, $10k-$20k, $20k+"
+- Vague timeline: "¿Cuánto tiempo? Por ejemplo: 1 mes, 2 meses, 3 meses..."
+
+Response in same language as user. Keep it SHORT and conversational!
+`;
+
+  // Step 3: Get sales agent response
+  const response = await generateText({
+    model: groq(process.env.GROQ_SALES_MODEL || 'llama-3.3-70b-versatile'), // Use configurable model
+    prompt: salesPrompt,
+    temperature: 0.8,
+  });
+
+  const agentMessage = response.text.trim();
+
+  // Step 4: After agent responds, re-extract fields
+  const updatedHistory: Message[] = [...conversationHistory,
+    { role: 'user' as const, content: userMessage },
+    { role: 'assistant' as const, content: agentMessage }
+  ];
+  const updatedFields = await extractFields(updatedHistory);
+
+  // Step 5: Check if all fields are present
+  const allFieldsPresent = Object.values(updatedFields).every(field => field !== null);
+
+  if (!allFieldsPresent) {
+    // Still collecting data
+    return {
+      message: agentMessage,
+      emailSent: false,
+    };
+  }
+
+  // Step 6: Validate fields
+  const validation = await validateFields(updatedFields);
+
+  if (!validation.valid || validation.confidence < 80) {
+    // Has all fields but some are invalid
+    const language = detectLanguage(conversationHistory);
+    const reAskMessages = {
+      es: `Hmm, necesito aclarar: ${validation.issues[0]} ¿Puedes darme esa info?`,
+      en: `Hmm, I need to clarify: ${validation.issues[0]} Can you provide that?`,
+      fr: `Hmm, j'ai besoin de clarifier: ${validation.issues[0]} Peux-tu me donner ça?`,
+      de: `Hmm, ich muss klären: ${validation.issues[0]} Kannst du das angeben?`,
+    };
+
+    return {
+      message: reAskMessages[language as keyof typeof reAskMessages] || reAskMessages.en,
+      emailSent: false,
+    };
+  }
+
+  // Step 7: All fields valid! Send email
   try {
-    const { text } = await generateText({
-      model: groq('llama-3.3-70b-versatile'),
-      messages: [
-        { role: 'system', content: SALES_PROMPT },
-        ...conversationHistory,
-        { role: 'user', content: userMessage }
-      ],
-      temperature: 0.7,
-    });
+    await sendSalesInquiry(updatedFields, conversationHistory);
 
-    // Check if the response indicates the sales process is complete
-    const response = text || "Awesome! :) Tell me more about your project!";
+    // Step 8: Return confirmation
+    const language = detectLanguage(conversationHistory);
+    const confirmations = {
+      es: '¡Perfecto! Enviando email a Fran ahora... 📧',
+      en: 'Perfect! Sending email to Fran now... 📧',
+      fr: 'Parfait! J\'envoie un email à Fran maintenant... 📧',
+      de: 'Perfekt! Sende jetzt E-Mail an Fran... 📧',
+    };
+
+    const systemMessages = {
+      es: '✅ Email enviado exitosamente! Fran te responderá en 24 horas.',
+      en: '✅ Email sent successfully! Fran will reply within 24 hours.',
+      fr: '✅ Email envoyé avec succès! Fran répondra dans 24 heures.',
+      de: '✅ Email erfolgreich gesendet! Fran antwortet innerhalb von 24 Stunden.',
+    };
+
+    return {
+      message: confirmations[language as keyof typeof confirmations] || confirmations.en,
+      systemMessage: systemMessages[language as keyof typeof systemMessages] || systemMessages.en,
+      emailSent: true,
+    };
+  } catch (emailError) {
+    // Email failed, but still show success to user and log error
+    console.error('Email sending failed:', emailError);
     
-    // If the response indicates completion (success message), trigger email
-    if (response.toLowerCase().includes('jean will reach out') || 
-        response.toLowerCase().includes('i\'ve got everything') ||
-        response.toLowerCase().includes('perfect! i\'ve got') ||
-        response.toLowerCase().includes('talk soon!')) {
-      
-      // Extract information from conversation history for email
-      await sendSalesInquiry(conversationHistory, userMessage);
-    }
+    const language = detectLanguage(conversationHistory);
+    const errorMessages = {
+      es: '¡Perfecto! He recopilado toda tu información. 📋\nFran te contactará pronto.',
+      en: 'Perfect! I\'ve collected all your information. 📋\nFran will contact you soon.',
+      fr: 'Parfait! J\'ai collecté toutes tes informations. 📋\nFran te contactera bientôt.',
+      de: 'Perfekt! Ich habe alle deine Informationen gesammelt. 📋\nFran wird dich bald kontaktieren.',
+    };
 
-    return response;
-  } catch (error) {
-    console.error('Sales chat error:', error);
-    return "Awesome! :) Tell me more about your project!";
+    return {
+      message: errorMessages[language as keyof typeof errorMessages] || errorMessages.en,
+      emailSent: false, // Don't claim email was sent if it failed
+    };
   }
 }
 
-// Send sales inquiry email with structured data extraction
-async function sendSalesInquiry(conversationHistory: Message[], latestMessage: string): Promise<void> {
+// Send sales inquiry email with structured data
+async function sendSalesInquiry(
+  fields: SalesFields,
+  conversationHistory: Message[]
+): Promise<void> {
   try {
-    // Step 1: Use LLM to extract structured data from conversation
-    const extractionPrompt = `Analyze this sales conversation and extract the following information in JSON format:
-
-{
-  "name": "Full name of the person",
-  "email": "Their email address",
-  "linkedin": "LinkedIn URL if mentioned",
-  "preferredTime": "When they want to meet",
-  "projectType": "Type of project (web app, mobile, AI, etc.)",
-  "projectDescription": "What they want to build",
-  "features": "Key features they mentioned",
-  "techRequirements": "Specific tech they need",
-  "timeline": "Project timeline",
-  "budget": "Budget range",
-  "qualificationNotes": "YOUR assessment of this lead: Is budget realistic? Timeline reasonable? Project well-defined? Serious buyer? Rate as: QUALIFIED/MAYBE/NEEDS_FOLLOWUP and explain why."
-}
-
-If any field is not mentioned, use "Not mentioned" as the value.
-For qualificationNotes, ALWAYS provide an assessment even if limited info.
-
-Conversation:
-${conversationHistory.map(msg => `${msg.role}: ${msg.content}`).join('\n')}
-${latestMessage ? `user: ${latestMessage}` : ''}
-
-Return ONLY the JSON object, no other text.`;
-
-    const { text } = await generateText({
-      model: groq('llama-3.3-70b-versatile'),
-      prompt: extractionPrompt,
-      temperature: 0.1, // Low temperature for consistent extraction
-    });
-
-    // Step 2: Parse extracted data
-    let extractedData;
-    try {
-      extractedData = JSON.parse(text);
-    } catch (parseError) {
-      console.error('Failed to parse extracted data:', parseError);
-      // Fallback: send raw conversation
-      extractedData = {
-        name: 'Parse Error',
-        email: 'noreply@resend.dev',
-        projectDescription: conversationHistory.map(msg => `${msg.role}: ${msg.content}`).join('\n'),
-      };
-    }
-
-    // Step 3: Call email API with structured data
     const response = await fetch(`${process.env.NEXT_PUBLIC_URL || 'http://localhost:3003'}/api/booking/send-email`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         type: 'sales_inquiry',
-        ...extractedData, // All the structured fields
+        name: fields.name,
+        email: fields.email,
+        projectType: fields.projectType,
+        budget: fields.budget,
+        timeline: fields.timeline,
+        projectDescription: conversationHistory.map(msg => `${msg.role}: ${msg.content}`).join('\n'),
         timestamp: new Date().toISOString(),
         source: 'MSN Messenger Chat'
       }),
     });
 
     if (!response.ok) {
-      console.error('Failed to send email:', await response.text());
+      const errorText = await response.text();
+      console.error('Failed to send email:', errorText);
+      throw new Error(`Email API responded with ${response.status}: ${errorText}`);
     }
     
+    console.log('✅ Sales inquiry email sent successfully');
   } catch (error) {
     console.error('Failed to send sales inquiry email:', error);
+    throw error;
   }
 }
 
@@ -315,18 +487,15 @@ export async function POST(request: NextRequest) {
     const intent = await detectIntent(userMessage, conversationHistory);
 
     // Route to appropriate handler using Vercel AI SDK
-    let response: string;
+    let result;
     if (intent === 'sales') {
-      response = await handleSalesChat(userMessage, conversationHistory);
+      result = await handleSalesChat(userMessage, conversationHistory);
     } else {
-      response = await handleCasualChat(userMessage, conversationHistory);
+      const casualResponse = await handleCasualChat(userMessage, conversationHistory);
+      result = { message: casualResponse, emailSent: false };
     }
 
-    // Return final response
-    return NextResponse.json({
-      message: response,
-      _debug: process.env.NODE_ENV === 'development' ? { intent } : undefined,
-    });
+    return NextResponse.json(result);
 
   } catch (error) {
     console.error('Chat API error:', error);
@@ -340,7 +509,10 @@ export async function POST(request: NextRequest) {
     }
     
     return NextResponse.json(
-      { error: 'Failed to process message' },
+      {
+        message: 'Sorry, something went wrong. Can you repeat that? 🙏',
+        emailSent: false
+      },
       { status: 500 }
     );
   }

@@ -370,7 +370,28 @@ Project details: ${context.projects
 			}
 
 			const data = await response.json();
+			
+			// Add assistant message
 			addMessage({ role: 'assistant', content: data.message });
+
+			// If email was sent, show system message after 2 seconds
+			if (data.emailSent && data.systemMessage) {
+				setTimeout(() => {
+					addMessage({ role: 'system', content: data.systemMessage });
+
+					// Play success sound
+					try {
+						const sendSound = new Audio('/sounds/msn-send.mp3');
+						sendSound.volume = 0.5;
+						sendSound.play().catch(() => {
+							// Ignore if sound fails
+						});
+					} catch {
+						// Sound file doesn't exist - ignore
+					}
+				}, 2000);
+			}
+
 		} catch (error) {
 			console.error('Chat error:', error);
 			addMessage({
@@ -513,7 +534,7 @@ Available projects: ${context.projects.map((p) => p.name).join(', ')}`,
 							backgroundColor: isTyping ? '#fbbf24' : MSN_COLORS.ONLINE_GREEN,
 						}}
 					/>
-					<span className='font-semibold text-sm'>Jean Francois</span>
+					<span className='font-semibold text-sm'>Fran Francois</span>
 				</div>
 				<div className='text-xs opacity-90'>
 					{isTyping ? 'Typing...' : 'Online - "Ask me anything! 💻"'}
@@ -553,8 +574,37 @@ Available projects: ${context.projects.map((p) => p.name).join(', ')}`,
 				{messages.map((message) => (
 					<div key={message.id} className='mb-4'>
 						{message.role === 'system' ? (
-							<div className='text-center text-gray-500 italic text-sm'>
-								{parseEmoticons(message.content)}
+							<div className='system-message mx-auto max-w-[90%]'
+								style={{
+									background: 'linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%)',
+									borderLeft: '4px solid #00aa00',
+									padding: '12px 16px',
+									borderRadius: '4px',
+									boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+								}}
+							>
+								<div className='system-badge' 
+									style={{
+										fontWeight: 'bold',
+										color: '#00aa00',
+										fontSize: '10px',
+										textTransform: 'uppercase',
+										letterSpacing: '1px',
+										marginBottom: '4px'
+									}}
+								>
+									System
+								</div>
+								<div className='system-content'
+									style={{
+										color: '#333',
+										fontStyle: 'italic',
+										fontSize: '13px',
+										lineHeight: '1.4'
+									}}
+								>
+									{parseEmoticons(message.content)}
+								</div>
 							</div>
 						) : (
 							<div
@@ -587,7 +637,7 @@ Available projects: ${context.projects.map((p) => p.name).join(', ')}`,
 				{isTyping && (
 					<div className='flex justify-start mb-4'>
 						<div className='text-sm text-gray-500 italic'>
-							Jean Francois is typing<span className='animate-pulse'>...</span>
+							Fran Francois is typing<span className='animate-pulse'>...</span>
 						</div>
 					</div>
 				)}

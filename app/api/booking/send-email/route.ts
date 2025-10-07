@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { resend } from '@/app/lib/resend';
 
 const BOOKING_EMAIL = process.env.BOOKING_EMAIL_TO || 'fallback@example.com';
+const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,7 +10,7 @@ export async function POST(request: NextRequest) {
 
     if (body.type === 'sales_inquiry') {
       const { data, error } = await resend.emails.send({
-        from: 'MSN Messenger Sales <onboarding@resend.dev>',
+        from: `MSN Messenger Sales <${FROM_EMAIL}>`,
         to: BOOKING_EMAIL,
         replyTo: body.email,
         subject: `🚀 New Sales Inquiry from ${body.name}`,
@@ -17,29 +18,26 @@ export async function POST(request: NextRequest) {
           <h2>New sales inquiry via MSN Messenger!</h2>
 
           <h3>👤 CONTACT INFO:</h3>
-          <p><strong>Name:</strong> ${body.name}</p>
-          <p><strong>Email:</strong> <a href="mailto:${body.email}">${body.email}</a></p>
-          ${body.linkedin ? `<p><strong>LinkedIn:</strong> <a href="${body.linkedin}">${body.linkedin}</a></p>` : ''}
-          <p><strong>Preferred Meeting:</strong> ${body.preferredTime}</p>
+          <p><strong>Name:</strong> ${body.name || 'Not provided'}</p>
+          <p><strong>Email:</strong> <a href="mailto:${body.email}">${body.email || 'Not provided'}</a></p>
 
           <hr>
 
           <h3>💼 PROJECT DETAILS:</h3>
-          <p><strong>Type:</strong> ${body.projectType}</p>
-          <p><strong>Description:</strong> ${body.projectDescription}</p>
-          <p><strong>Key Features:</strong> ${body.features}</p>
-          ${body.techRequirements ? `<p><strong>Tech Requirements:</strong> ${body.techRequirements}</p>` : ''}
+          <p><strong>Type:</strong> ${body.projectType || 'Not specified'}</p>
+          <p><strong>Budget:</strong> ${body.budget || 'Not specified'}</p>
+          <p><strong>Timeline:</strong> ${body.timeline || 'Not specified'}</p>
 
           <hr>
 
-          <h3>📊 QUALIFICATION:</h3>
-          <p><strong>Timeline:</strong> ${body.timeline}</p>
-          <p><strong>Budget:</strong> ${body.budget}</p>
+          <h3>💬 CONVERSATION HISTORY:</h3>
+          <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-family: monospace; white-space: pre-wrap;">${body.projectDescription || 'No conversation history'}</pre>
 
           <hr>
 
-          <h3>🎯 AI AGENT ASSESSMENT:</h3>
-          <p>${body.qualificationNotes}</p>
+          <h3>📊 METADATA:</h3>
+          <p><strong>Source:</strong> ${body.source || 'MSN Messenger Chat'}</p>
+          <p><strong>Timestamp:</strong> ${body.timestamp || new Date().toISOString()}</p>
 
           <hr>
           <p><em>Reply directly to this email to reach ${body.name}</em></p>
