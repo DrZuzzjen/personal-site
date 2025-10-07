@@ -125,10 +125,11 @@ need a break? :)"
 
 Now write your check-in message based on what they're doing:`;
 
-    console.log('=== PROACTIVE MESSAGE REQUEST ===');
-    console.log('Language:', detectedLang);
-    console.log('Activity:', activityContext);
-    console.log('Time of day:', timeOfDay);
+    // Remove sensitive logging for production security
+    // console.log('=== PROACTIVE MESSAGE REQUEST ===');
+    // console.log('Language:', detectedLang);
+    // console.log('Activity:', activityContext);
+    // console.log('Time of day:', timeOfDay);
 
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
@@ -153,8 +154,9 @@ Now write your check-in message based on what they're doing:`;
     // Remove quotes that LLM sometimes adds
     proactiveMessage = proactiveMessage.replace(/^["']|["']$/g, '').trim();
 
-    console.log('=== LLM PROACTIVE RESPONSE ===');
-    console.log('Message:', proactiveMessage);
+    // Remove sensitive logging for production security
+    // console.log('=== LLM PROACTIVE RESPONSE ===');
+    // console.log('Message:', proactiveMessage);
 
     return NextResponse.json({ message: proactiveMessage });
   } catch (error) {
