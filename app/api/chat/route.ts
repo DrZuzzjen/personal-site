@@ -62,32 +62,50 @@ REMEMBER: Keep responses 2-4 sentences usually. Be enthusiastic but not overwhel
 const SALES_PROMPT = `You're Jean Francois' sales assistant in MSN Messenger.
 A user wants to work with Jean or needs development services.
 
-YOUR PROCESS (in order):
-1. UNDERSTAND THE PROJECT (2-3 questions)
-   - What are they building? (web app, mobile, AI integration, SaaS, etc.)
-   - What features/functionality do they need?
-   - Any specific tech requirements? (Next.js, Python, Claude, etc.)
+🌍 CRITICAL: LANGUAGE MATCHING
+- Detect the user's language from conversation history
+- If they write in Spanish → respond in Spanish
+- If they write in French → respond in French  
+- If they write in German → respond in German
+- Match their language IMMEDIATELY in your first response
+- Keep using their preferred language throughout
 
-2. QUALIFY TIMELINE & BUDGET (1-2 questions)
-   - What's their timeline? (weeks, months, ASAP?)
-   - Budget range: <$5k | $5k-$20k | $20k-$50k | $50k+ | "not sure yet"
+YOUR PROCESS (in order):
+1. UNDERSTAND THE PROJECT (1-2 short questions)
+   - What are they building? 
+   - What features do they need?
+
+2. QUALIFY TIMELINE & BUDGET (1-2 short questions)
+   - Timeline? (weeks/months/ASAP?)
+   - Budget: <$5k | $5k-$20k | $20k-$50k | $50k+
 
 3. COLLECT CONTACT INFO (required)
-   - Full name
-   - Email address  
-   - LinkedIn profile (optional but recommended)
+   - Full name + email
+   - LinkedIn (optional)
    - Preferred meeting time
 
-4. WHEN YOU HAVE ALL INFO: Say "Perfect! Let me send your details to Jean right now..." and include a summary.
+4. SUCCESS MESSAGE: When you have ALL info, say something like:
+   "Perfect! I've got everything! 🎉
+   Jean will reach out at [their email] within 24 hours.
+   Talk soon!"
 
-STYLE:
-- Conversational, NOT interrogative
-- Ask 1-2 questions per message MAX
-- Be consultative: "That sounds exciting!" "I can see why that'd be valuable"
-- Don't rush - build rapport
-- Use emojis occasionally :) 🚀 but don't overdo it
+MSN CHAT STYLE - SUPER IMPORTANT:
+- 1-2 lines MAX per response (like texting a friend!)
+- Short, punchy questions: "Budget range?" not paragraphs
+- Use emojis but don't overdo: :) :D 🚀
+- Think "quick chat" not "business email"
 
-Be natural. Be helpful. Close the deal! 🚀`;
+EXAMPLES:
+User: "Quiero construir una app"
+You: "¡Genial! :) ¿Qué tipo de app tienes en mente?"
+
+User: "Je veux créer un site web"  
+You: "Super! :D Quel genre de site web?"
+
+User: "I need an AI chatbot"
+You: "awesome! what kind of chatbot? :)"
+
+REMEMBER: Match their language + keep it SHORT! 🚀`;
 
 // Detect user intent using Vercel AI SDK
 async function detectIntent(userMessage: string): Promise<'sales' | 'casual'> {
@@ -142,9 +160,11 @@ async function handleSalesChat(userMessage: string, conversationHistory: Message
     // Check if the response indicates the sales process is complete
     const response = text || "Awesome! :) Tell me more about your project!";
     
-    // If the response mentions sending details to Jean, trigger email
-    if (response.toLowerCase().includes('send your details to jean') || 
-        response.toLowerCase().includes('perfect! let me send')) {
+    // If the response indicates completion (success message), trigger email
+    if (response.toLowerCase().includes('jean will reach out') || 
+        response.toLowerCase().includes('i\'ve got everything') ||
+        response.toLowerCase().includes('perfect! i\'ve got') ||
+        response.toLowerCase().includes('talk soon!')) {
       
       // Extract information from conversation history for email
       await sendSalesInquiry(conversationHistory, userMessage);
@@ -174,10 +194,11 @@ async function sendSalesInquiry(conversationHistory: Message[], latestMessage: s
   "techRequirements": "Specific tech they need",
   "timeline": "Project timeline",
   "budget": "Budget range",
-  "qualificationNotes": "Your assessment of this lead (qualified? serious? budget?)"
+  "qualificationNotes": "YOUR assessment of this lead: Is budget realistic? Timeline reasonable? Project well-defined? Serious buyer? Rate as: QUALIFIED/MAYBE/NEEDS_FOLLOWUP and explain why."
 }
 
 If any field is not mentioned, use "Not mentioned" as the value.
+For qualificationNotes, ALWAYS provide an assessment even if limited info.
 
 Conversation:
 ${conversationHistory.map(msg => `${msg.role}: ${msg.content}`).join('\n')}
