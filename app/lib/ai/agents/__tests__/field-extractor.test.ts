@@ -23,7 +23,7 @@ describe('FieldExtractorAgent', () => {
   beforeAll(async () => {
     // Dynamic import after mocks are set up
     const { fieldExtractorAgent } = await import('../field-extractor-agent');
-    
+
     // Mock the agent's generate method
     vi.spyOn(fieldExtractorAgent as any, 'agent', 'get').mockReturnValue({
       generate: vi.fn().mockImplementation(({ prompt }) => {
@@ -97,7 +97,7 @@ describe('FieldExtractorAgent', () => {
   describe('extract()', () => {
     it('should extract all fields from complete conversation', async () => {
       const { fieldExtractorAgent } = await import('../field-extractor-agent');
-      
+
       const messages: Message[] = [
         { role: 'user', content: 'I want to build an e-commerce website' },
         { role: 'assistant', content: 'Great! What is your name?' },
@@ -122,7 +122,7 @@ describe('FieldExtractorAgent', () => {
 
     it('should handle partial information', async () => {
       const { fieldExtractorAgent } = await import('../field-extractor-agent');
-      
+
       const messages: Message[] = [
         { role: 'user', content: 'Hi, I need a website' },
         { role: 'assistant', content: 'What is your name?' },
@@ -141,7 +141,7 @@ describe('FieldExtractorAgent', () => {
 
     it('should handle user providing multiple fields at once', async () => {
       const { fieldExtractorAgent } = await import('../field-extractor-agent');
-      
+
       const messages: Message[] = [
         {
           role: 'user',
@@ -161,7 +161,7 @@ describe('FieldExtractorAgent', () => {
 
     it('should handle empty conversation', async () => {
       const { fieldExtractorAgent } = await import('../field-extractor-agent');
-      
+
       const messages: Message[] = [];
 
       const result = await fieldExtractorAgent.extract(messages);
@@ -176,7 +176,7 @@ describe('FieldExtractorAgent', () => {
 
     it('should handle Spanish conversation', async () => {
       const { fieldExtractorAgent } = await import('../field-extractor-agent');
-      
+
       const messages: Message[] = [
         { role: 'user', content: 'Hola, necesito una tienda online' },
         { role: 'assistant', content: '¡Genial! ¿Cuál es tu nombre?' },
@@ -194,7 +194,7 @@ describe('FieldExtractorAgent', () => {
 
     it('should not infer information not explicitly stated', async () => {
       const { fieldExtractorAgent } = await import('../field-extractor-agent');
-      
+
       const messages: Message[] = [
         { role: 'user', content: 'I need help' },
         { role: 'assistant', content: 'Sure! What do you need?' },
@@ -212,7 +212,7 @@ describe('FieldExtractorAgent', () => {
   describe('formatFields()', () => {
     it('should format fields for display', async () => {
       const { fieldExtractorAgent } = await import('../field-extractor-agent');
-      
+
       const fields = {
         name: 'John Doe',
         email: 'john@example.com',

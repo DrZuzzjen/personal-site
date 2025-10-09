@@ -3,6 +3,7 @@
 ## Field Extractor Agent
 
 ### Purpose
+
 Extracts customer information from conversation history for sales workflows.
 
 ### Usage
@@ -11,9 +12,9 @@ Extracts customer information from conversation history for sales workflows.
 import { fieldExtractorAgent } from './field-extractor-agent';
 
 const messages = [
-  { role: 'user', content: 'I want a website' },
-  { role: 'assistant', content: 'What is your name?' },
-  { role: 'user', content: 'John Doe' }
+	{ role: 'user', content: 'I want a website' },
+	{ role: 'assistant', content: 'What is your name?' },
+	{ role: 'user', content: 'John Doe' },
 ];
 
 const result = await fieldExtractorAgent.extract(messages);
@@ -44,6 +45,7 @@ console.log(result.confidence);
 ### Error Handling
 
 If extraction fails (invalid LLM response, parsing error, etc.), returns:
+
 - All fields as `null`
 - Confidence as `0`
 - Logs error to console
@@ -62,6 +64,7 @@ If extraction fails (invalid LLM response, parsing error, etc.), returns:
 Conversational agent that collects customer details and sends the final sales inquiry email once all required information is gathered.
 
 ### Purpose
+
 - Guide prospective customers through a structured intake conversation.
 - Gather the five required sales fields: `name`, `email`, `projectType`, `budget`, `timeline`.
 - Confirm information accuracy before triggering the email workflow.
@@ -73,20 +76,20 @@ import { createSalesAgent } from './sales-agent';
 import type { Message, SalesFields } from './types';
 
 const currentFields: SalesFields = {
-  name: 'John Doe',
-  email: 'john@example.com',
-  projectType: null,
-  budget: null,
-  timeline: null,
+	name: 'John Doe',
+	email: 'john@example.com',
+	projectType: null,
+	budget: null,
+	timeline: null,
 };
 
 const agent = createSalesAgent({
-  currentFields,
-  language: 'en',
+	currentFields,
+	language: 'en',
 });
 
 const messages: Message[] = [
-  { role: 'user', content: 'Hi, I want to build an AI chatbot.' },
+	{ role: 'user', content: 'Hi, I want to build an AI chatbot.' },
 ];
 
 const result = await agent.generate(messages);
@@ -99,14 +102,15 @@ console.log(result.steps); // Execution trace (tool calls, intermediate steps)
 
 ```typescript
 interface SalesAgentConfig {
-  currentFields: SalesFields;     // Current state of collected fields
-  language?: 'es' | 'en' | 'fr' | 'de'; // System prompt language (default: en)
+	currentFields: SalesFields; // Current state of collected fields
+	language?: 'es' | 'en' | 'fr' | 'de'; // System prompt language (default: en)
 }
 ```
 
 ### Tools
 
 #### validateAndSendEmail
+
 - **Purpose:** Validate collected fields and send the sales inquiry email.
 - **When Called:** Automatically when the agent determines all 5 fields are present.
 - **Parameters:** `name`, `email`, `projectType`, `budget`, `timeline`, `conversationHistory`.
