@@ -54,9 +54,26 @@ function validateSalesFields(fields: SalesFields): ValidationResult {
  * This should only run when all fields have been collected.
  */
 export const validateAndSendEmailTool = tool({
-  description: `Validate customer fields and send sales inquiry email to Fran.
+  description: `⚠️⚠️⚠️ STOP! READ BEFORE CALLING ⚠️⚠️⚠️
 
-⚠️ CRITICAL: ONLY call this tool when you have REAL VALUES for all 3 required fields.
+ONLY call this if ALL 3 conditions are TRUE:
+1. ✅ name = actual name (NOT null, NOT "unknown", NOT "NOT COLLECTED")
+2. ✅ email = actual email with @ (NOT null, NOT "unknown")
+3. ✅ projectType = actual project (NOT null, NOT "unknown")
+
+IF ANY FIELD IS MISSING:
+→ DO NOT CALL THIS TOOL
+→ ASK CUSTOMER FOR THE FIELD
+→ WAIT FOR RESPONSE
+
+WRONG (DO NOT DO):
+❌ validateAndSendEmail("unknown", "unknown", "sitio web")
+❌ validateAndSendEmail(null, "user@email.com", "app")
+
+CORRECT:
+✅ validateAndSendEmail("Juan García", "juan@gmail.com", "sitio web")
+
+Validate customer fields and send sales inquiry email to Fran.
 
 WHEN TO USE:
 ✅ You have actual name (not null, not "unknown")

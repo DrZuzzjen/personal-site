@@ -94,13 +94,24 @@ export class SalesAgent {
   }
 
   private formatFieldStatus(fields: SalesFields): string {
-    return [
-      `name: ${fields.name || 'NOT COLLECTED'}`,
-      `email: ${fields.email || 'NOT COLLECTED'}`,
-      `projectType: ${fields.projectType || 'NOT COLLECTED'}`,
-      `budget: ${fields.budget || 'NOT COLLECTED'}`,
-      `timeline: ${fields.timeline || 'NOT COLLECTED'}`,
-    ].join('\n');
+    const hasName = fields.name && fields.name !== 'null';
+    const hasEmail = fields.email && fields.email !== 'null';
+    const hasProject = fields.projectType && fields.projectType !== 'null';
+
+    return `
+FIELD STATUS:
+name: ${hasName ? '✅ ' + fields.name : '❌ MISSING - ASK FOR IT NOW'}
+email: ${hasEmail ? '✅ ' + fields.email : '❌ MISSING - ASK FOR IT NOW'}
+projectType: ${hasProject ? '✅ ' + fields.projectType : '❌ MISSING - ASK FOR IT NOW'}
+budget: ${fields.budget || '(optional - can be "I don\'t know")'}
+timeline: ${fields.timeline || '(optional - can be "flexible")'}
+
+YOUR NEXT ACTION:
+${!hasName ? '→ Ask: "¿Cómo te llamas?" and WAIT - DO NOT call tool' :
+  !hasEmail ? '→ Ask: "¿Cuál es tu email?" and WAIT - DO NOT call tool' :
+  !hasProject ? '→ Ask what they want to build and WAIT - DO NOT call tool' :
+  '→ ALL REQUIRED FIELDS READY - Call validateAndSendEmail NOW'}
+`.trim();
   }
 
   private buildSystemPrompt(fieldStatus: string): string {
