@@ -185,8 +185,26 @@ async function handleCasualChat(userMessage: string, conversationHistory: Messag
       return { type: 'openApp' }; // Fallback (should never happen)
     });
 
+    // When tools are called, generate a clean message without function syntax
+    let cleanMessage = text || "hey! :) what's up?";
+
+    // Remove any function call syntax from the message (UX fix)
+    cleanMessage = cleanMessage.replace(/<function[^>]*>.*?<\/function>/g, '').trim();
+
+    // If message is now empty and we have actions, generate a friendly confirmation
+    if (!cleanMessage && actions.length > 0) {
+      const action = actions[0];
+      if (action.type === 'openApp') {
+        cleanMessage = '¡Listo! 🎨';
+      } else if (action.type === 'closeApp') {
+        cleanMessage = '✅ Cerrado!';
+      } else if (action.type === 'restart') {
+        cleanMessage = '🔄 Reiniciando...';
+      }
+    }
+
     return {
-      message: text || "hey! :) what's up?",
+      message: cleanMessage,
       actions
     };
   } catch (error) {
