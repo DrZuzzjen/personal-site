@@ -17,11 +17,10 @@ function validateSalesFields(fields: SalesFields): ValidationResult {
   const issues: string[] = [];
   const missingFields: string[] = [];
 
+  // Only require name, email, projectType - budget/timeline are optional
   if (!fields.name) missingFields.push('name');
   if (!fields.email) missingFields.push('email');
   if (!fields.projectType) missingFields.push('projectType');
-  if (!fields.budget) missingFields.push('budget');
-  if (!fields.timeline) missingFields.push('timeline');
 
   if (missingFields.length > 0) {
     return {
@@ -55,27 +54,27 @@ function validateSalesFields(fields: SalesFields): ValidationResult {
  * This should only run when all fields have been collected.
  */
 export const validateAndSendEmailTool = tool({
-  description: `Validate all customer fields and send sales inquiry email to Fran.
+  description: `Validate customer fields and send sales inquiry email to Fran.
 
 WHEN TO USE:
-- ONLY when you have collected all 5 fields: name, email, projectType, budget, timeline
-- After confirming with the customer that information is correct
+- When you have the 3 REQUIRED fields: name, email, projectType
+- Budget/timeline are optional - accept "I don't know" or any answer
 
 WHAT IT DOES:
-1. Validates all fields are present and correctly formatted
+1. Validates required fields are present and correctly formatted
 2. Sends email to Fran with the customer inquiry
 3. Returns success or failure details
 
 DO NOT USE IF:
-- Any field is missing
-- Customer has not confirmed the information`,
+- Missing name, email, or projectType
+- Email format is invalid`,
 
   inputSchema: z.object({
     name: z.string().min(2).describe('Customer full name'),
     email: z.string().email().describe('Customer email address'),
     projectType: z.string().describe('Type of project the customer wants'),
-    budget: z.string().describe('Budget range the customer expects'),
-    timeline: z.string().describe('Desired delivery timeline'),
+    budget: z.string().optional().describe('Budget range (optional - can be "I don\'t know")'),
+    timeline: z.string().optional().describe('Timeline (optional - can be "flexible")'),
     conversationHistory: z
       .string()
       .describe('Full conversation history as JSON string'),
@@ -101,8 +100,8 @@ DO NOT USE IF:
       name,
       email,
       projectType,
-      budget,
-      timeline,
+      budget: budget || null,
+      timeline: timeline || null,
     });
 
     if (!validation.valid) {
@@ -125,8 +124,8 @@ DO NOT USE IF:
         name,
         email,
         projectType,
-        budget,
-        timeline,
+        budget: budget || null,
+        timeline: timeline || null,
         projectDescription: conversationHistory,
         timestamp: new Date().toISOString(),
         source: 'MSN Messenger Chat',
