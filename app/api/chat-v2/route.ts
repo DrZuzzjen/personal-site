@@ -32,6 +32,7 @@ async function detectIntent(userMessage: string, conversationHistory: Message[] 
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now();
+  let intent: 'sales' | 'casual' = 'sales';
 
   try {
     const { messages } = await request.json();
@@ -47,11 +48,19 @@ export async function POST(request: NextRequest) {
     const conversationHistory = messages.slice(0, -1);
 
     // Detect intent
-    const intent = await detectIntent(lastMessage.content, conversationHistory);
+    intent = await detectIntent(lastMessage.content, conversationHistory);
 
     if (intent === 'casual') {
       // Keep using old casual handler for now
       // TODO: Phase 3 - migrate casual to agent too
+      telemetry.log({
+        timestamp: new Date().toISOString(),
+        endpoint: '/api/chat-v2',
+        intent,
+        latencyMs: Date.now() - startTime,
+        emailSent: false
+      });
+
       return NextResponse.json({
         message: "Casual mode not implemented yet in v2",
         emailSent: false
@@ -96,7 +105,7 @@ export async function POST(request: NextRequest) {
     telemetry.log({
       timestamp: new Date().toISOString(),
       endpoint: '/api/chat-v2',
-      intent: 'sales',
+      intent,
       latencyMs: Date.now() - startTime,
       tokensUsed: result.usage?.totalTokens,
       agentSteps: result.steps?.length,
@@ -111,7 +120,7 @@ export async function POST(request: NextRequest) {
     telemetry.log({
       timestamp: new Date().toISOString(),
       endpoint: '/api/chat-v2',
-      intent: 'sales',
+      intent,
       latencyMs: Date.now() - startTime,
       emailSent: false,
       error: error instanceof Error ? error.message : 'Unknown error'
