@@ -77,15 +77,20 @@ const playSound = (soundKey: keyof typeof MSN_SOUNDS) => {
 };
 
 // Helper: Get window configuration for opening apps
-const getAppConfig = (appName: string): Omit<WindowType, 'id' | 'zIndex' | 'isMinimized' | 'isMaximized'> | null => {
-	const configs: Record<string, Omit<WindowType, 'id' | 'zIndex' | 'isMinimized' | 'isMaximized'>> = {
+const getAppConfig = (
+	appName: string
+): Omit<WindowType, 'id' | 'zIndex' | 'isMinimized' | 'isMaximized'> | null => {
+	const configs: Record<
+		string,
+		Omit<WindowType, 'id' | 'zIndex' | 'isMinimized' | 'isMaximized'>
+	> = {
 		paint: {
 			title: 'Paint.exe',
 			appType: 'paint',
 			position: { x: 100, y: 100 },
 			size: { width: 520, height: 420 },
 			icon: 'PT',
-			content: {}
+			content: {},
 		},
 		minesweeper: {
 			title: 'Minesweeper.exe',
@@ -93,7 +98,13 @@ const getAppConfig = (appName: string): Omit<WindowType, 'id' | 'zIndex' | 'isMi
 			position: { x: 120, y: 120 },
 			size: { width: 360, height: 320 },
 			icon: 'MS',
-			content: { rows: 9, cols: 9, mines: 10, difficulty: 'beginner', firstClickSafe: true }
+			content: {
+				rows: 9,
+				cols: 9,
+				mines: 10,
+				difficulty: 'beginner',
+				firstClickSafe: true,
+			},
 		},
 		snake: {
 			title: 'Snake.exe',
@@ -101,7 +112,7 @@ const getAppConfig = (appName: string): Omit<WindowType, 'id' | 'zIndex' | 'isMi
 			position: { x: 140, y: 140 },
 			size: { width: 860, height: 600 },
 			icon: 'SN',
-			content: {}
+			content: {},
 		},
 		notepad: {
 			title: 'Notepad',
@@ -109,7 +120,12 @@ const getAppConfig = (appName: string): Omit<WindowType, 'id' | 'zIndex' | 'isMi
 			position: { x: 160, y: 160 },
 			size: { width: 480, height: 320 },
 			icon: 'NP',
-			content: { filePath: null, fileName: 'Untitled.txt', body: '', readOnly: false }
+			content: {
+				filePath: null,
+				fileName: 'Untitled.txt',
+				body: '',
+				readOnly: false,
+			},
 		},
 		camera: {
 			title: 'Camera',
@@ -117,7 +133,7 @@ const getAppConfig = (appName: string): Omit<WindowType, 'id' | 'zIndex' | 'isMi
 			position: { x: 180, y: 180 },
 			size: { width: 720, height: 580 },
 			icon: 'CM',
-			content: { isActive: false, hasPermission: false, error: null }
+			content: { isActive: false, hasPermission: false, error: null },
 		},
 		tv: {
 			title: 'TV.exe',
@@ -125,7 +141,7 @@ const getAppConfig = (appName: string): Omit<WindowType, 'id' | 'zIndex' | 'isMi
 			position: { x: 200, y: 200 },
 			size: { width: 800, height: 600 },
 			icon: 'TV',
-			content: {}
+			content: {},
 		},
 		browser: {
 			title: 'Browser',
@@ -133,7 +149,7 @@ const getAppConfig = (appName: string): Omit<WindowType, 'id' | 'zIndex' | 'isMi
 			position: { x: 220, y: 220 },
 			size: { width: 900, height: 650 },
 			icon: 'BR',
-			content: { url: 'https://infobae.com/' }
+			content: { url: 'https://infobae.com/' },
 		},
 		mycomputer: {
 			title: 'My Computer',
@@ -141,7 +157,7 @@ const getAppConfig = (appName: string): Omit<WindowType, 'id' | 'zIndex' | 'isMi
 			position: { x: 240, y: 240 },
 			size: { width: 700, height: 500 },
 			icon: 'MC',
-			content: { path: '/My Computer' }
+			content: { path: '/My Computer' },
 		},
 		explorer: {
 			title: 'File Explorer',
@@ -149,7 +165,7 @@ const getAppConfig = (appName: string): Omit<WindowType, 'id' | 'zIndex' | 'isMi
 			position: { x: 260, y: 260 },
 			size: { width: 700, height: 500 },
 			icon: 'EX',
-			content: { path: '/C:/Users/Guest' }
+			content: { path: '/C:/Users/Guest' },
 		},
 		chatbot: {
 			title: 'MSN Messenger',
@@ -157,7 +173,7 @@ const getAppConfig = (appName: string): Omit<WindowType, 'id' | 'zIndex' | 'isMi
 			position: { x: 280, y: 280 },
 			size: { width: 600, height: 500 },
 			icon: 'MSN',
-			content: {}
+			content: {},
 		},
 		portfolio: {
 			title: 'Portfolio Media Center',
@@ -165,7 +181,7 @@ const getAppConfig = (appName: string): Omit<WindowType, 'id' | 'zIndex' | 'isMi
 			position: { x: 300, y: 300 },
 			size: { width: 900, height: 700 },
 			icon: 'PF',
-			content: {}
+			content: {},
 		},
 		terminal: {
 			title: 'Terminal',
@@ -173,8 +189,8 @@ const getAppConfig = (appName: string): Omit<WindowType, 'id' | 'zIndex' | 'isMi
 			position: { x: 320, y: 320 },
 			size: { width: 800, height: 600 },
 			icon: 'TRM',
-			content: {}
-		}
+			content: {},
+		},
 	};
 
 	return configs[appName] || null;
@@ -194,7 +210,8 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 	const lastNotifiedMessageIdRef = useRef<string | null>(null); // Track last message we notified about
 
 	const { rootItems } = useFileSystemContext();
-	const { windows, setWindowFlashing, openWindow, closeWindow } = useWindowContext();
+	const { windows, setWindowFlashing, openWindow, closeWindow } =
+		useWindowContext();
 
 	// Load chat history from localStorage OR generate personalized welcome
 	useEffect(() => {
@@ -206,7 +223,10 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 					timestamp: new Date(msg.timestamp),
 				}));
 				setMessages(parsedMessages);
-				console.log('[Chatbot] Restored messages from localStorage:', parsedMessages.length);
+				console.log(
+					'[Chatbot] Restored messages from localStorage:',
+					parsedMessages.length
+				);
 			} catch (error) {
 				console.error('Error loading chat history:', error);
 			}
@@ -249,8 +269,7 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 			const fallbackWelcome: Message = {
 				id: 'welcome',
 				role: 'assistant',
-				content:
-					"hey! :)\nwhat's up?",
+				content: "hey! :)\nwhat's up?",
 				timestamp: new Date(),
 			};
 			setMessages([fallbackWelcome]);
@@ -263,7 +282,10 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 	useEffect(() => {
 		if (messages.length > 0) {
 			localStorage.setItem('chatbot-history', JSON.stringify(messages));
-			console.log('[Chatbot] Persisted messages to localStorage:', messages.length);
+			console.log(
+				'[Chatbot] Persisted messages to localStorage:',
+				messages.length
+			);
 		}
 	}, [messages]);
 
@@ -288,7 +310,8 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 		const lastMessage = messages[messages.length - 1];
 
 		// Only check for assistant messages (skip welcome message with id 'welcome')
-		if (lastMessage.role !== 'assistant' || lastMessage.id === 'welcome') return;
+		if (lastMessage.role !== 'assistant' || lastMessage.id === 'welcome')
+			return;
 
 		// Skip if we already notified about this message
 		if (lastNotifiedMessageIdRef.current === lastMessage.id) {
@@ -296,7 +319,7 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 		}
 
 		// Check if window is minimized
-		const currentWindow = windows.find(w => w.id === windowId);
+		const currentWindow = windows.find((w) => w.id === windowId);
 		const isMinimized = currentWindow?.isMinimized ?? false;
 
 		if (isMinimized) {
@@ -317,7 +340,7 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 	useEffect(() => {
 		if (!windowId) return;
 
-		const currentWindow = windows.find(w => w.id === windowId);
+		const currentWindow = windows.find((w) => w.id === windowId);
 		const isMinimized = currentWindow?.isMinimized ?? false;
 
 		// Reset proactive flag when window is restored
@@ -329,20 +352,25 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 		// 1. Window is minimized
 		// 2. We have at least welcome message
 		// 3. Haven't sent proactive message yet this session
-		if (!isMinimized || messages.length === 0 || proactiveMessageSentRef.current) return;
+		if (
+			!isMinimized ||
+			messages.length === 0 ||
+			proactiveMessageSentRef.current
+		)
+			return;
 
 		// Random delay between 25-60 seconds (testing: 10-15s)
 		const randomDelay = Math.floor(Math.random() * (15000 - 10000 + 1)) + 10000;
 
 		const timer = setTimeout(async () => {
 			// Double-check still minimized
-			const currentWindow = windows.find(w => w.id === windowId);
+			const currentWindow = windows.find((w) => w.id === windowId);
 			if (currentWindow?.isMinimized) {
 				proactiveMessageSentRef.current = true; // Mark as sent
 
 				// Find currently active (focused) window
 				const focusedWindow = windows
-					.filter(w => !w.isMinimized && w.id !== windowId)
+					.filter((w) => !w.isMinimized && w.id !== windowId)
 					.sort((a, b) => b.zIndex - a.zIndex)[0];
 
 				const currentApp = focusedWindow?.appType || null;
@@ -350,7 +378,7 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 				try {
 					// Call proactive message API
 					const browserContext = getBrowserContext();
-					const conversationHistory = messages.map(msg => ({
+					const conversationHistory = messages.map((msg) => ({
 						role: msg.role,
 						content: msg.content,
 					}));
@@ -441,7 +469,9 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 
 		// Prevent duplicate sends
 		if (isSending) {
-			console.warn('[Chatbot] Message send already in progress, ignoring duplicate');
+			console.warn(
+				'[Chatbot] Message send already in progress, ignoring duplicate'
+			);
 			return;
 		}
 
@@ -502,7 +532,9 @@ Project details: ${context.projects
 					try {
 						if (action.type === 'openApp' && action.appName) {
 							// Check if window already open to prevent duplicates
-							const existingWindow = windows.find(w => w.appType === action.appName);
+							const existingWindow = windows.find(
+								(w) => w.appType === action.appName
+							);
 							if (existingWindow) {
 								return;
 							}
@@ -513,13 +545,15 @@ Project details: ${context.projects
 							}
 						} else if (action.type === 'closeApp' && action.appName) {
 							// Find window by appType and close it
-							const windowToClose = windows.find(w => w.appType === action.appName);
+							const windowToClose = windows.find(
+								(w) => w.appType === action.appName
+							);
 							if (windowToClose) {
 								closeWindow(windowToClose.id);
 							}
 						} else if (action.type === 'restart') {
 							// Close all windows
-							windows.forEach(w => closeWindow(w.id));
+							windows.forEach((w) => closeWindow(w.id));
 						}
 					} catch (error) {
 						console.error('Failed to execute action:', action, error);
@@ -544,12 +578,12 @@ Project details: ${context.projects
 					}
 				}, 2000);
 			}
-
 		} catch (error) {
 			console.error('Chat error:', error);
 			addMessage({
 				role: 'assistant',
-				content: 'Zzzzzzz 😴\n\nOpening Hours: not now\n\n(AI is probably rate-limited, try again later!)',
+				content:
+					'Zzzzzzz 😴\n\nOpening Hours: not now\n\n(AI is probably rate-limited, try again later!)',
 			});
 		} finally {
 			setIsTyping(false);
@@ -604,7 +638,8 @@ Project details: ${context.projects
 		setIsTyping(true);
 
 		try {
-			const nudgeMessage = '**NUDGE RECEIVED** - User just sent you a nudge (shook your window). React casually/funny. Keep it 1-2 lines max.';
+			const nudgeMessage =
+				'**NUDGE RECEIVED** - User just sent you a nudge (shook your window). React casually/funny. Keep it 1-2 lines max.';
 
 			const context = getPortfolioContext();
 			const contextMessage = {
@@ -720,42 +755,44 @@ Available projects: ${context.projects.map((p) => p.name).join(', ')}`,
 					)}
 				{messages.length === 0 && (
 					<div className='text-center text-gray-500 mt-8'>
-						<div className='text-sm italic'>
-							Loading chat...
-						</div>
+						<div className='text-sm italic'>Loading chat...</div>
 					</div>
 				)}
 
 				{messages.map((message) => (
 					<div key={message.id} className='mb-4'>
 						{message.role === 'system' ? (
-							<div className='system-message mx-auto max-w-[90%]'
+							<div
+								className='system-message mx-auto max-w-[90%]'
 								style={{
-									background: 'linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%)',
+									background:
+										'linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%)',
 									borderLeft: '4px solid #00aa00',
 									padding: '12px 16px',
 									borderRadius: '4px',
-									boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+									boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
 								}}
 							>
-								<div className='system-badge' 
+								<div
+									className='system-badge'
 									style={{
 										fontWeight: 'bold',
 										color: '#00aa00',
 										fontSize: '10px',
 										textTransform: 'uppercase',
 										letterSpacing: '1px',
-										marginBottom: '4px'
+										marginBottom: '4px',
 									}}
 								>
 									System
 								</div>
-								<div className='system-content'
+								<div
+									className='system-content'
 									style={{
 										color: '#333',
 										fontStyle: 'italic',
 										fontSize: '13px',
-										lineHeight: '1.4'
+										lineHeight: '1.4',
 									}}
 								>
 									{parseEmoticons(message.content)}

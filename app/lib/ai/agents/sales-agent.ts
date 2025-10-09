@@ -108,9 +108,9 @@ timeline: ${fields.timeline || '(optional - can be "flexible")'}
 
 YOUR NEXT ACTION:
 ${!hasName ? '→ Ask: "¿Cómo te llamas?" and WAIT - DO NOT call tool' :
-  !hasEmail ? '→ Ask: "¿Cuál es tu email?" and WAIT - DO NOT call tool' :
-  !hasProject ? '→ Ask what they want to build and WAIT - DO NOT call tool' :
-  '→ ALL REQUIRED FIELDS READY - Call validateAndSendEmail NOW'}
+        !hasEmail ? '→ Ask: "¿Cuál es tu email?" and WAIT - DO NOT call tool' :
+          !hasProject ? '→ Ask what they want to build and WAIT - DO NOT call tool' :
+            '→ ALL REQUIRED FIELDS READY - Call validateAndSendEmail NOW'}
 `.trim();
   }
 
