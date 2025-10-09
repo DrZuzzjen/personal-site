@@ -199,6 +199,7 @@ const getAppConfig = (
 export default function Chatbot({ windowId }: ChatbotProps) {
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [inputValue, setInputValue] = useState('');
+	const inputRef = useRef<HTMLInputElement>(null);
 	const [isTyping, setIsTyping] = useState(false);
 	const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 	const [isSending, setIsSending] = useState(false); // Prevent duplicate sends
@@ -482,6 +483,11 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 			addMessage({ role: 'user', content: userMessage });
 			setInputValue('');
 			setIsTyping(true);
+
+			// Keep input focused for smooth workflow
+			setTimeout(() => {
+				inputRef.current?.focus();
+			}, 100);
 
 			// Build context-enriched message history
 			const context = getPortfolioContext();
@@ -841,6 +847,7 @@ Available projects: ${context.projects.map((p) => p.name).join(', ')}`,
 			<div className='border-t p-3 bg-white'>
 				<div className='flex items-center gap-2 mb-2'>
 					<input
+						ref={inputRef}
 						type='text'
 						value={inputValue}
 						onChange={(e) => setInputValue(e.target.value)}
