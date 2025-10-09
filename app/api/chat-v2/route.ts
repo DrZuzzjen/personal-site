@@ -120,9 +120,10 @@ async function handleCasualChat(
     if (toolCallsList.length > 0) {
       const [firstTool] = toolCallsList;
       const toolResult = firstTool?.result ?? firstTool?.res ?? firstTool?.output;
-      cleanMessage = toolResult?.message || 'Listo!';
+      cleanMessage = toolResult?.message || text || 'Action completed! :)';
     } else {
-      cleanMessage = text || "hey! :) what's up?";
+      // Normal conversation without tools - use AI response
+      cleanMessage = text || "Hey! :) How's it going?";
     }
 
     return {

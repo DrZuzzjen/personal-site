@@ -196,12 +196,6 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 	const { rootItems } = useFileSystemContext();
 	const { windows, setWindowFlashing, openWindow, closeWindow } = useWindowContext();
 
-	console.log('[Chatbot] WindowContext functions available:', {
-		openWindow: typeof openWindow,
-		closeWindow: typeof closeWindow,
-		windowsCount: windows.length
-	});
-
 	// Load chat history from localStorage OR generate personalized welcome
 	useEffect(() => {
 		const saved = localStorage.getItem('chatbot-history');
@@ -452,8 +446,6 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 		}
 
 		setIsSending(true);
-		console.log('[Chatbot] sendMessage called, messages count:', messages.length);
-		console.log('[Chatbot] Sending to API:', userMessage);
 
 		try {
 			// Add user message immediately
@@ -500,51 +492,32 @@ Project details: ${context.projects
 			}
 
 			const data = await response.json();
-			console.log('[Chatbot] API response received:', {
-				message: data.message,
-				actions: data.actions,
-				emailSent: data.emailSent,
-				intent: data.debug?.intent,
-				fullResponse: data
-			});
 
 			// Add assistant message
 			addMessage({ role: 'assistant', content: data.message });
 
 			// Execute actions (function calling - open/close apps)
-			console.log('[Chatbot] Checking actions - data.actions:', data.actions);
-			console.log('[Chatbot] Actions array length:', data.actions?.length);
 			if (data.actions && data.actions.length > 0) {
-				console.log('[Chatbot] Executing actions:', data.actions);
 				data.actions.forEach((action: any, index: number) => {
-					console.log(`[Chatbot] Executing action ${index}:`, action);
 					try {
 						if (action.type === 'openApp' && action.appName) {
 							// Check if window already open to prevent duplicates
 							const existingWindow = windows.find(w => w.appType === action.appName);
 							if (existingWindow) {
-								console.warn('[Chatbot] Window already open, skipping:', action.appName);
 								return;
 							}
 
 							const appConfig = getAppConfig(action.appName);
-							console.log('[Chatbot] getAppConfig result for', action.appName, ':', appConfig);
 							if (appConfig) {
-								console.log('[Chatbot] Opening new window:', action.appName);
 								openWindow(appConfig);
-								console.log('[Chatbot] openWindow called successfully');
-							} else {
-								console.error('[Chatbot] No app config found for:', action.appName);
 							}
 						} else if (action.type === 'closeApp' && action.appName) {
 							// Find window by appType and close it
 							const windowToClose = windows.find(w => w.appType === action.appName);
 							if (windowToClose) {
-								console.log('[Chatbot] Closing window:', action.appName);
 								closeWindow(windowToClose.id);
 							}
 						} else if (action.type === 'restart') {
-							console.log('[Chatbot] Restarting desktop - closing all windows');
 							// Close all windows
 							windows.forEach(w => closeWindow(w.id));
 						}
