@@ -434,30 +434,26 @@ async function sendSalesInquiry(
   fields: SalesFields,
   conversationHistory: Message[]
 ): Promise<void> {
+  // Import the shared email utility
+  const { sendSalesInquiryEmail } = await import('@/app/lib/email-utils');
+
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_URL || 'http://localhost:3003'}/api/booking/send-email`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        type: 'sales_inquiry',
-        name: fields.name,
-        email: fields.email,
-        projectType: fields.projectType,
-        budget: fields.budget,
-        timeline: fields.timeline,
-        projectDescription: conversationHistory.map(msg => `${msg.role}: ${msg.content}`).join('\n'),
-        timestamp: new Date().toISOString(),
-        source: 'MSN Messenger Chat'
-      }),
+    const result = await sendSalesInquiryEmail({
+      name: fields.name,
+      email: fields.email,
+      projectType: fields.projectType,
+      budget: fields.budget,
+      timeline: fields.timeline,
+      projectDescription: conversationHistory.map(msg => `${msg.role}: ${msg.content}`).join('\n'),
+      timestamp: new Date().toISOString(),
+      source: 'MSN Messenger Chat',
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Failed to send email:', errorText);
-      throw new Error(`Email API responded with ${response.status}: ${errorText}`);
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to send email');
     }
-    
-    console.log('✅ Sales inquiry email sent successfully');
+
+    console.log('✅ Sales inquiry email sent successfully:', result.emailId);
   } catch (error) {
     console.error('Failed to send sales inquiry email:', error);
     throw error;
