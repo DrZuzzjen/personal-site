@@ -144,6 +144,17 @@ const APP_LAUNCHERS: LaunchDefinition[] = [  {
     }),
   },
   {
+    names: ['portfolio.exe', 'portfolio'],
+    description: 'Portfolio Media Center',
+    build: () => ({
+      title: 'Portfolio Media Center',
+      appType: 'portfolio',
+      size: { width: 900, height: 700 },
+      icon: 'PF',
+      content: {},
+    }),
+  },
+  {
     names: ['program manager.exe', 'explorer.exe', 'explorer'],
     description: 'Program Manager / File Explorer',
     build: ({ fileItem }) => ({

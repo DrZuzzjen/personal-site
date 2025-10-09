@@ -59,8 +59,11 @@ AVAILABLE APPS:
 - notepad (text editor)
 - camera (webcam app)
 - tv (YouTube player)
-- browser (web browser)
-- mycomputer (file browser)
+- browser (web browser / internet explorer)
+- chatbot (MSN Messenger - that's ME!)
+- portfolio (Portfolio Media Center with projects)
+- terminal (Terminal / Command Prompt)
+- mycomputer (My Computer file browser)
 - explorer (file explorer)
 
 TOOL USAGE EXAMPLES:
@@ -69,6 +72,8 @@ TOOL USAGE EXAMPLES:
 ✅ "cierra snake" / "close snake" → Use closeApp tool
 ✅ "restart" / "reiniciar" → Use restart tool
 ✅ "abre paint y minesweeper" → Use openApp tool TWICE (2 separate calls)
+✅ "abre terminal" → Use openApp tool with appName: "terminal"
+✅ "open portfolio" → Use openApp tool with appName: "portfolio"
 
 MULTILINGUAL SUPPORT:
 - Spanish: "abre" = open, "cierra" = close, "reinicia" = restart

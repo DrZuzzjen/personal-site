@@ -150,6 +150,30 @@ const getAppConfig = (appName: string): Omit<WindowType, 'id' | 'zIndex' | 'isMi
 			size: { width: 700, height: 500 },
 			icon: 'EX',
 			content: { path: '/C:/Users/Guest' }
+		},
+		chatbot: {
+			title: 'MSN Messenger',
+			appType: 'chatbot',
+			position: { x: 280, y: 280 },
+			size: { width: 600, height: 500 },
+			icon: 'MSN',
+			content: {}
+		},
+		portfolio: {
+			title: 'Portfolio Media Center',
+			appType: 'portfolio',
+			position: { x: 300, y: 300 },
+			size: { width: 900, height: 700 },
+			icon: 'PF',
+			content: {}
+		},
+		terminal: {
+			title: 'Terminal',
+			appType: 'terminal',
+			position: { x: 320, y: 320 },
+			size: { width: 800, height: 600 },
+			icon: 'TRM',
+			content: {}
 		}
 	};
 

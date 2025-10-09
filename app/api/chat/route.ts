@@ -149,25 +149,42 @@ async function handleCasualChat(userMessage: string, conversationHistory: Messag
       temperature: 0.8,
       tools: {
         openApp: {
-          description: 'Opens an application window on the Windows desktop. Use this when user asks to open, launch, or start an app.',
+          description: 'Opens an application window on the Windows desktop. Use this when user asks to open, launch, or start an app. Available apps: paint, minesweeper, snake, notepad, camera, tv, browser (internet explorer), chatbot (MSN Messenger), portfolio, terminal, mycomputer, explorer.',
           inputSchema: z.object({
-            appName: z.enum(['paint', 'minesweeper', 'snake', 'notepad', 'camera', 'tv', 'browser', 'mycomputer', 'explorer'])
+            appName: z.enum(['paint', 'minesweeper', 'snake', 'notepad', 'camera', 'tv', 'browser', 'chatbot', 'portfolio', 'terminal', 'mycomputer', 'explorer'])
               .describe('The name of the application to open')
           }),
-          execute: async ({ appName }) => ({ appName })
+          execute: async ({ appName }) => {
+            // Return contextual message based on app
+            const messages: Record<string, string> = {
+              paint: '¡Listo! Abriendo Paint 🎨',
+              minesweeper: '¡A jugar! Abriendo Minesweeper 💣',
+              snake: '¡Vamos! Abriendo Snake 🐍',
+              notepad: 'Abriendo Bloc de notas 📝',
+              camera: 'Abriendo cámara 📷',
+              tv: 'Abriendo TV 📺',
+              browser: 'Abriendo navegador 🌐',
+              chatbot: 'Abriendo MSN Messenger 💬',
+              portfolio: 'Abriendo Portfolio 📁',
+              terminal: 'Abriendo Terminal 💻',
+              mycomputer: 'Abriendo Mi PC 🖥️',
+              explorer: 'Abriendo explorador de archivos 📂'
+            };
+            return { appName, message: messages[appName] || '¡Listo!' };
+          }
         },
         closeApp: {
           description: 'Closes an open application window. Use this when user asks to close, quit, or exit an app.',
           inputSchema: z.object({
-            appName: z.enum(['paint', 'minesweeper', 'snake', 'notepad', 'camera', 'tv', 'browser', 'mycomputer', 'explorer'])
+            appName: z.enum(['paint', 'minesweeper', 'snake', 'notepad', 'camera', 'tv', 'browser', 'chatbot', 'portfolio', 'terminal', 'mycomputer', 'explorer'])
               .describe('The name of the application to close')
           }),
-          execute: async ({ appName }) => ({ appName })
+          execute: async ({ appName }) => ({ appName, message: `✅ Cerrando ${appName}` })
         },
         restart: {
           description: 'Closes all open windows and restarts the desktop. Use this when user asks to restart, reboot, or close everything.',
           inputSchema: z.object({}),
-          execute: async () => ({ success: true })
+          execute: async () => ({ success: true, message: '🔄 Reiniciando escritorio...' })
         }
       }
     });
@@ -185,22 +202,16 @@ async function handleCasualChat(userMessage: string, conversationHistory: Messag
       return { type: 'openApp' }; // Fallback (should never happen)
     });
 
-    // When tools are called, generate a clean message without function syntax
-    let cleanMessage = text || "hey! :) what's up?";
+    // Generate clean message based on tool results (NOT from LLM text)
+    let cleanMessage = '';
 
-    // Remove any function call syntax from the message (UX fix)
-    cleanMessage = cleanMessage.replace(/<function[^>]*>.*?<\/function>/g, '').trim();
-
-    // If message is now empty and we have actions, generate a friendly confirmation
-    if (!cleanMessage && actions.length > 0) {
-      const action = actions[0];
-      if (action.type === 'openApp') {
-        cleanMessage = '¡Listo! 🎨';
-      } else if (action.type === 'closeApp') {
-        cleanMessage = '✅ Cerrado!';
-      } else if (action.type === 'restart') {
-        cleanMessage = '🔄 Reiniciando...';
-      }
+    if (toolCalls.length > 0) {
+      // Get the message from the first tool's execute() result
+      const firstToolResult = (toolCalls[0] as any).result;
+      cleanMessage = firstToolResult?.message || '¡Listo!';
+    } else {
+      // No tools called, use LLM text response
+      cleanMessage = text || "hey! :) what's up?";
     }
 
     return {
