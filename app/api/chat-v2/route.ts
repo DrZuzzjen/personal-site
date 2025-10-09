@@ -68,20 +68,20 @@ async function handleCasualChat(
           }),
           execute: async ({ appName }) => {
             const messages: Record<string, string> = {
-              paint: 'Listo! Abriendo Paint :)',
-              minesweeper: 'A jugar! Abriendo Minesweeper :)',
-              snake: 'Vamos! Abriendo Snake :)',
-              notepad: 'Abriendo Bloc de notas...',
-              camera: 'Abriendo camara...',
-              tv: 'Abriendo TV...',
-              browser: 'Abriendo navegador...',
-              chatbot: 'Abriendo MSN Messenger...',
-              portfolio: 'Abriendo Portfolio...',
-              terminal: 'Abriendo Terminal...',
-              mycomputer: 'Abriendo Mi PC...',
-              explorer: 'Abriendo explorador de archivos...'
+              paint: '¡Listo! Abriendo Paint 🎨',
+              minesweeper: '¡A jugar! Abriendo Minesweeper 💣',
+              snake: '¡Vamos! Abriendo Snake 🐍',
+              notepad: '¡Listo! Abriendo Bloc de notas 📝',
+              camera: '¡Listo! Abriendo cámara 📷',
+              tv: '¡Listo! Abriendo TV 📺',
+              browser: '¡Listo! Abriendo navegador 🌐',
+              chatbot: '¡Listo! Abriendo MSN Messenger 💬',
+              portfolio: '¡Listo! Abriendo Portfolio 📁',
+              terminal: '¡Listo! Abriendo Terminal 💻',
+              mycomputer: '¡Listo! Abriendo Mi PC 🖥️',
+              explorer: '¡Listo! Abriendo explorador de archivos 📂'
             };
-            return { appName, message: messages[appName] || 'Listo!' };
+            return { appName, message: messages[appName] || '¡Listo!' };
           }
         },
         closeApp: {
@@ -120,7 +120,8 @@ async function handleCasualChat(
     if (toolCallsList.length > 0) {
       const [firstTool] = toolCallsList;
       const toolResult = firstTool?.result ?? firstTool?.res ?? firstTool?.output;
-      cleanMessage = toolResult?.message || text || 'Action completed! :)';
+      // When tools are used, only use the tool result message, NOT the text (which contains function call strings)
+      cleanMessage = toolResult?.message || 'Action completed! :)';
     } else {
       // Normal conversation without tools - use AI response
       cleanMessage = text || "Hey! :) How's it going?";
