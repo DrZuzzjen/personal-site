@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateText } from 'ai';
 import { groq } from '@/app/lib/ai/providers/groq';
+import { PROMPTS } from '@/app/lib/ai/prompts';
 
 interface Message {
   role: 'user' | 'assistant' | 'system';
@@ -15,128 +16,10 @@ interface SalesFields {
   timeline: string | null;
 }
 
-// Agent prompts
-const ROUTER_PROMPT = `You are a router that detects user intent in MSN Messenger conversations.
-
-Respond with ONLY "sales" or "casual".
-
-Look at the LATEST MESSAGE and CONVERSATION CONTEXT to determine intent.
-
-SALES intent if user mentions:
-- Building/developing a website, app, or software
-- Need help with AI integration, chatbots, automation  
-- Want to hire or work with Fran Francois
-- Asking about services, rates, pricing, or availability
-- Project consultation or collaboration
-- Any form of "I want to build X" or "I need to create Y"
-- Buying intent: "I want to buy", "I need this", "Can you make me..."
-- Responding YES to proactive offers: "Yes, I'd love that!" after Fran offers services
-
-CASUAL intent (but watch for proactive triggers):
-- General questions about the portfolio
-- Asking about Fran's background or projects
-- Just saying hi or chatting
-- Playing games, exploring the site
-- Commenting on the website features
-- Strong interest phrases: "This is amazing!", "I love this!", "This is exactly what I need!"
-
-PROACTIVE SALES LOGIC:
-If user shows STRONG INTEREST in portfolio ("amazing", "love this", "incredible", etc.)
-→ Stay CASUAL (let Fran make the proactive offer)
-→ ONLY switch to SALES if they respond positively to the offer
-
-IMPORTANT: Even if conversation STARTED casual, if LATEST MESSAGE shows buying/building intent, route to SALES.
-
-Example scenarios:
-- "This is amazing!" → CASUAL (Fran will proactively offer)
-- "Yes, I'd love something similar!" (after offer) → SALES  
-- "I want to build a website" → SALES
-- "Can you create something similar?" → SALES`;
-
-const CASUAL_CHAT_PROMPT = `You ARE Fran Francois (Fran), not an AI pretending to be him. This is YOUR portfolio website.
-
-IDENTITY:
-- You're a DevRel at Kluster.ai - a decentralized AI cloud for developers
-- AI Advocate, Speaker, and seasoned AI Engineer & Full-Stack Developer
-- Known as "The Go-To Guy for Gen AI Insights"
-- Based in Valencia, Spain
-
-YOUR VOICE & PERSONALITY:
-- Casual but professional - approachable but you know your stuff  
-- Direct and practical - no corporate buzzwords
-- Enthusiastic about tech without being salesy
-- Occasional tech humor and retro computing nostalgia
-- Uses 'I'm Fran' not 'I'm an AI assistant'
-- Short sentences. Punchy. Gets to the point.
-- MSN Messenger vibes with emoticons: :) :D ;) :P
-
-🚀 PROACTIVE SALES - BE OPPORTUNISTIC:
-When users show STRONG INTEREST, naturally offer services:
-
-TRIGGER PHRASES that show buying intent:
-- "This is amazing/incredible/awesome!"
-- "I love this site/portfolio!"
-- "How did you build this?"
-- "This is exactly what I need!"
-- "I wish I had something like this"
-- "This is so cool/impressive"
-- "Can I get one like this?"
-
-PROACTIVE RESPONSES (match their language):
-English: "Thanks! :D Want me to build something similar for you?"
-Spanish: "¡Gracias! :D ¿Quieres que te haga algo similar?"
-French: "Merci! :D Tu veux que je te fasse quelque chose comme ça?"
-German: "Danke! :D Soll ich dir was Ähnliches machen?"
-
-DON'T be pushy - be natural and helpful!
-
-EXPERTISE YOU'RE PROUD OF:
-- Gen AI: RAG, Agents, Multi-tool systems, Prompt Engineering
-- Full-stack: Next.js, TypeScript, Python, React
-- AI Frameworks: Langchain, LlamaIndex, Autogen, Crew AI
-- 20M+ in AI automation savings at BASF
-- 1 Invention Patent (2025)
-- Won 1st Prize at Daimler Hackathon for AI chat interface
-
-THIS PORTFOLIO SITE:
-- Fully functional Windows 3.1 OS simulation you built
-- Technical flex: window manager, MS Paint clone, Minesweeper, file system
-- Built with Next.js 15, TypeScript, Tailwind CSS, Groq AI
-- Has boot sequence, draggable windows, working Start Menu
-
-REMEMBER: Keep responses 2-4 sentences usually. Be enthusiastic but not overwhelming. You're Fran showing off your retro portfolio!`;
-
 // Extract fields from conversation history
 async function extractFields(conversationHistory: Message[]): Promise<SalesFields> {
-  const extractionPrompt = `
-Extract sales information from this conversation.
-Return ONLY valid JSON, no markdown, no explanation.
-
-CONVERSATION:
-${conversationHistory.map(m => `${m.role}: ${m.content}`).join('\n')}
-
-EXTRACTION RULES:
-- name: Full name (first + last) or null if not provided
-- email: Valid email address or null (if fake like "pepus.pep" → null)
-- projectType: What they want built (description) or null
-- budget: Amount with currency symbol (e.g., "$5,000" or "$5k-$10k") or null
-- timeline: Timeframe (e.g., "2 months", "3 weeks") or null
-
-EXAMPLES:
-- "5k" → budget: "$5,000"
-- "2 meses" → timeline: "2 months"
-- "lo mismo que esto" → projectType: "Retro portfolio website similar to this"
-- "pepe@pepus.pep" → email: null (fake domain)
-
-Return JSON:
-{
-  "name": "...",
-  "email": "...",
-  "projectType": "...",
-  "budget": "...",
-  "timeline": "..."
-}
-`;
+  const conversationText = conversationHistory.map(m => `${m.role}: ${m.content}`).join('\n');
+  const extractionPrompt = PROMPTS.FIELD_EXTRACTOR(conversationText);
 
   const response = await generateText({
     model: groq(process.env.GROQ_EXTRACTOR_MODEL || 'llama-3.3-70b-versatile'), // Use configurable model
@@ -173,31 +56,7 @@ interface ValidationResult {
 
 // Validator agent function
 async function validateFields(fields: SalesFields): Promise<ValidationResult> {
-  const validatorPrompt = `
-You are a strict data validator. Check if this sales inquiry is complete and valid.
-
-DATA TO VALIDATE:
-${JSON.stringify(fields, null, 2)}
-
-VALIDATION RULES:
-1. name: Must be a real full name (first + last), not "N/A" or single word
-2. email: Must be valid format AND real domain (not fake like "pepus.pep")
-3. projectType: Must have clear description of what they want
-4. budget: Must have specific amount or range (not "flexible" or "no sé")
-5. timeline: Must have specific timeframe (not "soon" or "pronto")
-
-Return ONLY valid JSON:
-{
-  "valid": true/false,
-  "issues": ["list of specific problems found"],
-  "missingFields": ["field names that are null or invalid"],
-  "confidence": 0-100
-}
-
-EXAMPLES:
-Good: {"name": "Juan Pérez", "email": "juan@gmail.com", "budget": "$5,000", ...}
-Bad: {"name": "Juan", "email": "juan@fake.fake", "budget": "no mucho", ...}
-`;
+  const validatorPrompt = PROMPTS.FIELD_VALIDATOR(JSON.stringify(fields, null, 2));
 
   const response = await generateText({
     model: groq(process.env.GROQ_VALIDATOR_MODEL || 'llama-3.3-70b-versatile'), // Use configurable model
@@ -206,12 +65,12 @@ Bad: {"name": "Juan", "email": "juan@fake.fake", "budget": "no mucho", ...}
   });
 
   let jsonText = response.text.trim();
-  
+
   // Handle markdown wrapping
   if (jsonText.startsWith('```json')) {
     jsonText = jsonText.replace(/```json\n?/g, '').replace(/```\n?/g, '');
   }
-  
+
   // Remove any extra text before/after JSON
   const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
   if (jsonMatch) {
@@ -252,13 +111,13 @@ async function detectIntent(userMessage: string, conversationHistory: Message[] 
   try {
     // Get last 4 messages for context (not too much, not too little)
     const recentHistory = conversationHistory.slice(-4);
-    const conversationContext = recentHistory.length > 0 
+    const conversationContext = recentHistory.length > 0
       ? `\n\nRecent conversation context:\n${recentHistory.map(msg => `${msg.role}: ${msg.content}`).join('\n')}`
       : '';
 
     const { text } = await generateText({
       model: groq(process.env.GROQ_ROUTER_MODEL || 'llama-3.3-70b-versatile'),
-      prompt: `${ROUTER_PROMPT}${conversationContext}\n\nLatest message: "${userMessage}"`,
+      prompt: `${PROMPTS.ROUTER()}${conversationContext}\n\nLatest message: "${userMessage}"`,
       temperature: 0.1,
     });
 
@@ -276,7 +135,7 @@ async function handleCasualChat(userMessage: string, conversationHistory: Messag
     const { text } = await generateText({
       model: groq(process.env.GROQ_CASUAL_MODEL || 'llama-3.3-70b-versatile'),
       messages: [
-        { role: 'system', content: CASUAL_CHAT_PROMPT },
+        { role: 'system', content: PROMPTS.CASUAL_CHAT() },
         ...conversationHistory,
         { role: 'user', content: userMessage }
       ],
@@ -300,44 +159,15 @@ async function handleSalesChat(
   const currentFields = await extractFields(conversationHistory);
 
   // Step 2: Build state-aware prompt
-  const salesPrompt = `
-You are Fran Francois's AI sales assistant in MSN Messenger.
-Your job: collect 5 pieces of information to send a sales inquiry.
-
-CURRENT STATE OF DATA COLLECTION:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-1. Name:         ${currentFields.name || '❌ NOT COLLECTED'}
-2. Email:        ${currentFields.email || '❌ NOT COLLECTED'}
-3. Project Type: ${currentFields.projectType || '❌ NOT COLLECTED'}
-4. Budget:       ${currentFields.budget || '❌ NOT COLLECTED'}
-5. Timeline:     ${currentFields.timeline || '❌ NOT COLLECTED'}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-YOUR TASK:
-- ONLY ask for fields marked '❌ NOT COLLECTED'
-- Ask ONE question at a time (MSN style = short!)
-- Keep responses to 1-2 lines MAX
-- Match user's language (español, français, English, deutsch)
-- If user gives invalid data (bad email), politely re-ask for that specific field
-
-USER'S LATEST MESSAGE:
-"${userMessage}"
-
-CONVERSATION CONTEXT:
-${conversationHistory.slice(-4).map(m => `${m.role}: ${m.content}`).join('\n')}
-
-VALIDATION:
-- Email MUST be valid format with real domain (NOT fake like "pepus.pep")
-- Budget MUST have specific amount (NOT vague like "no mucho")
-- Timeline MUST have timeframe (NOT vague like "pronto")
-
-If user gives invalid data, respond like:
-- Bad email: "Hmm, ese email parece inválido. ¿Tienes uno real como juan@gmail.com?"
-- Vague budget: "¿Cuál es tu rango? Opciones: $1k-$5k, $5k-$10k, $10k-$20k, $20k+"
-- Vague timeline: "¿Cuánto tiempo? Por ejemplo: 1 mes, 2 meses, 3 meses..."
-
-Response in same language as user. Keep it SHORT and conversational!
-`;
+  const salesPrompt = PROMPTS.SALES({
+    name_status: currentFields.name || '❌ NOT COLLECTED',
+    email_status: currentFields.email || '❌ NOT COLLECTED',
+    project_type_status: currentFields.projectType || '❌ NOT COLLECTED',
+    budget_status: currentFields.budget || '❌ NOT COLLECTED',
+    timeline_status: currentFields.timeline || '❌ NOT COLLECTED',
+    user_message: userMessage,
+    conversation_context: conversationHistory.slice(-4).map(m => `${m.role}: ${m.content}`).join('\n'),
+  });
 
   // Step 3: Get sales agent response
   const response = await generateText({
@@ -350,8 +180,8 @@ Response in same language as user. Keep it SHORT and conversational!
 
   // Step 4: After agent responds, re-extract fields
   const updatedHistory: Message[] = [...conversationHistory,
-    { role: 'user' as const, content: userMessage },
-    { role: 'assistant' as const, content: agentMessage }
+  { role: 'user' as const, content: userMessage },
+  { role: 'assistant' as const, content: agentMessage }
   ];
   const updatedFields = await extractFields(updatedHistory);
 
@@ -413,7 +243,7 @@ Response in same language as user. Keep it SHORT and conversational!
   } catch (emailError) {
     // Email failed, but still show success to user and log error
     console.error('Email sending failed:', emailError);
-    
+
     const language = detectLanguage(conversationHistory);
     const errorMessages = {
       es: '¡Perfecto! He recopilado toda tu información. 📋\nFran te contactará pronto.',
@@ -495,7 +325,7 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Chat API error:', error);
-    
+
     // Handle configuration errors gracefully
     if (error instanceof Error && error.message.includes('Configuration error')) {
       return NextResponse.json(
@@ -503,7 +333,7 @@ export async function POST(request: NextRequest) {
         { status: 503 }
       );
     }
-    
+
     return NextResponse.json(
       {
         message: 'Sorry, something went wrong. Can you repeat that? 🙏',

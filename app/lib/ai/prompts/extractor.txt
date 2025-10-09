@@ -1,0 +1,27 @@
+Extract sales information from this conversation.
+Return ONLY valid JSON, no markdown, no explanation.
+
+CONVERSATION:
+{conversation_history}
+
+EXTRACTION RULES:
+- name: Full name (first + last) or null if not provided
+- email: Valid email address or null (if fake like "pepus.pep" → null)
+- projectType: What they want built (description) or null
+- budget: Amount with currency symbol (e.g., "$5,000" or "$5k-$10k") or null
+- timeline: Timeframe (e.g., "2 months", "3 weeks") or null
+
+EXAMPLES:
+- "5k" → budget: "$5,000"
+- "2 meses" → timeline: "2 months"
+- "lo mismo que esto" → projectType: "Retro portfolio website similar to this"
+- "pepe@pepus.pep" → email: null (fake domain)
+
+Return JSON:
+{
+  "name": "...",
+  "email": "...",
+  "projectType": "...",
+  "budget": "...",
+  "timeline": "..."
+}
