@@ -196,6 +196,12 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 	const { rootItems } = useFileSystemContext();
 	const { windows, setWindowFlashing, openWindow, closeWindow } = useWindowContext();
 
+	console.log('[Chatbot] WindowContext functions available:', {
+		openWindow: typeof openWindow,
+		closeWindow: typeof closeWindow,
+		windowsCount: windows.length
+	});
+
 	// Load chat history from localStorage OR generate personalized welcome
 	useEffect(() => {
 		const saved = localStorage.getItem('chatbot-history');
@@ -494,15 +500,20 @@ Project details: ${context.projects
 			}
 
 			const data = await response.json();
-			console.log('[Chatbot] API response received', {
+			console.log('[Chatbot] API response received:', {
+				message: data.message,
+				actions: data.actions,
 				emailSent: data.emailSent,
 				intent: data.debug?.intent,
+				fullResponse: data
 			});
 
 			// Add assistant message
 			addMessage({ role: 'assistant', content: data.message });
 
 			// Execute actions (function calling - open/close apps)
+			console.log('[Chatbot] Checking actions - data.actions:', data.actions);
+			console.log('[Chatbot] Actions array length:', data.actions?.length);
 			if (data.actions && data.actions.length > 0) {
 				console.log('[Chatbot] Executing actions:', data.actions);
 				data.actions.forEach((action: any, index: number) => {
@@ -517,9 +528,13 @@ Project details: ${context.projects
 							}
 
 							const appConfig = getAppConfig(action.appName);
+							console.log('[Chatbot] getAppConfig result for', action.appName, ':', appConfig);
 							if (appConfig) {
 								console.log('[Chatbot] Opening new window:', action.appName);
 								openWindow(appConfig);
+								console.log('[Chatbot] openWindow called successfully');
+							} else {
+								console.error('[Chatbot] No app config found for:', action.appName);
 							}
 						} else if (action.type === 'closeApp' && action.appName) {
 							// Find window by appType and close it
