@@ -7,7 +7,8 @@
 		"build": "next build --turbopack",
 		"start": "next start",
 		"lint": "eslint",
-		"test": "vitest"
+		"test": "vitest",
+		"compare": "tsx scripts/compare-performance.ts"
 	},
 	"dependencies": {
 		"@ai-sdk/groq": "^2.0.22",
@@ -31,6 +32,7 @@
 		"eslint-config-next": "15.5.4",
 		"tailwindcss": "^4",
 		"typescript": "^5",
-		"vitest": "^3.2.4"
+		"vitest": "^3.2.4",
+		"tsx": "^4.19.2"
 	}
 }
