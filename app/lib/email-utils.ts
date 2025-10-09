@@ -27,7 +27,7 @@ export interface LeadProfile {
 }
 
 /**
- * Generate AI-powered sales opportunity summary
+ * Generate AI-powered sales opportunity summary in HTML format
  */
 async function generateOpportunitySummary(conversationHistory: string): Promise<string> {
   try {
@@ -37,20 +37,20 @@ async function generateOpportunitySummary(conversationHistory: string): Promise<
 
 Conversation: ${conversationHistory}
 
-Provide:
-1. What they want to build (1 line)
-2. Key details mentioned (budget, timeline, specific needs)
-3. Urgency signals (hot lead, exploratory, etc.)
-4. Any red flags or objections
+Provide exactly this format:
+<strong>Project:</strong> [What they want to build in 1 line]<br>
+<strong>Details:</strong> [Key budget, timeline, specific needs]<br>
+<strong>Status:</strong> [Hot lead/Warm lead/Exploratory/etc.]<br>
+<strong>Notes:</strong> [Any red flags, objections, or special considerations]
 
-Keep it concise, 3-4 sentences max, salesperson-friendly.`,
+Keep each line concise and HTML formatted.`,
       temperature: 0.3, // Low temperature for consistent analysis
     });
 
     return result.text.trim();
   } catch (error) {
     console.error('Failed to generate opportunity summary:', error);
-    return 'AI summary generation failed - please review conversation manually.';
+    return '<strong>Status:</strong> AI summary generation failed - please review conversation manually.';
   }
 }
 
@@ -148,7 +148,7 @@ export async function sendSalesInquiryEmail(data: SalesInquiryData): Promise<{ s
 
         <div style="background: #f0f8ff; padding: 15px; border-radius: 8px; margin: 15px 0;">
           <h3>📊 SALES OPPORTUNITY SUMMARY:</h3>
-          <p style="font-size: 16px; line-height: 1.5; margin: 0;">${opportunitySummary}</p>
+          <div style="font-size: 16px; line-height: 1.6; margin: 10px 0;">${opportunitySummary}</div>
         </div>
 
         <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin: 15px 0;">
