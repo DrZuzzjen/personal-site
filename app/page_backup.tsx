@@ -299,23 +299,6 @@ function resolveSnakeContent(
 
 	return { ...DEFAULT_SNAKE_CONFIG };
 }
-		return {
-			canvasWidth,
-			canvasHeight,
-			backgroundColor,
-			brushSize,
-			palette: [...palette],
-		};
-	}
-
-	return {
-		canvasWidth: DEFAULT_PAINT_CONFIG.canvasWidth,
-		canvasHeight: DEFAULT_PAINT_CONFIG.canvasHeight,
-		backgroundColor: DEFAULT_PAINT_CONFIG.backgroundColor,
-		brushSize: DEFAULT_PAINT_CONFIG.brushSize,
-		palette: [...DEFAULT_PAINT_CONFIG.palette],
-	};
-}
 
 function renderWindowContent(
 	windowData: WindowType,
@@ -343,7 +326,7 @@ function renderWindowContent(
 			const config = resolvePaintContent(windowData.content);
 			return <Paint {...config} />;
 		}
-\t\tcase 'snake': {
+		case 'snake': {
 			const config = resolveSnakeContent(windowData.content);
 			return <Snake {...config} />;
 		}
@@ -595,20 +578,20 @@ export default function MainPage() {
 				'Windows 3.1 Portfolio Help\n\n' +
 				'Welcome to the Windows 3.1 Portfolio Experience!\n\n' +
 				'How to use:\n' +
-				'• Double-click desktop icons to open apps\n' +
-				'• Right-click icons or files for context menu\n' +
-				'• Drag windows around by their title bar\n' +
-				'• Use taskbar buttons to switch between windows\n' +
-				'• Click Start button for system controls\n\n' +
+				'- Double-click desktop icons to open apps\n' +
+				'- Right-click icons or files for context menu\n' +
+				'- Drag windows around by their title bar\n' +
+				'- Use taskbar buttons to switch between windows\n' +
+				'- Click Start button for system controls\n\n' +
 				'Applications:\n' +
-				'• Paint.exe - Simple drawing program\n' +
-				'• Minesweeper.exe - Classic puzzle game\n' +
-				'• Notepad.exe - Text editor\n' +
-				'• File Explorer - Browse files and folders\n\n' +
+				'- Paint.exe - Simple drawing program\n' +
+				'- Minesweeper.exe - Classic puzzle game\n' +
+				'- Notepad.exe - Text editor\n' +
+				'- File Explorer - Browse files and folders\n\n' +
 				'System Controls:\n' +
-				'• Restart Windows - Replay boot sequence\n' +
-				'• Shut Down - End the portfolio session\n' +
-				'• Settings - Change background color\n\n' +
+				'- Restart Windows - Replay boot sequence\n' +
+				'- Shut Down - End the portfolio session\n' +
+				'- Settings - Change background color\n\n' +
 				'Easter Eggs:\n' +
 				'Try deleting protected files for surprises! ??\n\n' +
 				'Press any key during boot to skip the sequence.',

@@ -141,7 +141,7 @@ Now write your check-in message based on what they're doing:`;
         { role: 'user', content: proactivePrompt },
       ],
       temperature: 0.9,
-      maxTokens: 150,
+      maxOutputTokens: 150,
     });
 
     // Remove quotes that LLM sometimes adds

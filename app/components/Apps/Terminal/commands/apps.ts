@@ -1,4 +1,4 @@
-import type { AppType, FileSystemItem } from '@/app/lib/types';
+import type { AppType, FileSystemItem, WindowContent } from '@/app/lib/types';
 import type { Command } from '../types';
 import { resolvePath } from '../utils/path';
 
@@ -11,7 +11,7 @@ interface LaunchConfig {
   appType: AppType;
   size: { width: number; height: number };
   icon?: string;
-  content?: unknown;
+  content?: WindowContent;
 }
 
 interface LaunchDefinition {

@@ -12,7 +12,7 @@ export interface SalesAgentConfig {
  * Conversational sales agent that gathers customer details and sends them via email.
  */
 export class SalesAgent {
-  private readonly agent: Agent;
+  private readonly agent: Agent<any, any, any>;
 
   constructor(config: SalesAgentConfig) {
     const { currentFields, language = 'en' } = config;
@@ -20,7 +20,7 @@ export class SalesAgent {
     const fieldStatus = this.formatFieldStatus(currentFields);
     const systemPrompt = this.buildSystemPrompt(fieldStatus, language);
 
-    this.agent = new Agent({
+    this.agent = new Agent<any, any, any>({
       model: groq(process.env.GROQ_SALES_MODEL || 'llama-3.3-70b-versatile'),
       system: systemPrompt,
       temperature: 0.8,

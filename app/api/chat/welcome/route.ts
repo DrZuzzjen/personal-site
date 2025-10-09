@@ -122,7 +122,7 @@ Now write your greeting:`;
         { role: 'user', content: welcomePrompt },
       ],
       temperature: 0.9, // More creative for welcome messages
-      maxTokens: 300,
+      maxOutputTokens: 300,
     });
 
     // Remove quotes that LLM sometimes adds
