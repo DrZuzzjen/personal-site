@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useFileSystemContext } from '../../../lib/FileSystemContext';
 import { useWindowContext } from '../../../lib/WindowContext';
 import { getBrowserContext } from '../../../lib/personality';
+import type { AppType, Window as WindowType } from '../../../lib/types';
 
 // MSN Messenger color scheme
 const MSN_COLORS = {
@@ -75,6 +76,86 @@ const playSound = (soundKey: keyof typeof MSN_SOUNDS) => {
 	}
 };
 
+// Helper: Get window configuration for opening apps
+const getAppConfig = (appName: string): Omit<WindowType, 'id' | 'zIndex' | 'isMinimized' | 'isMaximized'> | null => {
+	const configs: Record<string, Omit<WindowType, 'id' | 'zIndex' | 'isMinimized' | 'isMaximized'>> = {
+		paint: {
+			title: 'Paint.exe',
+			appType: 'paint',
+			position: { x: 100, y: 100 },
+			size: { width: 520, height: 420 },
+			icon: 'PT',
+			content: {}
+		},
+		minesweeper: {
+			title: 'Minesweeper.exe',
+			appType: 'minesweeper',
+			position: { x: 120, y: 120 },
+			size: { width: 360, height: 320 },
+			icon: 'MS',
+			content: { rows: 9, cols: 9, mines: 10, difficulty: 'beginner', firstClickSafe: true }
+		},
+		snake: {
+			title: 'Snake.exe',
+			appType: 'snake',
+			position: { x: 140, y: 140 },
+			size: { width: 860, height: 600 },
+			icon: 'SN',
+			content: {}
+		},
+		notepad: {
+			title: 'Notepad',
+			appType: 'notepad',
+			position: { x: 160, y: 160 },
+			size: { width: 480, height: 320 },
+			icon: 'NP',
+			content: { filePath: null, fileName: 'Untitled.txt', body: '', readOnly: false }
+		},
+		camera: {
+			title: 'Camera',
+			appType: 'camera',
+			position: { x: 180, y: 180 },
+			size: { width: 720, height: 580 },
+			icon: 'CM',
+			content: { isActive: false, hasPermission: false, error: null }
+		},
+		tv: {
+			title: 'TV.exe',
+			appType: 'tv',
+			position: { x: 200, y: 200 },
+			size: { width: 800, height: 600 },
+			icon: 'TV',
+			content: {}
+		},
+		browser: {
+			title: 'Browser',
+			appType: 'browser',
+			position: { x: 220, y: 220 },
+			size: { width: 900, height: 650 },
+			icon: 'BR',
+			content: { url: 'https://infobae.com/' }
+		},
+		mycomputer: {
+			title: 'My Computer',
+			appType: 'mycomputer',
+			position: { x: 240, y: 240 },
+			size: { width: 700, height: 500 },
+			icon: 'MC',
+			content: { path: '/My Computer' }
+		},
+		explorer: {
+			title: 'File Explorer',
+			appType: 'explorer',
+			position: { x: 260, y: 260 },
+			size: { width: 700, height: 500 },
+			icon: 'EX',
+			content: { path: '/C:/Users/Guest' }
+		}
+	};
+
+	return configs[appName] || null;
+};
+
 export default function Chatbot({ windowId }: ChatbotProps) {
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [inputValue, setInputValue] = useState('');
@@ -87,7 +168,7 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 	const lastNotifiedMessageIdRef = useRef<string | null>(null); // Track last message we notified about
 
 	const { rootItems } = useFileSystemContext();
-	const { windows, setWindowFlashing } = useWindowContext();
+	const { windows, setWindowFlashing, openWindow, closeWindow } = useWindowContext();
 
 	// Load chat history from localStorage OR generate personalized welcome
 	useEffect(() => {
@@ -370,9 +451,34 @@ Project details: ${context.projects
 			}
 
 			const data = await response.json();
-			
+
 			// Add assistant message
 			addMessage({ role: 'assistant', content: data.message });
+
+			// Execute actions (function calling - open/close apps)
+			if (data.actions && data.actions.length > 0) {
+				data.actions.forEach((action: any) => {
+					try {
+						if (action.type === 'openApp' && action.appName) {
+							const appConfig = getAppConfig(action.appName);
+							if (appConfig) {
+								openWindow(appConfig);
+							}
+						} else if (action.type === 'closeApp' && action.appName) {
+							// Find window by appType and close it
+							const windowToClose = windows.find(w => w.appType === action.appName);
+							if (windowToClose) {
+								closeWindow(windowToClose.id);
+							}
+						} else if (action.type === 'restart') {
+							// Close all windows
+							windows.forEach(w => closeWindow(w.id));
+						}
+					} catch (error) {
+						console.error('Failed to execute action:', action, error);
+					}
+				});
+			}
 
 			// If email was sent, show system message after 2 seconds
 			if (data.emailSent && data.systemMessage) {
