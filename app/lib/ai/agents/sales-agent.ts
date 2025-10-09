@@ -104,7 +104,21 @@ export class SalesAgent {
   }
 
   private buildSystemPrompt(fieldStatus: string): string {
-    return PROMPTS.SALES_AGENT(fieldStatus);
+    const basePrompt = PROMPTS.SALES_AGENT(fieldStatus);
+
+    // Add explicit safety instructions at the end
+    const safetyNote = `
+
+CRITICAL SAFETY CHECK - READ CAREFULLY:
+Before calling validateAndSendEmail, verify:
+1. name is NOT null and NOT "unknown" → ask "What's your name?" if missing
+2. email is NOT null and NOT "unknown" → ask "What's your email?" if missing
+3. projectType is NOT null and NOT "unknown" → already extracted from conversation
+
+If ANY of the above is null/"unknown", DO NOT call the tool. Ask for the missing field instead.
+`;
+
+    return basePrompt + safetyNote;
   }
 }
 

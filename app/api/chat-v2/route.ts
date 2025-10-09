@@ -79,7 +79,6 @@ export async function POST(request: NextRequest) {
     const extractStart = Date.now();
     const extraction = await fieldExtractorAgent.extract(messages);
     console.log('[PERF] Fields extracted:', Date.now() - extractStart, 'ms');
-    console.log('[PERF] Extracted fields:', extraction.fields, 'confidence:', extraction.confidence);
     console.log('[chat-v2] Extracted fields:', extraction.fields);
 
     // Step 2: Create sales agent with current state
@@ -101,17 +100,19 @@ export async function POST(request: NextRequest) {
       });
     });
 
-    // Step 5: Check if email was sent (fixed detection logic)
+    // Step 5: Check if email was sent (optimized detection)
     const emailSent = result.steps.some((step: any) => {
       if (!step.content) return false;
 
       return step.content.some((content: any) => {
-        console.log('[chat-v2] Checking step content:', {
-          type: content.type,
-          toolName: content.toolName,
-          hasOutput: !!content.output,
-          output: content.output,
-        });
+        // Only log in development
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[chat-v2] Checking step content:', {
+            type: content.type,
+            toolName: content.toolName,
+            hasOutput: !!content.output,
+          });
+        }
 
         return (
           content.type === 'tool-result' &&
@@ -126,6 +127,7 @@ export async function POST(request: NextRequest) {
     const responsePayload = {
       message: result.text,
       emailSent,
+      systemMessage: emailSent ? '✅ Email sent to Fran! Check your inbox within 24h.' : undefined,
       // Debug info (remove in production)
       debug: {
         intent,

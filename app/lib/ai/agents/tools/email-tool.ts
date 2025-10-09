@@ -56,18 +56,28 @@ function validateSalesFields(fields: SalesFields): ValidationResult {
 export const validateAndSendEmailTool = tool({
   description: `Validate customer fields and send sales inquiry email to Fran.
 
+⚠️ CRITICAL: ONLY call this tool when you have REAL VALUES for all 3 required fields.
+
 WHEN TO USE:
-- When you have the 3 REQUIRED fields: name, email, projectType
-- Budget/timeline are optional - accept "I don't know" or any answer
+✅ You have actual name (not null, not "unknown")
+✅ You have valid email with @ symbol (not null, not "unknown")
+✅ You have projectType (not null, not "unknown")
+✅ Budget/timeline are optional - can be "I don't know" or any answer
+
+WHEN NOT TO USE:
+❌ ANY required field is null
+❌ ANY required field is "unknown" or placeholder value
+❌ Email doesn't have @ symbol
+❌ Name is too short (< 2 chars)
+
+IF FIELDS ARE MISSING:
+→ Ask the customer for the missing information
+→ Do NOT call this tool with placeholder values
 
 WHAT IT DOES:
 1. Validates required fields are present and correctly formatted
 2. Sends email to Fran with the customer inquiry
-3. Returns success or failure details
-
-DO NOT USE IF:
-- Missing name, email, or projectType
-- Email format is invalid`,
+3. Returns success or failure details`,
 
   inputSchema: z.object({
     name: z.string().min(2).describe('Customer full name'),
