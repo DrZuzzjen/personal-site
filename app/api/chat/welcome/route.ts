@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { generateText } from 'ai';
+import { groq } from '@/app/lib/ai/providers/groq';
 import { getPersonalityContext } from '@/app/lib/personality.server';
 
 export async function POST(req: NextRequest) {
@@ -112,39 +114,25 @@ Now write your greeting:`;
     // console.log('=== PROMPT BEING SENT ===');
     // console.log(welcomePrompt);
 
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'meta-llama/llama-4-maverick-17b-128e-instruct',
-        messages: [
-          { role: 'system', content: getPersonalityContext() },
-          { role: 'user', content: welcomePrompt },
-        ],
-        temperature: 0.9, // More creative for welcome messages
-        max_tokens: 300,
-      }),
+    // Use Vercel AI SDK for cleaner, type-safe API calls
+    const { text: welcomeMessage } = await generateText({
+      model: groq(process.env.GROQ_WELCOME_MODEL || 'meta-llama/llama-4-maverick-17b-128e-instruct'),
+      messages: [
+        { role: 'system', content: getPersonalityContext() },
+        { role: 'user', content: welcomePrompt },
+      ],
+      temperature: 0.9, // More creative for welcome messages
+      maxTokens: 300,
     });
 
-    if (!response.ok) {
-      throw new Error(`Groq API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    let welcomeMessage = data.choices[0]?.message?.content ||
-      "hey! :)\nwhat's up?";
-
     // Remove quotes that LLM sometimes adds
-    welcomeMessage = welcomeMessage.replace(/^["']|["']$/g, '').trim();
+    const cleanedMessage = welcomeMessage.replace(/^["']|["']$/g, '').trim();
 
     // Remove sensitive logging for production security
     // console.log('=== LLM RESPONSE ===');
-    // console.log('Welcome message:', welcomeMessage);
+    // console.log('Welcome message:', cleanedMessage);
 
-    return NextResponse.json({ message: welcomeMessage });
+    return NextResponse.json({ message: cleanedMessage });
   } catch (error) {
     console.error('Welcome API error:', error);
     // Fallback welcome message
