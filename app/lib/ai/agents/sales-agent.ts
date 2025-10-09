@@ -6,7 +6,6 @@ import { validateAndSendEmailTool } from './tools/email-tool';
 
 export interface SalesAgentConfig {
   currentFields: SalesFields;
-  language?: 'es' | 'en' | 'fr' | 'de';
 }
 
 /**
@@ -16,10 +15,10 @@ export class SalesAgent {
   private readonly agent: Agent<any, any, any>;
 
   constructor(config: SalesAgentConfig) {
-    const { currentFields, language = 'en' } = config;
+    const { currentFields } = config;
 
     const fieldStatus = this.formatFieldStatus(currentFields);
-    const systemPrompt = this.buildSystemPrompt(fieldStatus, language);
+    const systemPrompt = this.buildSystemPrompt(fieldStatus);
 
     this.agent = new Agent<any, any, any>({
       model: groq(process.env.GROQ_SALES_MODEL || 'llama-3.3-70b-versatile'),
@@ -76,8 +75,8 @@ export class SalesAgent {
     ].join('\n');
   }
 
-  private buildSystemPrompt(fieldStatus: string, language: 'es' | 'en' | 'fr' | 'de'): string {
-    return PROMPTS.SALES_AGENT(language, fieldStatus);
+  private buildSystemPrompt(fieldStatus: string): string {
+    return PROMPTS.SALES_AGENT(fieldStatus);
   }
 }
 

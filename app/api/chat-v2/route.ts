@@ -5,6 +5,7 @@ import { PROMPTS } from '@/app/lib/ai/prompts';
 import { fieldExtractorAgent } from '@/app/lib/ai/agents/field-extractor-agent';
 import { createSalesAgent } from '@/app/lib/ai/agents/sales-agent';
 import type { Message } from '@/app/lib/ai/agents/types';
+import { telemetry } from '@/app/lib/telemetry';
 
 // Detect user intent using Vercel AI SDK with conversation context
 async function detectIntent(userMessage: string, conversationHistory: Message[] = []): Promise<'sales' | 'casual'> {
@@ -30,6 +31,8 @@ async function detectIntent(userMessage: string, conversationHistory: Message[] 
 }
 
 export async function POST(request: NextRequest) {
+  const startTime = Date.now();
+
   try {
     const { messages } = await request.json();
 
@@ -62,17 +65,9 @@ export async function POST(request: NextRequest) {
     const extraction = await fieldExtractorAgent.extract(messages);
     console.log('[chat-v2] Extracted fields:', extraction.fields);
 
-    // Step 2: Detect language (simple heuristic)
-    const lastUserMessage = lastMessage.content.toLowerCase();
-    let language: 'es' | 'en' | 'fr' | 'de' = 'en';
-    if (/\b(hola|gracias|quiero)\b/.test(lastUserMessage)) language = 'es';
-    else if (/\b(merci|bonjour|oui)\b/.test(lastUserMessage)) language = 'fr';
-    else if (/\b(danke|hallo|ja)\b/.test(lastUserMessage)) language = 'de';
-
-    // Step 3: Create sales agent with current state
+    // Step 2: Create sales agent with current state
     const salesAgent = createSalesAgent({
-      currentFields: extraction.fields,
-      language
+      currentFields: extraction.fields
     });
 
     // Step 4: Generate response
@@ -87,20 +82,41 @@ export async function POST(request: NextRequest) {
 
     console.log('[chat-v2] Response generated, emailSent:', emailSent);
 
-    return NextResponse.json({
+    const responsePayload = {
       message: result.text,
       emailSent,
       // Debug info (remove in production)
       debug: {
         intent,
         extractedFields: extraction.fields,
-        confidence: extraction.confidence,
-        language
+        confidence: extraction.confidence
       }
+    };
+
+    telemetry.log({
+      timestamp: new Date().toISOString(),
+      endpoint: '/api/chat-v2',
+      intent: 'sales',
+      latencyMs: Date.now() - startTime,
+      tokensUsed: result.usage?.totalTokens,
+      agentSteps: result.steps?.length,
+      emailSent
     });
+
+    return NextResponse.json(responsePayload);
 
   } catch (error) {
     console.error('[chat-v2] Error:', error);
+
+    telemetry.log({
+      timestamp: new Date().toISOString(),
+      endpoint: '/api/chat-v2',
+      intent: 'sales',
+      latencyMs: Date.now() - startTime,
+      emailSent: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+
     return NextResponse.json(
       {
         message: "Sorry, something went wrong. Can you repeat that?",
