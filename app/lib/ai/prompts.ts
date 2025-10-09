@@ -56,6 +56,10 @@ export const PROMPTS = {
   // Field validation prompt
   FIELD_VALIDATOR: (fieldsData: string) =>
     loadPromptWithVars('validator.txt', { fields_data: fieldsData }),
+
+  // Sales agent prompts (by language)
+  SALES_AGENT: (language: 'es' | 'en' | 'fr' | 'de', fieldStatus: string) =>
+    loadPromptWithVars(`sales-agent-${language}.txt`, { field_status: fieldStatus }),
 } as const;
 
 export default PROMPTS;
