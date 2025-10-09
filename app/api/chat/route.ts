@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { generateText } from 'ai';
 import { groq } from '@/app/lib/ai/providers/groq';
 import { PROMPTS } from '@/app/lib/ai/prompts';
+import { z } from 'zod';
 
 interface Message {
   role: 'user' | 'assistant' | 'system';
@@ -14,6 +15,12 @@ interface SalesFields {
   projectType: string | null;
   budget: string | null;
   timeline: string | null;
+}
+
+// Action types for function calling (client-side execution)
+interface Action {
+  type: 'openApp' | 'closeApp' | 'restart';
+  appName?: string;
 }
 
 // Extract fields from conversation history
@@ -129,10 +136,10 @@ async function detectIntent(userMessage: string, conversationHistory: Message[] 
   }
 }
 
-// Handle casual chat using Vercel AI SDK
-async function handleCasualChat(userMessage: string, conversationHistory: Message[]): Promise<string> {
+// Handle casual chat using Vercel AI SDK with function calling tools
+async function handleCasualChat(userMessage: string, conversationHistory: Message[]): Promise<{ message: string; actions: Action[] }> {
   try {
-    const { text } = await generateText({
+    const { text, toolCalls } = await generateText({
       model: groq(process.env.GROQ_CASUAL_MODEL || 'llama-3.3-70b-versatile'),
       messages: [
         { role: 'system', content: PROMPTS.CASUAL_CHAT() },
@@ -140,12 +147,54 @@ async function handleCasualChat(userMessage: string, conversationHistory: Messag
         { role: 'user', content: userMessage }
       ],
       temperature: 0.8,
+      tools: {
+        openApp: {
+          description: 'Opens an application window on the Windows desktop. Use this when user asks to open, launch, or start an app.',
+          inputSchema: z.object({
+            appName: z.enum(['paint', 'minesweeper', 'snake', 'notepad', 'camera', 'tv', 'browser', 'mycomputer', 'explorer'])
+              .describe('The name of the application to open')
+          }),
+          execute: async ({ appName }) => ({ appName })
+        },
+        closeApp: {
+          description: 'Closes an open application window. Use this when user asks to close, quit, or exit an app.',
+          inputSchema: z.object({
+            appName: z.enum(['paint', 'minesweeper', 'snake', 'notepad', 'camera', 'tv', 'browser', 'mycomputer', 'explorer'])
+              .describe('The name of the application to close')
+          }),
+          execute: async ({ appName }) => ({ appName })
+        },
+        restart: {
+          description: 'Closes all open windows and restarts the desktop. Use this when user asks to restart, reboot, or close everything.',
+          inputSchema: z.object({}),
+          execute: async () => ({ success: true })
+        }
+      }
     });
 
-    return text || "hey! :) what's up?";
+    // Convert toolCalls to actions for client-side execution
+    const actions: Action[] = toolCalls.map(call => {
+      if (call.toolName === 'openApp' || call.toolName === 'closeApp') {
+        return {
+          type: call.toolName,
+          appName: (call as any).input?.appName
+        };
+      } else if (call.toolName === 'restart') {
+        return { type: 'restart' };
+      }
+      return { type: 'openApp' }; // Fallback (should never happen)
+    });
+
+    return {
+      message: text || "hey! :) what's up?",
+      actions
+    };
   } catch (error) {
     console.error('Casual chat error:', error);
-    return "hey! :) what's up?";
+    return {
+      message: "hey! :) what's up?",
+      actions: []
+    };
   }
 }
 
@@ -318,7 +367,11 @@ export async function POST(request: NextRequest) {
       result = await handleSalesChat(userMessage, conversationHistory);
     } else {
       const casualResponse = await handleCasualChat(userMessage, conversationHistory);
-      result = { message: casualResponse, emailSent: false };
+      result = {
+        message: casualResponse.message,
+        actions: casualResponse.actions,
+        emailSent: false
+      };
     }
 
     return NextResponse.json(result);
