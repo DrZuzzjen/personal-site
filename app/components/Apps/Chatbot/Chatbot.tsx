@@ -462,7 +462,7 @@ Project details: ${context.projects
 				{ role: 'user' as const, content: userMessage },
 			];
 
-			const response = await fetch('/api/chat', {
+			const response = await fetch('/api/chat-v2', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
