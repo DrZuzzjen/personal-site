@@ -185,6 +185,7 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 	const [inputValue, setInputValue] = useState('');
 	const [isTyping, setIsTyping] = useState(false);
 	const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+	const [isSending, setIsSending] = useState(false); // Prevent duplicate sends
 	const messagesEndRef = useRef<HTMLDivElement>(null);
 	const chatContainerRef = useRef<HTMLDivElement>(null);
 	const flashingTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -438,15 +439,22 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 	const sendMessage = async (userMessage: string) => {
 		if (!userMessage.trim()) return;
 
+		// Prevent duplicate sends
+		if (isSending) {
+			console.warn('[Chatbot] Message send already in progress, ignoring duplicate');
+			return;
+		}
+
+		setIsSending(true);
 		console.log('[Chatbot] sendMessage called, messages count:', messages.length);
 		console.log('[Chatbot] Sending to API:', userMessage);
 
-		// Add user message immediately
-		addMessage({ role: 'user', content: userMessage });
-		setInputValue('');
-		setIsTyping(true);
-
 		try {
+			// Add user message immediately
+			addMessage({ role: 'user', content: userMessage });
+			setInputValue('');
+			setIsTyping(true);
+
 			// Build context-enriched message history
 			const context = getPortfolioContext();
 			const contextMessage = {
@@ -496,20 +504,32 @@ Project details: ${context.projects
 
 			// Execute actions (function calling - open/close apps)
 			if (data.actions && data.actions.length > 0) {
-				data.actions.forEach((action: any) => {
+				console.log('[Chatbot] Executing actions:', data.actions);
+				data.actions.forEach((action: any, index: number) => {
+					console.log(`[Chatbot] Executing action ${index}:`, action);
 					try {
 						if (action.type === 'openApp' && action.appName) {
+							// Check if window already open to prevent duplicates
+							const existingWindow = windows.find(w => w.appType === action.appName);
+							if (existingWindow) {
+								console.warn('[Chatbot] Window already open, skipping:', action.appName);
+								return;
+							}
+
 							const appConfig = getAppConfig(action.appName);
 							if (appConfig) {
+								console.log('[Chatbot] Opening new window:', action.appName);
 								openWindow(appConfig);
 							}
 						} else if (action.type === 'closeApp' && action.appName) {
 							// Find window by appType and close it
 							const windowToClose = windows.find(w => w.appType === action.appName);
 							if (windowToClose) {
+								console.log('[Chatbot] Closing window:', action.appName);
 								closeWindow(windowToClose.id);
 							}
 						} else if (action.type === 'restart') {
+							console.log('[Chatbot] Restarting desktop - closing all windows');
 							// Close all windows
 							windows.forEach(w => closeWindow(w.id));
 						}
@@ -545,6 +565,7 @@ Project details: ${context.projects
 			});
 		} finally {
 			setIsTyping(false);
+			setIsSending(false); // Reset sending state
 		}
 	};
 
