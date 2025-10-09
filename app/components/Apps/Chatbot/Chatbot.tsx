@@ -189,6 +189,7 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 	const chatContainerRef = useRef<HTMLDivElement>(null);
 	const flashingTimerRef = useRef<NodeJS.Timeout | null>(null);
 	const proactiveMessageSentRef = useRef<boolean>(false); // Track if we already sent proactive message
+	const hasSentContextRef = useRef<boolean>(false);
 	const lastNotifiedMessageIdRef = useRef<string | null>(null); // Track last message we notified about
 
 	const { rootItems } = useFileSystemContext();
@@ -204,6 +205,7 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 					timestamp: new Date(msg.timestamp),
 				}));
 				setMessages(parsedMessages);
+				console.log('[Chatbot] Restored messages from localStorage:', parsedMessages.length);
 			} catch (error) {
 				console.error('Error loading chat history:', error);
 			}
@@ -260,6 +262,7 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 	useEffect(() => {
 		if (messages.length > 0) {
 			localStorage.setItem('chatbot-history', JSON.stringify(messages));
+			console.log('[Chatbot] Persisted messages to localStorage:', messages.length);
 		}
 	}, [messages]);
 
@@ -435,6 +438,9 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 	const sendMessage = async (userMessage: string) => {
 		if (!userMessage.trim()) return;
 
+		console.log('[Chatbot] sendMessage called, messages count:', messages.length);
+		console.log('[Chatbot] Sending to API:', userMessage);
+
 		// Add user message immediately
 		addMessage({ role: 'user', content: userMessage });
 		setInputValue('');
@@ -454,13 +460,18 @@ Project details: ${context.projects
 			};
 
 			const conversationHistory = [
-				contextMessage,
 				...messages.map((msg) => ({
 					role: msg.role,
 					content: msg.content,
 				})),
 				{ role: 'user' as const, content: userMessage },
 			];
+
+			if (!hasSentContextRef.current) {
+				conversationHistory.unshift(contextMessage);
+				hasSentContextRef.current = true;
+				console.log('[Chatbot] Added portfolio context to first request');
+			}
 
 			const response = await fetch('/api/chat-v2', {
 				method: 'POST',
@@ -475,6 +486,10 @@ Project details: ${context.projects
 			}
 
 			const data = await response.json();
+			console.log('[Chatbot] API response received', {
+				emailSent: data.emailSent,
+				intent: data.debug?.intent,
+			});
 
 			// Add assistant message
 			addMessage({ role: 'assistant', content: data.message });
@@ -633,6 +648,7 @@ Available projects: ${context.projects.map((p) => p.name).join(', ')}`,
 		if (confirm('Clear all messages?')) {
 			setMessages([]);
 			localStorage.removeItem('chatbot-history');
+			hasSentContextRef.current = false;
 		}
 	};
 

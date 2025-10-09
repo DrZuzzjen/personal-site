@@ -28,6 +28,7 @@ export class SalesAgent {
         validateAndSendEmail: validateAndSendEmailTool,
       },
       stopWhen: ({ steps }) => {
+        // Stop immediately if ANY step has a successful email send
         const emailSent = steps.some((step: any) =>
           step.toolCalls?.some(
             (call: any) =>
@@ -36,7 +37,19 @@ export class SalesAgent {
           ),
         );
 
-        return emailSent || steps.length >= 10;
+        // If email sent, stop regardless of step count
+        if (emailSent) {
+          console.log('[SalesAgent] Email sent successfully, stopping agent');
+          return true;
+        }
+
+        // Otherwise, limit to 10 steps for safety
+        if (steps.length >= 10) {
+          console.log('[SalesAgent] Max steps reached without email send');
+          return true;
+        }
+
+        return false;
       },
     });
   }
@@ -49,8 +62,23 @@ export class SalesAgent {
       return this.agent.generate({ messages: [] as any });
     }
 
-    const conversationHistory = JSON.stringify(messages);
     const lastMessage = messages[messages.length - 1];
+    const toolHistory = messages
+      .filter(message => message.role !== 'system')
+      .map(message => ({
+        role: message.role,
+        content: message.content.length > 500
+          ? message.content.slice(-500)
+          : message.content,
+      }))
+      .slice(-12);
+
+    const conversationHistory = JSON.stringify(toolHistory);
+    console.log('[SalesAgent] Prepared tool history', {
+      totalMessages: messages.length,
+      usedMessages: toolHistory.length,
+      historyBytes: conversationHistory.length,
+    });
 
     const messagesWithContext: Message[] = [
       ...messages.slice(0, -1),

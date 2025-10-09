@@ -17,10 +17,13 @@ import type { Message, SalesFields, ExtractionResult } from './types';
 
 export class FieldExtractorAgent {
   private agent: any; // Using any for now to avoid type issues
+  private cachedExtraction: ExtractionResult | null = null;
+  private cachedHistorySignature: string | null = null;
+  private cachedLastUserMessage: string | null = null;
 
   constructor() {
     this.agent = new Agent({
-      model: groq(process.env.GROQ_EXTRACTOR_MODEL || 'llama-3.3-70b-versatile'),
+      model: groq(process.env.GROQ_EXTRACTOR_MODEL || 'llama-3.1-8b-instant'),
 
       system: `You are a data extraction specialist. Analyze conversation history and extract customer information.
 
@@ -58,11 +61,41 @@ NEVER include explanations, only JSON.`,
    * Extract fields from conversation history
    */
   async extract(conversationHistory: Message[]): Promise<ExtractionResult> {
-    // Format conversation for the agent
-    const conversationText = conversationHistory
+    const relevantHistory = this.buildRelevantHistory(conversationHistory);
+    console.log('[FieldExtractor] History lengths:', {
+      original: conversationHistory.length,
+      relevant: relevantHistory.length,
+    });
+    const lastUserMessage = this.getLastUserMessage(conversationHistory);
+
+    const conversationText = relevantHistory
       .map(msg => `${msg.role}: ${msg.content}`)
       .join('\n');
 
+    const historySignature = `${relevantHistory.length}:${conversationText}`;
+
+    if (this.cachedExtraction && this.cachedHistorySignature === historySignature) {
+      console.log('[FieldExtractor] Using cached extraction (no new history)');
+      return this.cachedExtraction;
+    }
+
+    const cachedFieldsComplete =
+      this.cachedExtraction &&
+      (['name', 'email', 'projectType'] as const).every(
+        key => this.cachedExtraction!.fields[key] !== null,
+      );
+
+    if (
+      cachedFieldsComplete &&
+      this.cachedLastUserMessage &&
+      this.cachedLastUserMessage === lastUserMessage
+    ) {
+      console.log('[FieldExtractor] Reusing cached extraction (fields complete, no new user info)');
+      this.cachedHistorySignature = historySignature;
+      return this.cachedExtraction!;
+    }
+
+    // Format conversation for the agent
     const prompt = `Conversation history:\n\n${conversationText}\n\nExtract customer fields:`;
 
     try {
@@ -88,11 +121,17 @@ NEVER include explanations, only JSON.`,
       const fieldsFound = Object.values(fields).filter(v => v !== null).length;
       const confidence = (fieldsFound / 5) * 100;
 
-      return {
+      const extractionResult: ExtractionResult = {
         fields,
         confidence,
-        extractedFrom: conversationHistory.length
+        extractedFrom: relevantHistory.length
       };
+
+      this.cachedExtraction = extractionResult;
+      this.cachedHistorySignature = historySignature;
+      this.cachedLastUserMessage = lastUserMessage;
+
+      return extractionResult;
 
     } catch (error) {
       console.error('[FieldExtractorAgent] Extraction failed:', error);
@@ -107,9 +146,40 @@ NEVER include explanations, only JSON.`,
           timeline: null
         },
         confidence: 0,
-        extractedFrom: conversationHistory.length
+        extractedFrom: relevantHistory.length
       };
     }
+  }
+
+  private buildRelevantHistory(history: Message[]): Message[] {
+    const nonSystemHistory = history.filter(msg => msg.role !== 'system');
+
+    if (nonSystemHistory.length <= 12) {
+      return nonSystemHistory;
+    }
+
+    const recentAssistantMessages = nonSystemHistory
+      .filter(msg => msg.role === 'assistant')
+      .slice(-3);
+    const assistantSet = new Set(recentAssistantMessages);
+
+    const trimmed: Message[] = [];
+    for (const message of nonSystemHistory) {
+      if (message.role === 'user' || assistantSet.has(message)) {
+        trimmed.push(message);
+      }
+    }
+
+    return trimmed.length > 0 ? trimmed : nonSystemHistory.slice(-12);
+  }
+
+  private getLastUserMessage(history: Message[]): string | null {
+    for (let i = history.length - 1; i >= 0; i -= 1) {
+      if (history[i].role === 'user') {
+        return history[i].content;
+      }
+    }
+    return null;
   }
 
   /**

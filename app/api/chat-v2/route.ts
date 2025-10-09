@@ -32,10 +32,13 @@ async function detectIntent(userMessage: string, conversationHistory: Message[] 
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now();
+  console.log('[PERF] Request started');
   let intent: 'sales' | 'casual' = 'sales';
 
   try {
+    const parseStart = Date.now();
     const { messages } = await request.json();
+    console.log('[PERF] Messages parsed:', Date.now() - parseStart, 'ms');
 
     if (!messages || messages.length === 0) {
       return NextResponse.json(
@@ -48,7 +51,9 @@ export async function POST(request: NextRequest) {
     const conversationHistory = messages.slice(0, -1);
 
     // Detect intent
+    const intentStart = Date.now();
     intent = await detectIntent(lastMessage.content, conversationHistory);
+    console.log('[PERF] Intent detected:', Date.now() - intentStart, 'ms');
 
     if (intent === 'casual') {
       // Keep using old casual handler for now
@@ -71,7 +76,10 @@ export async function POST(request: NextRequest) {
     console.log('[chat-v2] Sales intent detected, using agents');
 
     // Step 1: Extract current fields
+    const extractStart = Date.now();
     const extraction = await fieldExtractorAgent.extract(messages);
+    console.log('[PERF] Fields extracted:', Date.now() - extractStart, 'ms');
+    console.log('[PERF] Extracted fields:', extraction.fields, 'confidence:', extraction.confidence);
     console.log('[chat-v2] Extracted fields:', extraction.fields);
 
     // Step 2: Create sales agent with current state
@@ -80,16 +88,40 @@ export async function POST(request: NextRequest) {
     });
 
     // Step 4: Generate response
+    const salesStart = Date.now();
     const result = await salesAgent.generate(messages);
+    console.log('[PERF] Sales agent completed:', Date.now() - salesStart, 'ms');
+    console.log('[PERF] Agent steps:', result.steps?.length || 0);
+    console.log('[PERF] Total tokens:', result.usage?.totalTokens);
+    result.steps?.forEach((step: any, index: number) => {
+      console.log(`[PERF] Step ${index + 1}:`, {
+        toolCalls: step.toolCalls?.map((c: any) => c.toolName),
+        hasText: !!step.text,
+        textLength: step.text?.length
+      });
+    });
 
-    // Step 5: Check if email was sent
-    const emailSent = result.steps.some((step: any) =>
-      step.toolCalls?.some((call: any) =>
-        call.toolName === 'validateAndSendEmail' && call.result?.sent === true
-      )
-    );
+    // Step 5: Check if email was sent (fixed detection logic)
+    const emailSent = result.steps.some((step: any) => {
+      if (!step.content) return false;
 
-    console.log('[chat-v2] Response generated, emailSent:', emailSent);
+      return step.content.some((content: any) => {
+        console.log('[chat-v2] Checking step content:', {
+          type: content.type,
+          toolName: content.toolName,
+          hasOutput: !!content.output,
+          output: content.output,
+        });
+
+        return (
+          content.type === 'tool-result' &&
+          content.toolName === 'validateAndSendEmail' &&
+          content.output?.sent === true
+        );
+      });
+    });
+
+    console.log('[chat-v2] Email sent detection result:', emailSent);
 
     const responsePayload = {
       message: result.text,
@@ -111,11 +143,13 @@ export async function POST(request: NextRequest) {
       agentSteps: result.steps?.length,
       emailSent
     });
+    console.log('[PERF] Total latency:', Date.now() - startTime, 'ms');
 
     return NextResponse.json(responsePayload);
 
   } catch (error) {
     console.error('[chat-v2] Error:', error);
+    console.log('[PERF] Request failed after:', Date.now() - startTime, 'ms');
 
     telemetry.log({
       timestamp: new Date().toISOString(),
