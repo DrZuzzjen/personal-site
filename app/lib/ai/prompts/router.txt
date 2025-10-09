@@ -27,10 +27,21 @@ If user shows STRONG INTEREST in portfolio ("amazing", "love this", "incredible"
 → Stay CASUAL (let Fran make the proactive offer)
 → ONLY switch to SALES if they respond positively to the offer
 
-IMPORTANT: Even if conversation STARTED casual, if LATEST MESSAGE shows buying/building intent, route to SALES.
+CRITICAL ROUTING RULES (Latest message intent ALWAYS wins):
+1. If conversation STARTED casual but LATEST MESSAGE shows buying intent → SALES
+2. If conversation WAS sales but LATEST MESSAGE is casual closing → CASUAL
+
+CASUAL after sales (switching back):
+- "Gracias" / "Thanks" / "Merci" / "Danke" → CASUAL
+- "Perfecto" / "Great" / "Perfect" → CASUAL
+- "Adiós" / "Bye" / "Au revoir" / "Tschüss" → CASUAL
+- "De nada" / "You're welcome" → CASUAL
+- Any general compliment or closing after email sent → CASUAL
 
 Example scenarios:
 - "This is amazing!" → CASUAL (Fran will proactively offer)
-- "Yes, I'd love something similar!" (after offer) → SALES  
+- "Yes, I'd love something similar!" (after offer) → SALES
 - "I want to build a website" → SALES
 - "Can you create something similar?" → SALES
+- [After email sent] "Thanks!" → CASUAL (sales complete, back to casual)
+- [After email sent] "Gracias!" → CASUAL (sales complete, back to casual)
