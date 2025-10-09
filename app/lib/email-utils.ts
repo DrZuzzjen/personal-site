@@ -59,7 +59,7 @@ Keep each line concise and HTML formatted.`,
  */
 function detectLanguage(conversationHistory: string): string {
   const text = conversationHistory.toLowerCase();
-  
+
   // Simple language detection based on common words
   if (text.includes('hola') || text.includes('quiero') || text.includes('necesito') || text.includes('presupuesto')) {
     return 'Spanish';
@@ -78,11 +78,11 @@ function detectLanguage(conversationHistory: string): string {
 function generateLeadProfile(conversationHistory: string): LeadProfile {
   const now = new Date();
   const language = detectLanguage(conversationHistory);
-  
+
   // Determine timezone based on language (rough approximation)
   let timezone = 'UTC';
   let location = 'Unknown';
-  
+
   if (language === 'Spanish') {
     timezone = 'Europe/Madrid (GMT+1/+2)';
     location = 'Spain/Latin America';
@@ -101,10 +101,10 @@ function generateLeadProfile(conversationHistory: string): LeadProfile {
     language,
     timezone,
     location,
-    timeOfInteraction: now.toLocaleTimeString('en-US', { 
-      hour: '2-digit', 
+    timeOfInteraction: now.toLocaleTimeString('en-US', {
+      hour: '2-digit',
       minute: '2-digit',
-      hour12: false 
+      hour12: false
     }),
     visitorType: 'returning', // Could be enhanced with actual tracking
     visitCount: Math.floor(Math.random() * 5) + 1, // Placeholder - replace with real data
@@ -119,13 +119,13 @@ function generateLeadProfile(conversationHistory: string): LeadProfile {
 export async function sendSalesInquiryEmail(data: SalesInquiryData): Promise<{ success: boolean; emailId?: string; error?: string }> {
   try {
     console.log('[Email] Generating AI opportunity summary...');
-    
+
     // Generate AI-powered opportunity summary
     const opportunitySummary = await generateOpportunitySummary(data.projectDescription);
-    
+
     // Generate lead profile
     const leadProfile = generateLeadProfile(data.projectDescription);
-    
+
     // Determine urgency level based on budget and timeline
     let urgencyLevel = '🟡 Warm';
     if (data.budget && parseInt(data.budget.replace(/\D/g, '')) > 10000) {

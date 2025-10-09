@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { generateText } from 'ai';
+import { generateText, Experimental_Agent as Agent, tool, stepCountIs } from 'ai';
 import { groq } from '@/app/lib/ai/providers/groq';
 import { PROMPTS } from '@/app/lib/ai/prompts';
 import { fieldExtractorAgent } from '@/app/lib/ai/agents/field-extractor-agent';
@@ -11,16 +11,6 @@ import { z } from 'zod';
 interface Action {
   type: 'openApp' | 'closeApp' | 'restart';
   appName?: string;
-}
-
-type CasualToolName = 'openApp' | 'closeApp' | 'restart';
-
-interface CasualToolCall {
-  toolName: CasualToolName | string;
-  input?: { appName?: string };
-  result?: { message?: string };
-  res?: { message?: string };
-  output?: { message?: string };
 }
 
 // Detect user intent using Vercel AI SDK with conversation context
@@ -46,89 +36,96 @@ async function detectIntent(userMessage: string, conversationHistory: Message[] 
   }
 }
 
+// Create casual chat agent with automatic tool execution
+const casualAgent = new Agent({
+  model: groq(process.env.GROQ_CASUAL_MODEL || 'llama-3.3-70b-versatile'),
+  system: PROMPTS.CASUAL_CHAT(),
+  temperature: 0.8,
+  stopWhen: stepCountIs(3), // Allow multiple tool calls
+  tools: {
+    openApp: tool({
+      description: 'Opens an application window on the Windows desktop. Use this when user asks to open, launch, or start an app. Available apps: paint, minesweeper, snake, notepad, camera, tv, browser (internet explorer), chatbot (MSN Messenger), portfolio, terminal, mycomputer, explorer.',
+      inputSchema: z.object({
+        appName: z.enum(['paint', 'minesweeper', 'snake', 'notepad', 'camera', 'tv', 'browser', 'chatbot', 'portfolio', 'terminal', 'mycomputer', 'explorer'])
+          .describe('The name of the application to open')
+      }),
+      execute: async ({ appName }) => {
+        const messages: Record<string, string> = {
+          paint: '¡Listo! Abriendo Paint 🎨',
+          minesweeper: '¡A jugar! Abriendo Minesweeper 💣',
+          snake: '¡Vamos! Abriendo Snake 🐍',
+          notepad: '¡Listo! Abriendo Bloc de notas 📝',
+          camera: '¡Listo! Abriendo cámara 📷',
+          tv: '¡Listo! Abriendo TV 📺',
+          browser: '¡Listo! Abriendo navegador 🌐',
+          chatbot: '¡Listo! Abriendo MSN Messenger 💬',
+          portfolio: '¡Listo! Abriendo Portfolio 📁',
+          terminal: '¡Listo! Abriendo Terminal 💻',
+          mycomputer: '¡Listo! Abriendo Mi PC 🖥️',
+          explorer: '¡Listo! Abriendo explorador de archivos 📂'
+        };
+        return { appName, message: messages[appName] || '¡Listo!' };
+      }
+    }),
+    closeApp: tool({
+      description: 'Closes an open application window. Use this when user asks to close, quit, or exit an app.',
+      inputSchema: z.object({
+        appName: z.enum(['paint', 'minesweeper', 'snake', 'notepad', 'camera', 'tv', 'browser', 'chatbot', 'portfolio', 'terminal', 'mycomputer', 'explorer'])
+          .describe('The name of the application to close')
+      }),
+      execute: async ({ appName }) => ({ appName, message: `Cerrando ${appName}...` })
+    }),
+    restart: tool({
+      description: 'Closes all open windows and restarts the desktop. Use this when user asks to restart, reboot, or close everything.',
+      inputSchema: z.object({}),
+      execute: async () => ({ success: true, message: 'Reiniciando escritorio...' })
+    })
+  }
+});
+
 async function handleCasualChat(
   userMessage: string,
   conversationHistory: Message[]
 ): Promise<{ message: string; actions: Action[] }> {
   try {
-    const { text, toolCalls } = await generateText({
-      model: groq(process.env.GROQ_CASUAL_MODEL || 'llama-3.3-70b-versatile'),
+    // Use Agent to handle conversation and tools automatically
+    const result = await casualAgent.generate({
       messages: [
-        { role: 'system', content: PROMPTS.CASUAL_CHAT() },
         ...conversationHistory,
         { role: 'user', content: userMessage }
-      ],
-      temperature: 0.8,
-      tools: {
-        openApp: {
-          description: 'Opens an application window on the Windows desktop. Use this when user asks to open, launch, or start an app. Available apps: paint, minesweeper, snake, notepad, camera, tv, browser (internet explorer), chatbot (MSN Messenger), portfolio, terminal, mycomputer, explorer.',
-          inputSchema: z.object({
-            appName: z.enum(['paint', 'minesweeper', 'snake', 'notepad', 'camera', 'tv', 'browser', 'chatbot', 'portfolio', 'terminal', 'mycomputer', 'explorer'])
-              .describe('The name of the application to open')
-          }),
-          execute: async ({ appName }) => {
-            const messages: Record<string, string> = {
-              paint: '¡Listo! Abriendo Paint 🎨',
-              minesweeper: '¡A jugar! Abriendo Minesweeper 💣',
-              snake: '¡Vamos! Abriendo Snake 🐍',
-              notepad: '¡Listo! Abriendo Bloc de notas 📝',
-              camera: '¡Listo! Abriendo cámara 📷',
-              tv: '¡Listo! Abriendo TV 📺',
-              browser: '¡Listo! Abriendo navegador 🌐',
-              chatbot: '¡Listo! Abriendo MSN Messenger 💬',
-              portfolio: '¡Listo! Abriendo Portfolio 📁',
-              terminal: '¡Listo! Abriendo Terminal 💻',
-              mycomputer: '¡Listo! Abriendo Mi PC 🖥️',
-              explorer: '¡Listo! Abriendo explorador de archivos 📂'
-            };
-            return { appName, message: messages[appName] || '¡Listo!' };
+      ]
+    });
+
+    // Extract actions from tool calls in steps
+    const actions: Action[] = [];
+    for (const step of result.steps) {
+      if (step.toolCalls) {
+        for (const toolCall of step.toolCalls) {
+          if (toolCall.toolName === 'openApp') {
+            const input = toolCall.input as { appName: string };
+            if (input?.appName) {
+              actions.push({
+                type: 'openApp',
+                appName: input.appName
+              });
+            }
+          } else if (toolCall.toolName === 'closeApp') {
+            const input = toolCall.input as { appName: string };
+            if (input?.appName) {
+              actions.push({
+                type: 'closeApp',
+                appName: input.appName
+              });
+            }
+          } else if (toolCall.toolName === 'restart') {
+            actions.push({ type: 'restart' });
           }
-        },
-        closeApp: {
-          description: 'Closes an open application window. Use this when user asks to close, quit, or exit an app.',
-          inputSchema: z.object({
-            appName: z.enum(['paint', 'minesweeper', 'snake', 'notepad', 'camera', 'tv', 'browser', 'chatbot', 'portfolio', 'terminal', 'mycomputer', 'explorer'])
-              .describe('The name of the application to close')
-          }),
-          execute: async ({ appName }) => ({ appName, message: `Cerrando ${appName}...` })
-        },
-        restart: {
-          description: 'Closes all open windows and restarts the desktop. Use this when user asks to restart, reboot, or close everything.',
-          inputSchema: z.object({}),
-          execute: async () => ({ success: true, message: 'Reiniciando escritorio...' })
         }
       }
-    });
-
-    const toolCallsList: CasualToolCall[] = Array.isArray(toolCalls)
-      ? (toolCalls as CasualToolCall[])
-      : [];
-    const actions: Action[] = toolCallsList.map(call => {
-      if (call.toolName === 'openApp' || call.toolName === 'closeApp') {
-        return {
-          type: call.toolName as Action['type'],
-          appName: call.input?.appName
-        };
-      }
-      if (call.toolName === 'restart') {
-        return { type: 'restart' };
-      }
-      return { type: 'openApp' };
-    });
-
-    let cleanMessage = '';
-    if (toolCallsList.length > 0) {
-      const [firstTool] = toolCallsList;
-      const toolResult = firstTool?.result ?? firstTool?.res ?? firstTool?.output;
-      // When tools are used, only use the tool result message, NOT the text (which contains function call strings)
-      cleanMessage = toolResult?.message || 'Action completed! :)';
-    } else {
-      // Normal conversation without tools - use AI response
-      cleanMessage = text || "Hey! :) How's it going?";
     }
 
     return {
-      message: cleanMessage,
+      message: result.text || "Hey! :) How's it going?",
       actions
     };
   } catch (error) {
