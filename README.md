@@ -156,8 +156,5 @@ Looking for: retro game ports, accessibility upgrades, new agent skills, and OG 
 **Why Windows 3.1?**  
 > "I wanted people to say *Wait, WHAT?!* Nostalgia plus cutting-edge AI proves we can blend playful experiences with serious engineering."
 
-## ⭐ Star History
-[![Star History Chart](https://api.star-history.com/svg?repos=DrZuzzjen/personal-site&type=Date)](https://star-history.com/#DrZuzzjen/personal-site&Date)
-
 ## 📄 License
 MIT License – remix, fork, and build your own retro-OS portfolio.
