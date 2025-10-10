@@ -88,11 +88,15 @@ export default function Camera({ onClose }: CameraProps) {
 			}
 		} catch (err: unknown) {
 			console.error('Camera access denied:', err);
-			if (err && typeof err === 'object' && 'name' in err && err.name === 'NotAllowedError') {
+			const errorName =
+				typeof err === 'object' && err !== null && 'name' in err
+					? (err as { name?: string }).name
+					: undefined;
+			if (errorName === 'NotAllowedError') {
 				setError(
 					'Camera access denied. Please allow camera permission in your browser settings.'
 				);
-			} else if (err.name === 'NotFoundError') {
+			} else if (errorName === 'NotFoundError') {
 				setError('No camera detected. Please connect a webcam.');
 			} else {
 				setError('Failed to access camera. Please try again.');

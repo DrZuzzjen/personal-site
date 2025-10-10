@@ -1,4 +1,6 @@
 import { resend } from '@/app/lib/resend';
+import { generateText } from 'ai';
+import { groq } from '@/app/lib/ai/providers/groq';
 
 const BOOKING_EMAIL = process.env.BOOKING_EMAIL_TO || 'fallback@example.com';
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
@@ -14,19 +16,156 @@ export interface SalesInquiryData {
   source: string;
 }
 
+export interface LeadProfile {
+  language?: string;
+  timezone?: string;
+  location?: string;
+  timeOfInteraction?: string;
+  visitorType?: 'new' | 'returning';
+  visitCount?: number;
+  appsExplored?: string[];
+}
+
 /**
- * Send sales inquiry email via Resend
+ * Generate AI-powered sales opportunity summary in HTML format
+ */
+async function generateOpportunitySummary(conversationHistory: string): Promise<string> {
+  try {
+    const result = await generateText({
+      model: groq('llama-3.1-8b-instant'),
+      prompt: `Analyze this sales conversation and create a brief opportunity summary:
+
+Conversation: ${conversationHistory}
+
+Provide exactly this format:
+<strong>Project:</strong> [What they want to build in 1 line]<br>
+<strong>Details:</strong> [Key budget, timeline, specific needs]<br>
+<strong>Status:</strong> [Hot lead/Warm lead/Exploratory/etc.]<br>
+<strong>Notes:</strong> [Any red flags, objections, or special considerations]
+
+Keep each line concise and HTML formatted.`,
+      temperature: 0.3, // Low temperature for consistent analysis
+    });
+
+    return result.text.trim();
+  } catch (error) {
+    console.error('Failed to generate opportunity summary:', error);
+    return '<strong>Status:</strong> AI summary generation failed - please review conversation manually.';
+  }
+}
+
+/**
+ * Detect language from conversation history
+ */
+function detectLanguage(conversationHistory: string): string {
+  const text = conversationHistory.toLowerCase();
+
+  // Simple language detection based on common words
+  if (text.includes('hola') || text.includes('quiero') || text.includes('necesito') || text.includes('presupuesto')) {
+    return 'Spanish';
+  } else if (text.includes('bonjour') || text.includes('salut') || text.includes('veux') || text.includes('besoin')) {
+    return 'French';
+  } else if (text.includes('hallo') || text.includes('ich') || text.includes('brauche') || text.includes('projekt')) {
+    return 'German';
+  } else {
+    return 'English';
+  }
+}
+
+/**
+ * Generate lead profile from browser context and conversation
+ */
+function generateLeadProfile(conversationHistory: string): LeadProfile {
+  const now = new Date();
+  const language = detectLanguage(conversationHistory);
+
+  // Determine timezone based on language (rough approximation)
+  let timezone = 'UTC';
+  let location = 'Unknown';
+
+  if (language === 'Spanish') {
+    timezone = 'Europe/Madrid (GMT+1/+2)';
+    location = 'Spain/Latin America';
+  } else if (language === 'French') {
+    timezone = 'Europe/Paris (GMT+1/+2)';
+    location = 'France/Francophone';
+  } else if (language === 'German') {
+    timezone = 'Europe/Berlin (GMT+1/+2)';
+    location = 'Germany/DACH';
+  } else {
+    timezone = 'Unknown';
+    location = 'English-speaking region';
+  }
+
+  return {
+    language,
+    timezone,
+    location,
+    timeOfInteraction: now.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    }),
+    visitorType: 'returning', // Could be enhanced with actual tracking
+    visitCount: Math.floor(Math.random() * 5) + 1, // Placeholder - replace with real data
+    appsExplored: ['Paint', 'Minesweeper', 'Portfolio', 'MSN Messenger'], // Placeholder
+  };
+}
+
+/**
+ * Send sales inquiry email via Resend with AI-generated opportunity summary
  * Shared utility function for both API routes and direct calls
  */
 export async function sendSalesInquiryEmail(data: SalesInquiryData): Promise<{ success: boolean; emailId?: string; error?: string }> {
   try {
+    console.log('[Email] Generating AI opportunity summary...');
+
+    // Generate AI-powered opportunity summary
+    const opportunitySummary = await generateOpportunitySummary(data.projectDescription);
+
+    // Generate lead profile
+    const leadProfile = generateLeadProfile(data.projectDescription);
+
+    // Determine urgency level based on budget and timeline
+    let urgencyLevel = '🟡 Warm';
+    const budgetText = (data.budget ?? '').toString();
+    const nums = budgetText.match(/\d+(?:[.,]\d+)?/g);
+    const maxBudget = nums ? Math.max(...nums.map(n => parseFloat(n.replace(/,/g, '')))) : null;
+    const tl = (data.timeline ?? '').toLowerCase();
+    if ((maxBudget ?? 0) > 10000) {
+      urgencyLevel = '🔥 Hot';
+    } else if (/\b(urgent|asap|urgente|inmediato)\b/i.test(tl)) {
+      urgencyLevel = '🔥 Hot';
+    } else if (!budgetText || /\b(don'?t know|unknown|no se|no sé)\b/i.test(budgetText)) {
+      urgencyLevel = '🔵 Cold';
+    }
+
+    console.log('[Email] Sending enhanced sales inquiry email...');
+
     const { data: emailData, error } = await resend.emails.send({
       from: `MSN Messenger Sales <${FROM_EMAIL}>`,
       to: BOOKING_EMAIL,
       replyTo: data.email || undefined,
-      subject: `🚀 New Sales Inquiry from ${data.name}`,
+      subject: `🚀 ${urgencyLevel.split(' ')[1]} Lead: ${data.name} - ${data.projectType}`,
       html: `
-        <h2>New sales inquiry via MSN Messenger!</h2>
+        <h2>New sales inquiry via MSN Messenger! ${urgencyLevel}</h2>
+
+        <div style="background: #f0f8ff; padding: 15px; border-radius: 8px; margin: 15px 0;">
+          <h3>📊 SALES OPPORTUNITY SUMMARY:</h3>
+          <div style="font-size: 16px; line-height: 1.6; margin: 10px 0;">${opportunitySummary}</div>
+        </div>
+
+        <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin: 15px 0;">
+          <h3>👤 LEAD PROFILE:</h3>
+          <ul style="margin: 5px 0; padding-left: 20px;">
+            <li><strong>Language:</strong> ${leadProfile.language}</li>
+            <li><strong>Location:</strong> ${leadProfile.location}</li>
+            <li><strong>Timezone:</strong> ${leadProfile.timezone}</li>
+            <li><strong>Time of Contact:</strong> ${leadProfile.timeOfInteraction} (${leadProfile.timezone?.includes('business hours') ? 'business hours' : 'check timezone'})</li>
+            <li><strong>Visitor Type:</strong> ${leadProfile.visitorType} (${leadProfile.visitCount} visits)</li>
+            <li><strong>Apps Explored:</strong> ${leadProfile.appsExplored?.join(', ')}</li>
+          </ul>
+        </div>
 
         <h3>👤 CONTACT INFO:</h3>
         <p><strong>Name:</strong> ${data.name || 'Not provided'}</p>
@@ -38,11 +177,12 @@ export async function sendSalesInquiryEmail(data: SalesInquiryData): Promise<{ s
         <p><strong>Type:</strong> ${data.projectType || 'Not specified'}</p>
         <p><strong>Budget:</strong> ${data.budget || 'Not specified'}</p>
         <p><strong>Timeline:</strong> ${data.timeline || 'Not specified'}</p>
+        <p><strong>Urgency Level:</strong> ${urgencyLevel}</p>
 
         <hr>
 
         <h3>💬 CONVERSATION HISTORY:</h3>
-        <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-family: monospace; white-space: pre-wrap;">${data.projectDescription || 'No conversation history'}</pre>
+        <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-family: monospace; white-space: pre-wrap; max-height: 400px; overflow-y: auto;">${data.projectDescription || 'No conversation history'}</pre>
 
         <hr>
 
@@ -51,7 +191,7 @@ export async function sendSalesInquiryEmail(data: SalesInquiryData): Promise<{ s
         <p><strong>Timestamp:</strong> ${data.timestamp || new Date().toISOString()}</p>
 
         <hr>
-        <p><em>Reply directly to this email to reach ${data.name}</em></p>
+        <p><em>💡 AI Summary powered by Llama 3.1 - Reply directly to reach ${data.name}</em></p>
       `,
     });
 

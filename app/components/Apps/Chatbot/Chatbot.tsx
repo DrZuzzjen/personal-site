@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useFileSystemContext } from '../../../lib/FileSystemContext';
 import { useWindowContext } from '../../../lib/WindowContext';
 import { getBrowserContext } from '../../../lib/personality';
+import type { AppType, Window as WindowType } from '../../../lib/types';
 
 // MSN Messenger color scheme
 const MSN_COLORS = {
@@ -75,19 +76,143 @@ const playSound = (soundKey: keyof typeof MSN_SOUNDS) => {
 	}
 };
 
+// Helper: Get window configuration for opening apps
+const getAppConfig = (
+	appName: string
+): Omit<WindowType, 'id' | 'zIndex' | 'isMinimized' | 'isMaximized'> | null => {
+	const configs: Record<
+		string,
+		Omit<WindowType, 'id' | 'zIndex' | 'isMinimized' | 'isMaximized'>
+	> = {
+		paint: {
+			title: 'Paint.exe',
+			appType: 'paint',
+			position: { x: 100, y: 100 },
+			size: { width: 520, height: 420 },
+			icon: 'PT',
+			content: {},
+		},
+		minesweeper: {
+			title: 'Minesweeper.exe',
+			appType: 'minesweeper',
+			position: { x: 120, y: 120 },
+			size: { width: 360, height: 320 },
+			icon: 'MS',
+			content: {
+				rows: 9,
+				cols: 9,
+				mines: 10,
+				difficulty: 'beginner',
+				firstClickSafe: true,
+			},
+		},
+		snake: {
+			title: 'Snake.exe',
+			appType: 'snake',
+			position: { x: 140, y: 140 },
+			size: { width: 860, height: 600 },
+			icon: 'SN',
+			content: {},
+		},
+		notepad: {
+			title: 'Notepad',
+			appType: 'notepad',
+			position: { x: 160, y: 160 },
+			size: { width: 480, height: 320 },
+			icon: 'NP',
+			content: {
+				filePath: null,
+				fileName: 'Untitled.txt',
+				body: '',
+				readOnly: false,
+			},
+		},
+		camera: {
+			title: 'Camera',
+			appType: 'camera',
+			position: { x: 180, y: 180 },
+			size: { width: 720, height: 580 },
+			icon: 'CM',
+			content: { isActive: false, hasPermission: false, error: null },
+		},
+		tv: {
+			title: 'TV.exe',
+			appType: 'tv',
+			position: { x: 200, y: 200 },
+			size: { width: 800, height: 600 },
+			icon: 'TV',
+			content: {},
+		},
+		browser: {
+			title: 'Browser',
+			appType: 'browser',
+			position: { x: 220, y: 220 },
+			size: { width: 900, height: 650 },
+			icon: 'BR',
+			content: { url: 'https://infobae.com/' },
+		},
+		mycomputer: {
+			title: 'My Computer',
+			appType: 'mycomputer',
+			position: { x: 240, y: 240 },
+			size: { width: 700, height: 500 },
+			icon: 'MC',
+			content: { path: '/My Computer' },
+		},
+		explorer: {
+			title: 'File Explorer',
+			appType: 'explorer',
+			position: { x: 260, y: 260 },
+			size: { width: 700, height: 500 },
+			icon: 'EX',
+			content: { path: '/C:/Users/Guest' },
+		},
+		chatbot: {
+			title: 'MSN Messenger',
+			appType: 'chatbot',
+			position: { x: 280, y: 280 },
+			size: { width: 600, height: 500 },
+			icon: 'MSN',
+			content: {},
+		},
+		portfolio: {
+			title: 'Portfolio Media Center',
+			appType: 'portfolio',
+			position: { x: 300, y: 300 },
+			size: { width: 900, height: 700 },
+			icon: 'PF',
+			content: {},
+		},
+		terminal: {
+			title: 'Terminal',
+			appType: 'terminal',
+			position: { x: 320, y: 320 },
+			size: { width: 800, height: 600 },
+			icon: 'TRM',
+			content: {},
+		},
+	};
+
+	return configs[appName] || null;
+};
+
 export default function Chatbot({ windowId }: ChatbotProps) {
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [inputValue, setInputValue] = useState('');
+	const inputRef = useRef<HTMLInputElement>(null);
 	const [isTyping, setIsTyping] = useState(false);
 	const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+	const [isSending, setIsSending] = useState(false); // Prevent duplicate sends
 	const messagesEndRef = useRef<HTMLDivElement>(null);
 	const chatContainerRef = useRef<HTMLDivElement>(null);
 	const flashingTimerRef = useRef<NodeJS.Timeout | null>(null);
 	const proactiveMessageSentRef = useRef<boolean>(false); // Track if we already sent proactive message
+	const hasSentContextRef = useRef<boolean>(false);
 	const lastNotifiedMessageIdRef = useRef<string | null>(null); // Track last message we notified about
 
 	const { rootItems } = useFileSystemContext();
-	const { windows, setWindowFlashing } = useWindowContext();
+	const { windows, setWindowFlashing, openWindow, closeWindow } =
+		useWindowContext();
 
 	// Load chat history from localStorage OR generate personalized welcome
 	useEffect(() => {
@@ -99,6 +224,10 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 					timestamp: new Date(msg.timestamp),
 				}));
 				setMessages(parsedMessages);
+				console.log(
+					'[Chatbot] Restored messages from localStorage:',
+					parsedMessages.length
+				);
 			} catch (error) {
 				console.error('Error loading chat history:', error);
 			}
@@ -141,8 +270,7 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 			const fallbackWelcome: Message = {
 				id: 'welcome',
 				role: 'assistant',
-				content:
-					"hey! :)\nwhat's up?",
+				content: "hey! :)\nwhat's up?",
 				timestamp: new Date(),
 			};
 			setMessages([fallbackWelcome]);
@@ -155,6 +283,10 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 	useEffect(() => {
 		if (messages.length > 0) {
 			localStorage.setItem('chatbot-history', JSON.stringify(messages));
+			console.log(
+				'[Chatbot] Persisted messages to localStorage:',
+				messages.length
+			);
 		}
 	}, [messages]);
 
@@ -179,7 +311,8 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 		const lastMessage = messages[messages.length - 1];
 
 		// Only check for assistant messages (skip welcome message with id 'welcome')
-		if (lastMessage.role !== 'assistant' || lastMessage.id === 'welcome') return;
+		if (lastMessage.role !== 'assistant' || lastMessage.id === 'welcome')
+			return;
 
 		// Skip if we already notified about this message
 		if (lastNotifiedMessageIdRef.current === lastMessage.id) {
@@ -187,7 +320,7 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 		}
 
 		// Check if window is minimized
-		const currentWindow = windows.find(w => w.id === windowId);
+		const currentWindow = windows.find((w) => w.id === windowId);
 		const isMinimized = currentWindow?.isMinimized ?? false;
 
 		if (isMinimized) {
@@ -208,7 +341,7 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 	useEffect(() => {
 		if (!windowId) return;
 
-		const currentWindow = windows.find(w => w.id === windowId);
+		const currentWindow = windows.find((w) => w.id === windowId);
 		const isMinimized = currentWindow?.isMinimized ?? false;
 
 		// Reset proactive flag when window is restored
@@ -220,20 +353,25 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 		// 1. Window is minimized
 		// 2. We have at least welcome message
 		// 3. Haven't sent proactive message yet this session
-		if (!isMinimized || messages.length === 0 || proactiveMessageSentRef.current) return;
+		if (
+			!isMinimized ||
+			messages.length === 0 ||
+			proactiveMessageSentRef.current
+		)
+			return;
 
 		// Random delay between 25-60 seconds (testing: 10-15s)
 		const randomDelay = Math.floor(Math.random() * (15000 - 10000 + 1)) + 10000;
 
 		const timer = setTimeout(async () => {
 			// Double-check still minimized
-			const currentWindow = windows.find(w => w.id === windowId);
+			const currentWindow = windows.find((w) => w.id === windowId);
 			if (currentWindow?.isMinimized) {
 				proactiveMessageSentRef.current = true; // Mark as sent
 
 				// Find currently active (focused) window
 				const focusedWindow = windows
-					.filter(w => !w.isMinimized && w.id !== windowId)
+					.filter((w) => !w.isMinimized && w.id !== windowId)
 					.sort((a, b) => b.zIndex - a.zIndex)[0];
 
 				const currentApp = focusedWindow?.appType || null;
@@ -241,7 +379,7 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 				try {
 					// Call proactive message API
 					const browserContext = getBrowserContext();
-					const conversationHistory = messages.map(msg => ({
+					const conversationHistory = messages.map((msg) => ({
 						role: msg.role,
 						content: msg.content,
 					}));
@@ -274,6 +412,24 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 
 		return () => clearTimeout(timer);
 	}, [windows, windowId, messages.length]);
+
+	// Auto-focus input when window is active (not minimized)
+	useEffect(() => {
+		if (!windowId) return;
+
+		const currentWindow = windows.find((w) => w.id === windowId);
+		const isMinimized = currentWindow?.isMinimized ?? false;
+
+		// If window is NOT minimized and NOT typing, focus the input
+		if (!isMinimized && !isTyping) {
+			// Small delay to ensure DOM is ready
+			const focusTimer = setTimeout(() => {
+				inputRef.current?.focus();
+			}, 50);
+
+			return () => clearTimeout(focusTimer);
+		}
+	}, [windows, windowId, isTyping, messages.length]); // Re-run when messages change (after bot responds)
 
 	// Build portfolio context for AI
 	const getPortfolioContext = () => {
@@ -330,12 +486,27 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 	const sendMessage = async (userMessage: string) => {
 		if (!userMessage.trim()) return;
 
-		// Add user message immediately
-		addMessage({ role: 'user', content: userMessage });
-		setInputValue('');
-		setIsTyping(true);
+		// Prevent duplicate sends
+		if (isSending) {
+			console.warn(
+				'[Chatbot] Message send already in progress, ignoring duplicate'
+			);
+			return;
+		}
+
+		setIsSending(true);
 
 		try {
+			// Add user message immediately
+			addMessage({ role: 'user', content: userMessage });
+			setInputValue('');
+			setIsTyping(true);
+
+			// Keep input focused for smooth workflow
+			setTimeout(() => {
+				inputRef.current?.focus();
+			}, 100);
+
 			// Build context-enriched message history
 			const context = getPortfolioContext();
 			const contextMessage = {
@@ -349,7 +520,6 @@ Project details: ${context.projects
 			};
 
 			const conversationHistory = [
-				contextMessage,
 				...messages.map((msg) => ({
 					role: msg.role,
 					content: msg.content,
@@ -357,7 +527,13 @@ Project details: ${context.projects
 				{ role: 'user' as const, content: userMessage },
 			];
 
-			const response = await fetch('/api/chat', {
+			if (!hasSentContextRef.current) {
+				conversationHistory.unshift(contextMessage);
+				hasSentContextRef.current = true;
+				console.log('[Chatbot] Added portfolio context to first request');
+			}
+
+			const response = await fetch('/api/chat-v2', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
@@ -370,9 +546,44 @@ Project details: ${context.projects
 			}
 
 			const data = await response.json();
-			
+
 			// Add assistant message
 			addMessage({ role: 'assistant', content: data.message });
+
+			// Execute actions (function calling - open/close apps)
+			if (data.actions && data.actions.length > 0) {
+				data.actions.forEach((action: any, index: number) => {
+					try {
+						if (action.type === 'openApp' && action.appName) {
+							// Check if window already open to prevent duplicates
+							const existingWindow = windows.find(
+								(w) => w.appType === action.appName
+							);
+							if (existingWindow) {
+								return;
+							}
+
+							const appConfig = getAppConfig(action.appName);
+							if (appConfig) {
+								openWindow(appConfig);
+							}
+						} else if (action.type === 'closeApp' && action.appName) {
+							// Find window by appType and close it
+							const windowToClose = windows.find(
+								(w) => w.appType === action.appName
+							);
+							if (windowToClose) {
+								closeWindow(windowToClose.id);
+							}
+						} else if (action.type === 'restart') {
+							// Close all windows
+							windows.forEach((w) => closeWindow(w.id));
+						}
+					} catch (error) {
+						console.error('Failed to execute action:', action, error);
+					}
+				});
+			}
 
 			// If email was sent, show system message after 2 seconds
 			if (data.emailSent && data.systemMessage) {
@@ -391,15 +602,16 @@ Project details: ${context.projects
 					}
 				}, 2000);
 			}
-
 		} catch (error) {
 			console.error('Chat error:', error);
 			addMessage({
 				role: 'assistant',
-				content: 'Zzzzzzz 😴\n\nOpening Hours: not now\n\n(AI is probably rate-limited, try again later!)',
+				content:
+					'Zzzzzzz 😴\n\nOpening Hours: not now\n\n(AI is probably rate-limited, try again later!)',
 			});
 		} finally {
 			setIsTyping(false);
+			setIsSending(false); // Reset sending state
 		}
 	};
 
@@ -450,7 +662,8 @@ Project details: ${context.projects
 		setIsTyping(true);
 
 		try {
-			const nudgeMessage = '**NUDGE RECEIVED** - User just sent you a nudge (shook your window). React casually/funny. Keep it 1-2 lines max.';
+			const nudgeMessage =
+				'**NUDGE RECEIVED** - User just sent you a nudge (shook your window). React casually/funny. Keep it 1-2 lines max.';
 
 			const context = getPortfolioContext();
 			const contextMessage = {
@@ -503,6 +716,7 @@ Available projects: ${context.projects.map((p) => p.name).join(', ')}`,
 		if (confirm('Clear all messages?')) {
 			setMessages([]);
 			localStorage.removeItem('chatbot-history');
+			hasSentContextRef.current = false;
 		}
 	};
 
@@ -565,42 +779,44 @@ Available projects: ${context.projects.map((p) => p.name).join(', ')}`,
 					)}
 				{messages.length === 0 && (
 					<div className='text-center text-gray-500 mt-8'>
-						<div className='text-sm italic'>
-							Loading chat...
-						</div>
+						<div className='text-sm italic'>Loading chat...</div>
 					</div>
 				)}
 
 				{messages.map((message) => (
 					<div key={message.id} className='mb-4'>
 						{message.role === 'system' ? (
-							<div className='system-message mx-auto max-w-[90%]'
+							<div
+								className='system-message mx-auto max-w-[90%]'
 								style={{
-									background: 'linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%)',
+									background:
+										'linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%)',
 									borderLeft: '4px solid #00aa00',
 									padding: '12px 16px',
 									borderRadius: '4px',
-									boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+									boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
 								}}
 							>
-								<div className='system-badge' 
+								<div
+									className='system-badge'
 									style={{
 										fontWeight: 'bold',
 										color: '#00aa00',
 										fontSize: '10px',
 										textTransform: 'uppercase',
 										letterSpacing: '1px',
-										marginBottom: '4px'
+										marginBottom: '4px',
 									}}
 								>
 									System
 								</div>
-								<div className='system-content'
+								<div
+									className='system-content'
 									style={{
 										color: '#333',
 										fontStyle: 'italic',
 										fontSize: '13px',
-										lineHeight: '1.4'
+										lineHeight: '1.4',
 									}}
 								>
 									{parseEmoticons(message.content)}
@@ -649,6 +865,7 @@ Available projects: ${context.projects.map((p) => p.name).join(', ')}`,
 			<div className='border-t p-3 bg-white'>
 				<div className='flex items-center gap-2 mb-2'>
 					<input
+						ref={inputRef}
 						type='text'
 						value={inputValue}
 						onChange={(e) => setInputValue(e.target.value)}

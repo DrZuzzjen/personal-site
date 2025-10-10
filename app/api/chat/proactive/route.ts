@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { generateText } from 'ai';
+import { groq } from '@/app/lib/ai/providers/groq';
 import { getPersonalityContext } from '@/app/lib/personality.server';
 
 export async function POST(req: NextRequest) {
@@ -131,34 +133,25 @@ Now write your check-in message based on what they're doing:`;
     // console.log('Activity:', activityContext);
     // console.log('Time of day:', timeOfDay);
 
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'meta-llama/llama-4-maverick-17b-128e-instruct',
-        messages: [
-          { role: 'system', content: getPersonalityContext() },
-          { role: 'user', content: proactivePrompt },
-        ],
-        temperature: 0.9,
-        max_tokens: 150,
-      }),
+    // Use Vercel AI SDK for cleaner, type-safe API calls
+    const { text: proactiveMessage } = await generateText({
+      model: groq(process.env.GROQ_PROACTIVE_MODEL || 'meta-llama/llama-4-maverick-17b-128e-instruct'),
+      messages: [
+        { role: 'system', content: getPersonalityContext() },
+        { role: 'user', content: proactivePrompt },
+      ],
+      temperature: 0.9,
+      maxOutputTokens: 150,
     });
 
-    const data = await response.json();
-    let proactiveMessage = data.choices[0]?.message?.content || "hey! :)\nstill there?";
-
     // Remove quotes that LLM sometimes adds
-    proactiveMessage = proactiveMessage.replace(/^["']|["']$/g, '').trim();
+    const cleanedMessage = proactiveMessage.replace(/^["']|["']$/g, '').trim();
 
     // Remove sensitive logging for production security
     // console.log('=== LLM PROACTIVE RESPONSE ===');
-    // console.log('Message:', proactiveMessage);
+    // console.log('Message:', cleanedMessage);
 
-    return NextResponse.json({ message: proactiveMessage });
+    return NextResponse.json({ message: cleanedMessage });
   } catch (error) {
     console.error('Proactive API error:', error);
     return NextResponse.json({ message: "hey! :)\nstill there?" });

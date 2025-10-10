@@ -53,7 +53,14 @@ export default function TaskbarTestPage() {
         </Window>
       ))}
 
-      <Taskbar />
+      <Taskbar
+        onLaunchApp={() => {}}
+        onRestart={() => {}}
+        onShutDown={() => {}}
+        onShowSettings={() => {}}
+        onShowFind={() => {}}
+        onShowHelp={() => {}}
+      />
     </div>
   );
 }

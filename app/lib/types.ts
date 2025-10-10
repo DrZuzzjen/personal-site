@@ -142,6 +142,10 @@ export interface SnakeWindowContent {
 // File Explorer
 export interface ExplorerWindowContent {
   folderPath?: string | null;
+  /**
+   * Legacy property used by older components. Prefer folderPath.
+   */
+  path?: string | null;
 }
 
 // Camera App
@@ -155,6 +159,10 @@ export interface CameraWindowContent {
 export interface BrowserWindowContent {
   initialUrl?: string | null;
   homeUrl?: string | null;
+  /**
+   * Legacy property used by older components. Prefer initialUrl.
+   */
+  url?: string | null;
 }
 
 export type WindowContent =

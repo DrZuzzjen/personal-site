@@ -1,4 +1,4 @@
-import type { Command } from '../types';
+import type { Command, TerminalLineInput } from '../types';
 
 const WINDOWS_VERSION_LINES = [
   'Windows 3.1 Portfolio Edition',
@@ -80,7 +80,7 @@ export function createSystemCommands(getCommands: () => Command[]): Command[] {
       }, {});
 
       const categoryOrder = Object.keys(grouped).sort();
-      const lines = [
+      const lines: TerminalLineInput[] = [
         { text: 'Available Commands:' },
         { text: '-------------------' },
       ];
