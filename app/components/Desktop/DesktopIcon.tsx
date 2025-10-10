@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useFileSystemContext } from '@/app/lib/FileSystemContext';
 import { useWindowContext } from '@/app/lib/WindowContext';
 import { COLORS, DESKTOP_GRID } from '@/app/lib/constants';
+import { APP_CONFIGS, type AppName } from '@/app/lib/app-configs';
 import { useIconDrag } from './useIconDrag';
 import type {
 	DesktopIcon as DesktopIconType,
@@ -42,12 +43,6 @@ interface LaunchConfig {
 }
 
 const DEFAULT_LAUNCH_POSITION = { x: 320, y: 160 };
-const NOTEPAD_WINDOW_SIZE = { width: 520, height: 380 };
-const MINESWEEPER_WINDOW_SIZE = { width: 360, height: 440 };
-const PAINT_WINDOW_SIZE = { width: 800, height: 600 }; // Compact but roomy for new sidebar layout
-const CAMERA_WINDOW_SIZE = { width: 720, height: 580 }; // Good size for camera interface
-const TV_WINDOW_SIZE = { width: 880, height: 720 }; // Good size for retro TV with controls
-const BROWSER_WINDOW_SIZE = { width: 960, height: 720 }; // Wide viewport for modern browsing
 const PAINT_PALETTE = [
 	'#000000',
 	'#FFFFFF',
@@ -58,6 +53,21 @@ const PAINT_PALETTE = [
 	'#FF00FF',
 	'#00FFFF',
 ];
+
+// Helper function to create launch config from centralized app configs
+function createAppLaunch(appName: AppName, overrides?: Partial<LaunchConfig>): LaunchConfig {
+	const config = APP_CONFIGS[appName];
+	
+	return {
+		title: config.title,
+		appType: appName as LaunchConfig['appType'],
+		position: config.defaultPosition,
+		size: config.defaultSize,
+		icon: config.icon,
+		content: config.defaultContent,
+		...overrides,
+	};
+}
 
 function createNotepadLaunch(
 	item: FileSystemItem,
@@ -75,14 +85,10 @@ function createNotepadLaunch(
 		...overrides,
 	};
 
-	return {
+	return createAppLaunch('notepad', {
 		title: `${item.name} - Notepad`,
-		appType: 'notepad',
-		position: DEFAULT_LAUNCH_POSITION,
-		size: NOTEPAD_WINDOW_SIZE,
-		icon: 'NP',
 		content: mergedContent,
-	};
+	});
 }
 
 function createUnsupportedFileLaunch(
@@ -103,14 +109,9 @@ function createPaintLaunch(): LaunchConfig {
 		palette: PAINT_PALETTE,
 	};
 
-	return {
-		title: 'Paint',
-		appType: 'paint',
-		position: { x: 340, y: 140 },
-		size: PAINT_WINDOW_SIZE,
-		icon: 'PT',
+	return createAppLaunch('paint', {
 		content,
-	};
+	});
 }
 
 function createMinesweeperLaunch(): LaunchConfig {
@@ -122,36 +123,17 @@ function createMinesweeperLaunch(): LaunchConfig {
 		firstClickSafe: true,
 	};
 
-	return {
-		title: 'Minesweeper',
-		appType: 'minesweeper',
-		position: { x: 360, y: 180 },
-		size: MINESWEEPER_WINDOW_SIZE,
-		icon: 'MS',
+	return createAppLaunch('minesweeper', {
 		content,
-	};
+	});
 }
 
 function createTerminalLaunch(): LaunchConfig {
-	return {
-		title: 'Terminal',
-		appType: 'terminal',
-		position: { x: 340, y: 140 },
-		size: { width: 800, height: 600 },
-		icon: 'CMD',
-		content: {},
-	};
+	return createAppLaunch('terminal');
 }
 
 function createSnakeLaunch(): LaunchConfig {
-	return {
-		title: 'Snake.exe',
-		appType: 'snake',
-		position: { x: 350, y: 160 },
-		size: { width: 850, height: 580 },
-		icon: 'SN',
-		content: {},
-	};
+	return createAppLaunch('snake');
 }
 
 function createCameraLaunch(): LaunchConfig {
@@ -161,46 +143,21 @@ function createCameraLaunch(): LaunchConfig {
 		error: null,
 	};
 
-	return {
-		title: 'Camera',
-		appType: 'camera',
-		position: { x: 330, y: 120 },
-		size: CAMERA_WINDOW_SIZE,
-		icon: '📹',
+	return createAppLaunch('camera', {
 		content,
-	};
+	});
 }
 
 function createTVLaunch(): LaunchConfig {
-	return {
-		title: 'TV',
-		appType: 'tv',
-		position: { x: 310, y: 100 },
-		size: TV_WINDOW_SIZE,
-		icon: '📺',
-	};
+	return createAppLaunch('tv');
 }
 
 function createChatbotLaunch(): LaunchConfig {
-	return {
-		title: 'MSN Messenger - Jean Francois',
-		appType: 'chatbot',
-		position: { x: 300, y: 120 },
-		size: { width: 480, height: 620 },
-		icon: '💬',
-		content: {},
-	};
+	return createAppLaunch('chatbot');
 }
 
 function createPortfolioLaunch(): LaunchConfig {
-	return {
-		title: 'Portfolio Media Center - Jean Francois',
-		appType: 'portfolio',
-		position: { x: 310, y: 100 },
-		size: { width: 750, height: 863 },
-		icon: '📂',
-		content: {},
-	};
+	return createAppLaunch('portfolio');
 }
 
 function createBrowserLaunch(initialUrl?: string): LaunchConfig {
@@ -209,11 +166,7 @@ function createBrowserLaunch(initialUrl?: string): LaunchConfig {
 	};
 
 	return {
-		title: 'Microsoft Explorer',
-		appType: 'browser',
-		position: { x: 330, y: 130 },
-		size: BROWSER_WINDOW_SIZE,
-		icon: 'IE',
+		...createAppLaunch('browser'),
 		content,
 	};
 }
@@ -290,11 +243,8 @@ function getLaunchConfigForFile(item: FileSystemItem): LaunchConfig | null {
 		};
 
 		return {
+			...createAppLaunch('paint'),
 			title: `${item.name} - Paint`,
-			appType: 'paint',
-			position: { x: 340, y: 140 },
-			size: PAINT_WINDOW_SIZE,
-			icon: 'PT',
 			content,
 		};
 	}
