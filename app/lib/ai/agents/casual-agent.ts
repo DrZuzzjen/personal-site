@@ -57,12 +57,20 @@ export class CasualAgent {
         })
       },
       stopWhen: ({ steps }) => {
-        // Stop after first tool call OR after 2 conversational turns
-        const hasToolCall = steps.some(s => s.toolCalls && s.toolCalls.length > 0);
+        // Stop after tool call + response OR after 2 conversational turns
+        const toolCallIndex = steps.findIndex(s => s.toolCalls && s.toolCalls.length > 0);
 
-        if (hasToolCall) {
-          console.log('[CasualAgent] Tool executed, stopping');
-          return true;
+        if (toolCallIndex !== -1) {
+          // Found a tool call - allow 1 more step for Agent to generate response text
+          const stepsAfterTool = steps.length - toolCallIndex - 1;
+
+          if (stepsAfterTool >= 1) {
+            console.log('[CasualAgent] Tool executed + response generated, stopping');
+            return true;
+          }
+
+          console.log('[CasualAgent] Tool executed, waiting for response text...');
+          return false; // Allow 1 more step to generate text
         }
 
         // For pure conversation, stop after 2 steps
@@ -203,23 +211,31 @@ export class CasualAgent {
    * Priority 5: Improve Message Extraction
    */
   private extractMessage(result: any): string {
-    // Extract the LAST conversational message from steps
-    let message = "Hey! :) How's it going?";
-
+    // Try to get text from result.text first
     if (result.text && result.text.trim().length > 0) {
-      message = result.text.trim();
-    } else if (result.steps && result.steps.length > 0) {
+      return result.text.trim();
+    }
+
+    // Try to find text in steps
+    if (result.steps && result.steps.length > 0) {
       // Find last step with text content
       for (let i = result.steps.length - 1; i >= 0; i--) {
         const step = result.steps[i];
         if (step.text && step.text.trim().length > 0) {
-          message = step.text.trim();
-          break;
+          return step.text.trim();
         }
       }
     }
 
-    return message;
+    // If we still have nothing, check if there was a tool call
+    const hasToolCall = result.steps?.some((step: { toolCalls?: unknown[] }) => step.toolCalls && step.toolCalls.length > 0);
+    if (hasToolCall) {
+      console.warn('[CasualAgent] Tool call executed but no response text generated - this should not happen with new stopWhen logic');
+    }
+
+    // Ultimate fallback (should rarely be used now)
+    console.warn('[CasualAgent] No message found in result, using generic fallback');
+    return "Hey! :)";
   }
 }
 
