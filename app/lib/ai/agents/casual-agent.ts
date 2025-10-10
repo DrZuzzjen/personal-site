@@ -2,6 +2,7 @@ import { Experimental_Agent as Agent, tool } from 'ai';
 import { groq } from '@/app/lib/ai/providers/groq';
 import { PROMPTS } from '@/app/lib/ai/prompts';
 import type { Message } from './types';
+import type { AgentStep, AgentResult } from './sdk-types';
 import { z } from 'zod';
 
 export interface Action {
@@ -137,7 +138,7 @@ export class CasualAgent {
         const result = await conversationOnlyAgent.generate({ messages: trimmedHistory });
 
         return {
-          message: this.extractMessage(result),
+          message: this.extractMessage(result as AgentResult),
           actions: [] // No actions when tools are blocked
         };
       }
@@ -146,10 +147,10 @@ export class CasualAgent {
       const result = await this.agent.generate({ messages: trimmedHistory });
 
       // Priority 4: Add Error Handling in Action Extraction
-      const actions = this.extractActionsFromSteps(result.steps);
+      const actions = this.extractActionsFromSteps(result.steps as AgentStep[]);
 
       // Priority 5: Improve Message Extraction
-      const message = this.extractMessage(result);
+      const message = this.extractMessage(result as AgentResult);
 
       return { message, actions };
     } catch (error) {
@@ -164,7 +165,7 @@ export class CasualAgent {
   /**
    * Priority 4: Add Error Handling in Action Extraction
    */
-  private extractActionsFromSteps(steps: any[]): Action[] {
+  private extractActionsFromSteps(steps: AgentStep[]): Action[] {
     const actions: Action[] = [];
 
     try {
@@ -214,7 +215,7 @@ export class CasualAgent {
   /**
    * Priority 5: Improve Message Extraction
    */
-  private extractMessage(result: any): string {
+  private extractMessage(result: AgentResult): string {
     // Try to get text from result.text first
     if (result.text && result.text.trim().length > 0) {
       return result.text.trim();

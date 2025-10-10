@@ -6,6 +6,7 @@ import { fieldExtractorAgent } from '@/app/lib/ai/agents/field-extractor-agent';
 import { createSalesAgent } from '@/app/lib/ai/agents/sales-agent';
 import { createCasualAgent, type Action } from '@/app/lib/ai/agents/casual-agent';
 import type { Message } from '@/app/lib/ai/agents/types';
+import type { AgentResult, AgentStep, StepContent } from '@/app/lib/ai/agents/sdk-types';
 import { telemetry } from '@/app/lib/telemetry';
 
 // Detect user intent using Vercel AI SDK with conversation context
@@ -122,32 +123,35 @@ export async function POST(request: NextRequest) {
     console.log('[PERF] Sales agent completed:', Date.now() - salesStart, 'ms');
     console.log('[PERF] Agent steps:', result.steps?.length || 0);
     console.log('[PERF] Total tokens:', result.usage?.totalTokens);
-    result.steps?.forEach((step: any, index: number) => {
+    result.steps?.forEach((step, index: number) => {
+      const agentStep = step as AgentStep;
       console.log(`[PERF] Step ${index + 1}:`, {
-        toolCalls: step.toolCalls?.map((c: any) => c.toolName),
-        hasText: !!step.text,
-        textLength: step.text?.length
+        toolCalls: agentStep.toolCalls?.map((c) => c.toolName),
+        hasText: !!agentStep.text,
+        textLength: agentStep.text?.length
       });
     });
 
     // Step 5: Check if email was sent (optimized detection)
-    const emailSent = (result.steps ?? []).some((step: any) => {
-      if (!step.content) return false;
+    const emailSent = (result.steps ?? []).some((step) => {
+      const agentStep = step as AgentStep;
+      if (!agentStep.content) return false;
 
-      return step.content.some((content: any) => {
+      return agentStep.content.some((content) => {
+        const stepContent = content as StepContent;
         // Only log in development
         if (process.env.NODE_ENV === 'development') {
           console.log('[chat-v2] Checking step content:', {
-            type: content.type,
-            toolName: content.toolName,
-            hasOutput: !!content.output,
+            type: stepContent.type,
+            toolName: stepContent.toolName,
+            hasOutput: !!stepContent.output,
           });
         }
 
         return (
-          content.type === 'tool-result' &&
-          content.toolName === 'validateAndSendEmail' &&
-          content.output?.sent === true
+          stepContent.type === 'tool-result' &&
+          stepContent.toolName === 'validateAndSendEmail' &&
+          stepContent.output?.sent === true
         );
       });
     });

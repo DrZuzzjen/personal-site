@@ -2,6 +2,7 @@ import { Experimental_Agent as Agent } from 'ai';
 import { groq } from '@/app/lib/ai/providers/groq';
 import { PROMPTS } from '@/app/lib/ai/prompts';
 import type { Message, SalesFields } from './types';
+import type { AgentStep, ToolCall } from './sdk-types';
 import { validateAndSendEmailTool } from './tools/email-tool';
 
 export interface SalesAgentConfig {
@@ -29,13 +30,14 @@ export class SalesAgent {
       },
       stopWhen: ({ steps }) => {
         // Stop immediately if ANY step has a successful email send
-        const emailSent = steps.some((step: any) =>
-          step.toolCalls?.some(
-            (call: any) =>
-              call.toolName === 'validateAndSendEmail' &&
-              call.result?.sent === true,
-          ),
-        );
+        const emailSent = steps.some((step) => {
+          const agentStep = step as AgentStep;
+          return agentStep.toolCalls?.some((call) => {
+            const toolCall = call as ToolCall;
+            return toolCall.toolName === 'validateAndSendEmail' &&
+              toolCall.result?.sent === true;
+          });
+        });
 
         // If email sent, stop regardless of step count
         if (emailSent) {
