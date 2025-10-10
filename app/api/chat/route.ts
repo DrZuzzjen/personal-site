@@ -139,6 +139,46 @@ async function detectIntent(userMessage: string, conversationHistory: Message[] 
 // Handle casual chat using Vercel AI SDK with function calling tools
 async function handleCasualChat(userMessage: string, conversationHistory: Message[]): Promise<{ message: string; actions: Action[] }> {
   try {
+    // 🛡️ SAFETY CHECK 1: Block tools if sales just completed
+    const lastSystemMessage = conversationHistory
+      .slice(-3) // Check last 3 messages
+      .reverse()
+      .find(msg => msg.role === 'system');
+
+    const salesJustCompleted = lastSystemMessage?.content.includes('Email sent successfully');
+
+    // 🛡️ SAFETY CHECK 2: Block tools for gratitude/closing phrases (STANDALONE ONLY)
+    // Match ONLY if the phrase is standalone (not followed by more words)
+    // Examples: "ok" ✅, "ok!" ✅, "ok muestrame" ❌, "nice thanks" ❌
+    const closingPhrases = /^(thanks?|thank you|gracias|merci|danke|nice|cool|perfect|great|ok|bye|adiós|au revoir|tschüss|wow|neat)(!|\.|\?)?$/i;
+    const isClosingPhrase = closingPhrases.test(userMessage.trim());
+
+    // If post-sales OR closing phrase → NO TOOLS (just conversation)
+    if (salesJustCompleted || isClosingPhrase) {
+      console.log('[CasualChat] Safety check triggered - blocking tools', {
+        salesJustCompleted,
+        isClosingPhrase,
+        userMessage
+      });
+
+      const { text } = await generateText({
+        model: groq(process.env.GROQ_CASUAL_MODEL || 'llama-3.3-70b-versatile'),
+        messages: [
+          { role: 'system', content: PROMPTS.CASUAL_CHAT() },
+          ...conversationHistory,
+          { role: 'user', content: userMessage }
+        ],
+        temperature: 0.8,
+        // ❌ NO TOOLS - Just conversation
+      });
+
+      return {
+        message: text || "You're welcome! :)",
+        actions: [] // No app actions
+      };
+    }
+
+    // Normal flow with tools enabled
     const { text, toolCalls } = await generateText({
       model: groq(process.env.GROQ_CASUAL_MODEL || 'llama-3.3-70b-versatile'),
       messages: [

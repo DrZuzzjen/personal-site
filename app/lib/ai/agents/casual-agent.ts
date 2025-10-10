@@ -89,6 +89,48 @@ export class CasualAgent {
         }))
         .slice(-12); // Only last 12 messages
 
+      // 🛡️ SAFETY CHECK 1: Block tools if sales just completed
+      const lastSystemMessage = messages
+        .slice(-3)
+        .reverse()
+        .find(msg => msg.role === 'system');
+
+      const salesJustCompleted = lastSystemMessage?.content.includes('Email sent');
+
+      // 🛡️ SAFETY CHECK 2: Block tools for gratitude/closing phrases (STANDALONE ONLY)
+      const lastUserMessage = messages.filter(m => m.role === 'user').pop();
+      // Match ONLY if the phrase is standalone (not followed by more words)
+      // Examples: "ok" ✅, "ok!" ✅, "ok muestrame" ❌, "nice thanks" ❌
+      const closingPhrases = /^(thanks?|thank you|gracias|merci|danke|nice|cool|perfect|great|ok|bye|adiós|au revoir|tschüss|wow|neat)(!|\.|\?)?$/i;
+      const isClosingPhrase = lastUserMessage ? closingPhrases.test(lastUserMessage.content.trim()) : false;
+
+      // If post-sales OR closing phrase → Block tools, generate conversation only
+      const shouldBlockTools = salesJustCompleted || isClosingPhrase;
+
+      if (shouldBlockTools) {
+        console.log('[CasualAgent] Safety check triggered - blocking tools', {
+          salesJustCompleted,
+          isClosingPhrase,
+          lastUserMessage: lastUserMessage?.content
+        });
+
+        // Create agent WITHOUT tools for this turn
+        const conversationOnlyAgent = new Agent({
+          model: groq(process.env.GROQ_CASUAL_MODEL || 'llama-3.3-70b-versatile'),
+          system: PROMPTS.CASUAL_CHAT(),
+          temperature: 0.8,
+          // ❌ NO TOOLS
+        });
+
+        const result = await conversationOnlyAgent.generate({ messages: trimmedHistory });
+
+        return {
+          message: this.extractMessage(result),
+          actions: [] // No actions when tools are blocked
+        };
+      }
+
+      // Normal flow with tools enabled
       const result = await this.agent.generate({ messages: trimmedHistory });
 
       // Priority 4: Add Error Handling in Action Extraction
