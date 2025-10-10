@@ -114,12 +114,16 @@ Desktop/
 
 ## Technical Challenges (The Flex)
 
-1. **Window Manager**: Complex state management for multiple overlapping windows
-2. **Canvas Rendering**: Real-time Paint.exe with tool palette
-3. **File System Simulation**: Hierarchical structure with CRUD operations
-4. **State Persistence**: localStorage for user-created content
-5. **Drag/Drop System**: Smooth outline dragging with proper z-index handling
-6. **Boot Animation**: Authentic sequence with timing and transitions
+1. **Multi-Agent AI System**: 3-agent orchestration (Router, FieldExtractor, Sales/Casual agents) with tool calling, email automation, and desktop control
+2. **Window Manager**: Complex state management for multiple overlapping windows with z-index, minimize/maximize, and drag/drop
+3. **Canvas Rendering**: Real-time Paint.exe with tool palette and pixel manipulation
+4. **File System Simulation**: Hierarchical structure with CRUD operations, symlinks, and Windows-style paths
+5. **State Persistence**: localStorage with versioning, migration, and desktop icon management
+6. **Drag/Drop System**: Authentic Win3.1 outline dragging with proper z-index handling
+7. **Boot Animation**: Authentic POST → Memory check → Windows loading sequence
+8. **Type Safety**: Centralized registries (app-configs, SDK types) eliminating "any" usage
+9. **Agentic Workflows**: Sales funnel automation with email validation and multi-step conversations
+10. **Desktop Integration**: AI-controlled window management (open/close apps via chat)
 
 ---
 
@@ -190,6 +194,118 @@ This is the SAME file used by Claude Desktop app. The VS Code extension reads fr
   - Typing sound effects (type.mp3)
   - Context-aware AI responses with CV knowledge
 
+## Recent Updates (Oct 10, 2025)
+
+### 🤖 AI Agentic System - **MAJOR ARCHITECTURE CHANGE**
+
+Complete rewrite from single LLM to **multi-agent orchestration** using Vercel AI SDK.
+
+#### Router Agent (`app/api/chat-v2/route.ts`)
+- **Intent Detection**: Classifies messages as `sales` or `casual`
+- Uses conversation history (last 4 messages) for context
+- Model: Llama-3.3-70b-versatile (temp: 0.1)
+- Fallback: `casual` on errors
+
+#### Field Extractor Agent (`app/lib/ai/agents/field-extractor-agent.ts`)
+- **Pure extraction**: NO validation, NO emails, NO conversation
+- Extracts: name, email, company, role, budget, needs, urgency
+- Trimmed history: 12 messages max (performance)
+- Returns: confidence scores + fields
+- **Security**: Removed PII cache (GDPR/CCPA fix)
+
+#### Sales Agent (`app/lib/ai/agents/sales-agent.ts`)
+- **Multi-step workflow**: Ask → Validate → Send email
+- Tool: `validateAndSendEmail` (7 required fields)
+- StopWhen: Immediately stops if email sent
+- Conversational: Follow-ups, objection handling
+- Multilingual: EN/ES/FR/DE post-sales messages
+
+#### Casual Agent (`app/lib/ai/agents/casual-agent.ts`)
+- **Desktop control**: Opens/closes apps, restarts
+- Tools: `openApp`, `closeApp`, `restart`
+- 12 apps: paint, minesweeper, snake, notepad, camera, tv, browser, chatbot, portfolio, terminal, mycomputer, explorer
+- Post-sales mode: Auto-switches after email sent
+- MSN Messenger personality (friendly, emoji-heavy)
+
+#### Email Tool (`app/lib/ai/agents/tools/email-tool.ts`)
+- Validates 7 fields before sending
+- Rejects: "null", "unknown", "not collected", "n/a"
+- Budget parsing: Handles ranges ("5000-10000" → 10000)
+- Sends to: jeanfrancoisgutierrez@gmail.com
+- API: Resend
+
+#### Agent Flow Example
+```
+User: "I need an AI consultant"
+  ↓ Router → 'sales'
+  ↓ FieldExtractor → { name: null, email: null, ... }
+  ↓ SalesAgent → "Great! What's your name?"
+  ↓ User → "John from Acme Corp"
+  ↓ SalesAgent → "And your email?"
+  ↓ User → "john@acme.com"
+  ↓ SalesAgent → validateAndSendEmail({ name: "John", email: "john@acme.com", ... })
+  ↓ Result → { sent: true }
+  ↓ Response → "Thanks! Check your inbox within 24h."
+```
+
+#### Security Fixes (CodeRabbit - Oct 9)
+- ✅ PII cache removed (no user data persistence)
+- ✅ ReDoS vulnerability fixed (prompts.ts regex)
+- ✅ Email validation (rejects placeholders + requires @)
+- ✅ Budget parsing (handles ranges correctly)
+- ✅ Multilingual detection (4 languages)
+- ✅ Undefined guards (`result.steps ?? []`)
+
+---
+
+### 🎨 Centralized App Configurations
+
+#### Problem: Paint Window Size Bug
+Paint opened at **wrong size** from Terminal/MSN (520×420) vs Desktop (800×600).
+
+#### Solution: `app/lib/app-configs.ts` Registry
+Single source of truth for ALL 12 apps:
+```typescript
+export const APP_CONFIGS: Record<AppName, AppConfig> = {
+  paint: {
+    title: 'Paint',
+    defaultSize: { width: 800, height: 600 }, // ✅ Canonical
+    defaultPosition: { x: 340, y: 140 },
+    icon: 'PT',
+    defaultContent: { ... },
+    aliases: ['paint.exe', 'paint'],
+  },
+  // ... 11 more
+};
+```
+
+**Helpers:** `getAppConfigByName()`, `getAllAppNames()`
+
+**Refactored:**
+- `DesktopIcon.tsx` - Generic `createAppLaunch()`
+- `Terminal/apps.ts` - Registry lookup
+- `Chatbot.tsx` - `getAppConfigByName()`
+
+**Impact:** -34 net lines (removed duplication)
+
+---
+
+### 🔒 TypeScript Type Safety Improvements
+- ✅ **SDK Types Registry** - Created `app/lib/ai/agents/sdk-types.ts`
+- ✅ **Window Content Types** - Fixed 5 files to use `WindowContent` vs `any`
+- ✅ **Agent Response Types** - All agents use proper SDK types
+- ✅ **-65% "any" usage** - 23 → 8 instances (all acceptable)
+- ✅ **Inspired by app-configs.ts** - Centralized registry pattern
+
+**SDK Types:** `AgentStep`, `AgentResult`, `ToolCall`, `ToolResult`, `StepContent`
+
+**Remaining acceptable "any":**
+- Test mocks (6) - Standard practice
+- JSON parsing (2) - Runtime validation needed
+- SDK agent instance (1) - Documented limitation
+
+---
+
 ## Recent Updates (Oct 6, 2025)
 
 ### File System & Navigation Fixes
@@ -215,6 +331,11 @@ This is the SAME file used by Claude Desktop app. The VS Code extension reads fr
 
 ## MSN Messenger Chatbot - Technical Details
 
+### Architecture Overview
+**Multi-Agent System** (see "AI Agentic System" section above for full details)
+- **Primary:** `/api/chat-v2` - Agentic routing (sales/casual workflows)
+- **Fallback:** `/api/chat` - Simple LLM (welcome, nudge, proactive messages)
+
 ### Personality System (`app/lib/personality.ts`)
 - **Jean Francois persona** derived from CV (DevRel at Kluster.ai)
 - Voice characteristics: "Direct and practical - no corporate buzzwords"
@@ -223,30 +344,70 @@ This is the SAME file used by Claude Desktop app. The VS Code extension reads fr
 - Writing style: "Short sentences. Punchy. Gets to the point."
 - Signature phrases: "I'm your guy", "Let's shake things up", "Tailor-made solutions"
 
+### Conversation Modes
+
+**1. Sales Mode** (Auto-detected by Router Agent)
+- Triggers on: "need consultant", "hire", "project", "budget", etc.
+- Agent: SalesAgent with email tool
+- Flow: Extract info → Ask questions → Validate → Send email
+- Email to: jeanfrancoisgutierrez@gmail.com
+- Success: "✅ Email sent! Check inbox within 24h."
+
+**2. Casual Mode** (Default)
+- Triggers on: Everything else
+- Agent: CasualAgent with desktop tools
+- Capabilities:
+  - Open apps: "open paint", "launch minesweeper"
+  - Close apps: "close paint"
+  - Restart system: "restart computer"
+- Personality: MSN Messenger style (friendly, emoji-heavy)
+
+**3. Post-Sales Mode** (Auto-switches after email sent)
+- CasualAgent takes over after successful email
+- Detects: "Email sent successfully" in 4 languages (EN/ES/FR/DE)
+- User can continue chatting casually after sales workflow
+
 ### LLM Integration
-- **System Prompt**: `getPersonalityContext()` - comprehensive personality config
-- **Welcome API** (`app/api/chat/welcome/route.ts`): Generates personalized greetings
-- **Browser Context Detection**: Language, timezone, time of day, returning visitor status
-- **Model**: Groq API with Llama-4-Maverick-17b-128e-instruct
-- **Temperature**: 0.9 for welcome (creative), 0.8 for chat (balanced)
+- **Models**: Groq API
+  - Router: Llama-3.3-70b-versatile (temp 0.1)
+  - Agents: Llama-3.3-70b-versatile (temp 0.8)
+  - Welcome: Llama-4-Maverick-17b-128e-instruct (temp 0.9)
+- **System Prompt**: `getPersonalityContext()` - comprehensive config
+- **Welcome API** (`app/api/chat/welcome/route.ts`): Personalized greetings
+- **Browser Context**: Language, timezone, time of day, returning visitor
 
 ### Audio Features
-- **Typing Sound**: `/sounds/type.mp3` plays on AI message received
-- **MSN Sounds**: Nudge, send, receive (authentic MSN Messenger experience)
+- **Typing Sound**: `/sounds/type.mp3` on AI message
+- **MSN Sounds**: Nudge, send, receive (authentic experience)
 
 ### Smart Welcome Messages
-Examples based on context:
-- Morning visitor in Spanish: Greets "¡Buenos días!" then switches to English
-- Late night returning visitor: "Back for more! What should we explore tonight?"
-- First-time visitor: Full portfolio introduction with app suggestions
+Examples based on browser context:
+- Morning in Spanish: "¡Buenos días!" → English
+- Late night: "Back for more! What should we explore?"
+- First-time: Portfolio intro + app suggestions
+
+### Desktop Control (Casual Agent)
+**Available Actions:**
+```typescript
+interface Action {
+  type: 'openApp' | 'closeApp' | 'restart';
+  appName?: string; // 12 apps available
+}
+```
+
+**Example Interactions:**
+- User: "open paint" → Opens Paint.exe
+- User: "close minesweeper" → Closes game
+- User: "restart" → Closes all windows
 
 ### Context Awareness
 Chatbot knows:
-- Jean Francois's full professional background (from CV)
-- Portfolio technical stack (Next.js 15, TypeScript, Tailwind)
-- All available apps (Paint, Minesweeper, Camera, TV, etc.)
-- Project structure and features
-- README content and achievements
+- Jean Francois's CV (About.txt content)
+- 6 portfolio projects (My Documents/*.txt)
+- All 12 available apps
+- Portfolio tech stack (Next.js 15, TypeScript, Tailwind)
+- File system structure
+- Recent conversation history (last 4 messages for routing)
 
 ## Working Directory
 `/Users/franzuzz/Documents/GitHub/personal-site`
@@ -268,12 +429,15 @@ Chatbot knows:
 
 ### ✅ Technical Implementation
 - [x] Next.js 15 App Router
-- [x] TypeScript with strict typing
+- [x] TypeScript with strict typing (-65% "any" usage)
 - [x] Tailwind CSS styling
-- [x] localStorage persistence
+- [x] localStorage persistence with versioning
 - [x] Symlink resolution system
 - [x] Context API state management
 - [x] Window manager with z-index stacking
+- [x] **Multi-Agent AI System** (Router, FieldExtractor, Sales, Casual)
+- [x] **Agent Tools** (email automation, desktop control)
+- [x] **Centralized Registries** (app-configs, SDK types)
 
 ### ✅ SEO & Metadata
 - [x] Comprehensive meta tags
@@ -323,12 +487,14 @@ Chatbot knows:
 **Portfolio as Experience**: Instead of a boring list of projects, visitors *explore* your work by navigating a simulated OS. Each app, each folder, each interaction tells your story.
 
 **Technical Flex**: Building a full OS simulation in the browser demonstrates:
-- Complex state management
-- Canvas rendering (Paint.exe)
-- Game logic (Minesweeper, Snake)
-- File system architecture
-- Window management
-- Drag & drop systems
-- Real-time AI chat integration
+- **Multi-Agent AI Orchestration**: Router, FieldExtractor, Sales/Casual agents with tool calling
+- **Complex State Management**: Windows, file system, localStorage versioning
+- **Canvas Rendering**: Real-time Paint.exe with pixel manipulation
+- **Game Logic**: Minesweeper (mine detection), Snake (collision detection)
+- **File System Architecture**: Hierarchical structure with symlinks and Windows paths
+- **Window Management**: Z-index stacking, drag/drop, minimize/maximize
+- **Agentic Workflows**: Sales automation with email validation and multi-step conversations
+- **Desktop AI Control**: Chat-driven window management (open/close apps)
+- **Type Safety Architecture**: Centralized registries eliminating unsafe types
 
-This is the portfolio that makes recruiters go "Wait, WHAT?" 🤯
+This is the portfolio that makes recruiters go "Wait, WHAT?! Did you just automate your sales funnel with AI agents... IN A WINDOWS 3.1 SIMULATION?!" 🤯

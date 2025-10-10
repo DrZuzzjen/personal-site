@@ -30,6 +30,7 @@ import type {
 	SnakeWindowContent,
 	CameraWindowContent,
 	BrowserWindowContent,
+	ExplorerWindowContent,
 } from '@/app/lib/types';
 
 const DEFAULT_NOTEPAD_MESSAGE =
@@ -538,7 +539,7 @@ export default function MainPage() {
 	}, [openWindow, windows.length, bootComplete]);
 
 	// Start Menu handlers
-	const handleLaunchApp = (appType: string, content?: any) => {
+	const handleLaunchApp = (appType: string, content?: WindowContent) => {
 		const position = {
 			x: 100 + Math.random() * 200,
 			y: 80 + Math.random() * 150,
@@ -572,7 +573,8 @@ export default function MainPage() {
 			}
 
 			case 'notepad': {
-				const fileName = content?.fileName || 'Untitled';
+				const notepadContent = content as NotepadWindowContent | undefined;
+				const fileName = notepadContent?.fileName || 'Untitled';
 				const title = fileName.endsWith('.txt') ? fileName : `${fileName}.txt`;
 				openWindow({
 					title: `${title} - Notepad`,
@@ -581,10 +583,10 @@ export default function MainPage() {
 					size: { width: 440, height: 320 },
 					icon: 'NP',
 					content: {
-						fileName: content?.fileName || 'Untitled',
-						filePath: content?.filePath || null,
-						body: content?.content || DEFAULT_NOTEPAD_MESSAGE,
-						readOnly: content?.readOnly || false,
+						fileName: notepadContent?.fileName || 'Untitled',
+						filePath: notepadContent?.filePath || null,
+						body: notepadContent?.body || DEFAULT_NOTEPAD_MESSAGE,
+						readOnly: notepadContent?.readOnly || false,
 					} as NotepadWindowContent,
 				});
 				break;
@@ -700,13 +702,14 @@ export default function MainPage() {
 			}
 
 			case 'file-explorer': {
+				const explorerContent = content as ExplorerWindowContent | undefined;
 				openWindow({
-					title: `${content?.path || 'My Computer'} - File Explorer`,
+					title: `${explorerContent?.path || 'My Computer'} - File Explorer`,
 					appType: 'explorer',
 					position,
 					size: { width: 480, height: 360 },
 					icon: 'FE',
-					content: { folderPath: content?.path || null },
+					content: { folderPath: explorerContent?.path || null },
 				});
 				break;
 			}
@@ -780,7 +783,7 @@ export default function MainPage() {
 	const handleShowHelp = () => {
 		handleLaunchApp('notepad', {
 			fileName: 'Help',
-			content:
+			body:
 				'Windows 3.1 Portfolio Help\n\n' +
 				'Welcome to the Windows 3.1 Portfolio Experience!\n\n' +
 				'How to use:\n' +

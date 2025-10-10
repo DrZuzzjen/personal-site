@@ -3,7 +3,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useWindowContext } from '@/app/lib/WindowContext';
 import { COLORS, Z_INDEX } from '@/app/lib/constants';
-import type { Window as WindowType } from '@/app/lib/types';
+import type { Window as WindowType, WindowContent } from '@/app/lib/types';
 import TaskbarButton from './TaskbarButton';
 import Clock from './Clock';
 import { StartMenu } from '@/app/components/StartMenu';
@@ -26,7 +26,7 @@ function getActiveWindowId(windows: WindowType[]): string | null {
 }
 
 interface TaskbarProps {
-	onLaunchApp: (appType: string, content?: any) => void;
+	onLaunchApp: (appType: string, content?: WindowContent) => void;
 	onRestart: () => void;
 	onShutDown: () => void;
 	onShowSettings: () => void;

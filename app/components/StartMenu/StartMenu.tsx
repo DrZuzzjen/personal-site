@@ -5,11 +5,12 @@ import { COLORS } from '@/app/lib/constants';
 import StartMenuItem from './StartMenuItem';
 import Submenu from './Submenu';
 import type { SubmenuType } from './types';
+import type { WindowContent } from '@/app/lib/types';
 
 interface StartMenuProps {
 	isOpen: boolean;
 	onClose: () => void;
-	onLaunchApp: (appType: string, content?: any) => void;
+	onLaunchApp: (appType: string, content?: WindowContent) => void;
 	onRestart: () => void;
 	onShutDown: () => void;
 	onShowSettings: () => void;

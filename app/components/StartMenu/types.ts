@@ -1,8 +1,10 @@
+import type { WindowContent } from '@/app/lib/types';
+
 export type SubmenuType = 'programs' | 'documents' | 'settings';
 
 export interface SubmenuProps {
   type: SubmenuType;
-  onLaunchApp: (appType: string, content?: any) => void;
+  onLaunchApp: (appType: string, content?: WindowContent) => void;
   onShowSettings: () => void;
   onClose: () => void;
 }
