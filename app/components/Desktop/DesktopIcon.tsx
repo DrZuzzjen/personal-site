@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useFileSystemContext } from '@/app/lib/FileSystemContext';
 import { useWindowContext } from '@/app/lib/WindowContext';
 import { COLORS, DESKTOP_GRID } from '@/app/lib/constants';
+import { APP_CONFIGS, type AppName } from '@/app/lib/app-configs';
 import { useIconDrag } from './useIconDrag';
 import type {
 	DesktopIcon as DesktopIconType,
