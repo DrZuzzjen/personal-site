@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useFileSystemContext } from '../../../lib/FileSystemContext';
 import { useWindowContext } from '../../../lib/WindowContext';
 import { getBrowserContext } from '../../../lib/personality';
+import { getAppConfigByName } from '../../../lib/app-configs';
 import type { AppType, Window as WindowType } from '../../../lib/types';
 import type { Action } from '@/app/lib/ai/agents/casual-agent';
 
@@ -81,120 +82,21 @@ const playSound = (soundKey: keyof typeof MSN_SOUNDS) => {
 const getAppConfig = (
 	appName: string
 ): Omit<WindowType, 'id' | 'zIndex' | 'isMinimized' | 'isMaximized'> | null => {
-	const configs: Record<
-		string,
-		Omit<WindowType, 'id' | 'zIndex' | 'isMinimized' | 'isMaximized'>
-	> = {
-		paint: {
-			title: 'Paint.exe',
-			appType: 'paint',
-			position: { x: 100, y: 100 },
-			size: { width: 520, height: 420 },
-			icon: 'PT',
-			content: {},
-		},
-		minesweeper: {
-			title: 'Minesweeper.exe',
-			appType: 'minesweeper',
-			position: { x: 120, y: 120 },
-			size: { width: 360, height: 320 },
-			icon: 'MS',
-			content: {
-				rows: 9,
-				cols: 9,
-				mines: 10,
-				difficulty: 'beginner',
-				firstClickSafe: true,
-			},
-		},
-		snake: {
-			title: 'Snake.exe',
-			appType: 'snake',
-			position: { x: 140, y: 140 },
-			size: { width: 860, height: 600 },
-			icon: 'SN',
-			content: {},
-		},
-		notepad: {
-			title: 'Notepad',
-			appType: 'notepad',
-			position: { x: 160, y: 160 },
-			size: { width: 480, height: 320 },
-			icon: 'NP',
-			content: {
-				filePath: null,
-				fileName: 'Untitled.txt',
-				body: '',
-				readOnly: false,
-			},
-		},
-		camera: {
-			title: 'Camera',
-			appType: 'camera',
-			position: { x: 180, y: 180 },
-			size: { width: 720, height: 580 },
-			icon: 'CM',
-			content: { isActive: false, hasPermission: false, error: null },
-		},
-		tv: {
-			title: 'TV.exe',
-			appType: 'tv',
-			position: { x: 200, y: 200 },
-			size: { width: 800, height: 600 },
-			icon: 'TV',
-			content: {},
-		},
-		browser: {
-			title: 'Browser',
-			appType: 'browser',
-			position: { x: 220, y: 220 },
-			size: { width: 900, height: 650 },
-			icon: 'BR',
-			content: { url: 'https://infobae.com/' },
-		},
-		mycomputer: {
-			title: 'My Computer',
-			appType: 'mycomputer',
-			position: { x: 240, y: 240 },
-			size: { width: 700, height: 500 },
-			icon: 'MC',
-			content: { path: '/My Computer' },
-		},
-		explorer: {
-			title: 'File Explorer',
-			appType: 'explorer',
-			position: { x: 260, y: 260 },
-			size: { width: 700, height: 500 },
-			icon: 'EX',
-			content: { path: '/C:/Users/Guest' },
-		},
-		chatbot: {
-			title: 'MSN Messenger',
-			appType: 'chatbot',
-			position: { x: 280, y: 280 },
-			size: { width: 600, height: 500 },
-			icon: 'MSN',
-			content: {},
-		},
-		portfolio: {
-			title: 'Portfolio Media Center',
-			appType: 'portfolio',
-			position: { x: 300, y: 300 },
-			size: { width: 900, height: 700 },
-			icon: 'PF',
-			content: {},
-		},
-		terminal: {
-			title: 'Terminal',
-			appType: 'terminal',
-			position: { x: 320, y: 320 },
-			size: { width: 800, height: 600 },
-			icon: 'TRM',
-			content: {},
-		},
+	// Use centralized app configuration
+	const configResult = getAppConfigByName(appName);
+	if (!configResult) return null;
+	
+	const { config } = configResult;
+	
+	// Convert to the format expected by MSN Messenger
+	return {
+		title: config.title,
+		appType: configResult.name as WindowType['appType'],
+		position: config.defaultPosition,
+		size: config.defaultSize,
+		icon: config.icon,
+		content: config.defaultContent,
 	};
-
-	return configs[appName] || null;
 };
 
 export default function Chatbot({ windowId }: ChatbotProps) {
