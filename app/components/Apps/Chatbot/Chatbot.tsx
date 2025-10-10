@@ -4,6 +4,7 @@ import { useFileSystemContext } from '../../../lib/FileSystemContext';
 import { useWindowContext } from '../../../lib/WindowContext';
 import { getBrowserContext } from '../../../lib/personality';
 import type { AppType, Window as WindowType } from '../../../lib/types';
+import type { Action } from '@/app/lib/ai/agents/casual-agent';
 
 // MSN Messenger color scheme
 const MSN_COLORS = {
@@ -552,7 +553,7 @@ Project details: ${context.projects
 
 			// Execute actions (function calling - open/close apps)
 			if (data.actions && data.actions.length > 0) {
-				data.actions.forEach((action: any, index: number) => {
+				data.actions.forEach((action: Action) => {
 					try {
 						if (action.type === 'openApp' && action.appName) {
 							// Check if window already open to prevent duplicates
