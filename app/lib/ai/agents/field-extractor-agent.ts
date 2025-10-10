@@ -17,9 +17,6 @@ import type { Message, SalesFields, ExtractionResult } from './types';
 
 export class FieldExtractorAgent {
   private agent: any; // Using any for now to avoid type issues
-  private cachedExtraction: ExtractionResult | null = null;
-  private cachedHistorySignature: string | null = null;
-  private cachedLastUserMessage: string | null = null;
 
   constructor() {
     this.agent = new Agent({
@@ -72,29 +69,6 @@ NEVER include explanations, only JSON.`,
       .map(msg => `${msg.role}: ${msg.content}`)
       .join('\n');
 
-    const historySignature = `${relevantHistory.length}:${conversationText}`;
-
-    if (this.cachedExtraction && this.cachedHistorySignature === historySignature) {
-      console.log('[FieldExtractor] Using cached extraction (no new history)');
-      return this.cachedExtraction;
-    }
-
-    const cachedFieldsComplete =
-      this.cachedExtraction &&
-      (['name', 'email', 'projectType'] as const).every(
-        key => this.cachedExtraction!.fields[key] !== null,
-      );
-
-    if (
-      cachedFieldsComplete &&
-      this.cachedLastUserMessage &&
-      this.cachedLastUserMessage === lastUserMessage
-    ) {
-      console.log('[FieldExtractor] Reusing cached extraction (fields complete, no new user info)');
-      this.cachedHistorySignature = historySignature;
-      return this.cachedExtraction!;
-    }
-
     // Format conversation for the agent
     const prompt = `Conversation history:\n\n${conversationText}\n\nExtract customer fields:`;
 
@@ -127,10 +101,6 @@ NEVER include explanations, only JSON.`,
         extractedFrom: relevantHistory.length
       };
 
-      this.cachedExtraction = extractionResult;
-      this.cachedHistorySignature = historySignature;
-      this.cachedLastUserMessage = lastUserMessage;
-
       return extractionResult;
 
     } catch (error) {
@@ -152,25 +122,8 @@ NEVER include explanations, only JSON.`,
   }
 
   private buildRelevantHistory(history: Message[]): Message[] {
-    const nonSystemHistory = history.filter(msg => msg.role !== 'system');
-
-    if (nonSystemHistory.length <= 12) {
-      return nonSystemHistory;
-    }
-
-    const recentAssistantMessages = nonSystemHistory
-      .filter(msg => msg.role === 'assistant')
-      .slice(-3);
-    const assistantSet = new Set(recentAssistantMessages);
-
-    const trimmed: Message[] = [];
-    for (const message of nonSystemHistory) {
-      if (message.role === 'user' || assistantSet.has(message)) {
-        trimmed.push(message);
-      }
-    }
-
-    return trimmed.length > 0 ? trimmed : nonSystemHistory.slice(-12);
+    const nonSystem = history.filter(msg => msg.role !== 'system');
+    return nonSystem.length <= 12 ? nonSystem : nonSystem.slice(-12);
   }
 
   private getLastUserMessage(history: Message[]): string | null {

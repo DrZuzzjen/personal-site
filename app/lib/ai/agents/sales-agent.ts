@@ -94,9 +94,21 @@ export class SalesAgent {
   }
 
   private formatFieldStatus(fields: SalesFields): string {
-    const hasName = fields.name && fields.name !== 'null';
-    const hasEmail = fields.email && fields.email !== 'null';
-    const hasProject = fields.projectType && fields.projectType !== 'null';
+    const norm = (v: string | null | undefined) => (v ?? '').trim().toLowerCase();
+    const isMissing = (v: string | null | undefined) => {
+      const n = norm(v);
+      return (
+        n === '' ||
+        n === 'null' ||
+        n === 'unknown' ||
+        n === 'not collected' ||
+        n === 'not_collected' ||
+        n === 'n/a'
+      );
+    };
+    const hasName = !isMissing(fields.name);
+    const hasEmail = !isMissing(fields.email) && (fields.email || '').includes('@');
+    const hasProject = !isMissing(fields.projectType);
 
     return `
 FIELD STATUS:

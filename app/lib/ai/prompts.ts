@@ -2,14 +2,20 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 
 const PROMPTS_DIR = join(process.cwd(), 'app/lib/ai/prompts');
+const PROMPT_CACHE = new Map<string, string>();
 
 /**
- * Load prompt from text file
+ * Load prompt from text file with module-level caching
  */
 function loadPrompt(filename: string): string {
+  const cached = PROMPT_CACHE.get(filename);
+  if (cached) return cached;
+
   try {
     const filePath = join(PROMPTS_DIR, filename);
-    return readFileSync(filePath, 'utf-8').trim();
+    const content = readFileSync(filePath, 'utf-8').trim();
+    PROMPT_CACHE.set(filename, content);
+    return content;
   } catch (error) {
     console.error(`Failed to load prompt: ${filename}`, error);
     throw new Error(`Failed to load prompt: ${filename}`);
@@ -17,17 +23,16 @@ function loadPrompt(filename: string): string {
 }
 
 /**
- * Load prompt with variable substitution
+ * Load prompt with variable substitution (safe from ReDoS)
  */
 function loadPromptWithVars(filename: string, variables: Record<string, string>): string {
-  let prompt = loadPrompt(filename);
-
-  // Replace variables in {variable_name} format
-  Object.entries(variables).forEach(([key, value]) => {
-    prompt = prompt.replace(new RegExp(`\\{${key}\\}`, 'g'), value);
+  const prompt = loadPrompt(filename);
+  // Replace tokens of the form {key} using a single safe regex
+  return prompt.replace(/\{([a-zA-Z0-9_]+)\}/g, (_m, key: string) => {
+    if (!(key in variables)) return _m; // leave unknown tokens intact
+    // Basic sanitation: strip braces and trim
+    return String(variables[key]).replace(/[{}]/g, '').trim();
   });
-
-  return prompt;
 }
 
 // Export all prompts

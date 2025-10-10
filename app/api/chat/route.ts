@@ -145,7 +145,11 @@ async function handleCasualChat(userMessage: string, conversationHistory: Messag
       .reverse()
       .find(msg => msg.role === 'system');
 
-    const salesJustCompleted = lastSystemMessage?.content.includes('Email sent successfully');
+    const salesJustCompleted =
+      !!lastSystemMessage &&
+      /(Email sent successfully|Email enviado exitosamente|Email envoyé avec succès|Email erfolgreich gesendet)/i.test(
+        lastSystemMessage.content
+      );
 
     // 🛡️ SAFETY CHECK 2: Block tools for gratitude/closing phrases (STANDALONE ONLY)
     // Match ONLY if the phrase is standalone (not followed by more words)

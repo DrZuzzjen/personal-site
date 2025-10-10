@@ -103,7 +103,11 @@ export class CasualAgent {
         .reverse()
         .find(msg => msg.role === 'system');
 
-      const salesJustCompleted = lastSystemMessage?.content.includes('Email sent');
+      const salesJustCompleted =
+        !!lastSystemMessage &&
+        /(Email sent successfully|Email enviado exitosamente|Email envoyé avec succès|Email erfolgreich gesendet)/i.test(
+          lastSystemMessage.content
+        );
 
       // 🛡️ SAFETY CHECK 2: Block tools for gratitude/closing phrases (STANDALONE ONLY)
       const lastUserMessage = messages.filter(m => m.role === 'user').pop();

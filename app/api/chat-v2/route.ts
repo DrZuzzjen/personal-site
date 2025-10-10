@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Step 5: Check if email was sent (optimized detection)
-    const emailSent = result.steps.some((step: any) => {
+    const emailSent = (result.steps ?? []).some((step: any) => {
       if (!step.content) return false;
 
       return step.content.some((content: any) => {

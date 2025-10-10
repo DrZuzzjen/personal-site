@@ -128,11 +128,15 @@ export async function sendSalesInquiryEmail(data: SalesInquiryData): Promise<{ s
 
     // Determine urgency level based on budget and timeline
     let urgencyLevel = '🟡 Warm';
-    if (data.budget && parseInt(data.budget.replace(/\D/g, '')) > 10000) {
+    const budgetText = (data.budget ?? '').toString();
+    const nums = budgetText.match(/\d+(?:[.,]\d+)?/g);
+    const maxBudget = nums ? Math.max(...nums.map(n => parseFloat(n.replace(/,/g, '')))) : null;
+    const tl = (data.timeline ?? '').toLowerCase();
+    if ((maxBudget ?? 0) > 10000) {
       urgencyLevel = '🔥 Hot';
-    } else if (data.timeline && (data.timeline.includes('urgent') || data.timeline.includes('asap'))) {
+    } else if (/\b(urgent|asap|urgente|inmediato)\b/i.test(tl)) {
       urgencyLevel = '🔥 Hot';
-    } else if (!data.budget || data.budget.includes('don\'t know')) {
+    } else if (!budgetText || /\b(don'?t know|unknown|no se|no sé)\b/i.test(budgetText)) {
       urgencyLevel = '🔵 Cold';
     }
 
