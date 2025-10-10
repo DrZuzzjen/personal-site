@@ -413,6 +413,24 @@ export default function Chatbot({ windowId }: ChatbotProps) {
 		return () => clearTimeout(timer);
 	}, [windows, windowId, messages.length]);
 
+	// Auto-focus input when window is active (not minimized)
+	useEffect(() => {
+		if (!windowId) return;
+
+		const currentWindow = windows.find((w) => w.id === windowId);
+		const isMinimized = currentWindow?.isMinimized ?? false;
+
+		// If window is NOT minimized and NOT typing, focus the input
+		if (!isMinimized && !isTyping) {
+			// Small delay to ensure DOM is ready
+			const focusTimer = setTimeout(() => {
+				inputRef.current?.focus();
+			}, 50);
+
+			return () => clearTimeout(focusTimer);
+		}
+	}, [windows, windowId, isTyping, messages.length]); // Re-run when messages change (after bot responds)
+
 	// Build portfolio context for AI
 	const getPortfolioContext = () => {
 		const myComputerItem = rootItems.find(
