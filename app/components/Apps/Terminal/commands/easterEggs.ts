@@ -135,7 +135,7 @@ async function handleHackCommand(context: CommandContext): Promise<void | { erro
       return { error: `hack cat: file not found: ${target}` };
     }
 
-    runtime.printLines(content.map((line) => ({ text: line }))); 
+    runtime.printLines(content.map((line) => ({ text: line })));
     return;
   }
 
@@ -157,9 +157,12 @@ async function handleHackCommand(context: CommandContext): Promise<void | { erro
 }
 
 function handleMatrix(context: CommandContext) {
+  console.log('[DEBUG] handleMatrix called');
   context.runtime.print({ text: 'Booting Matrix rain...', type: 'system' });
+  console.log('[DEBUG] Setting effect to matrix');
   context.runtime.setEffect('matrix');
   setTimeout(() => {
+    console.log('[DEBUG] Matrix timeout - clearing effect');
     context.runtime.setEffect(null);
     context.runtime.print({ text: 'Matrix sequence complete.', type: 'system' });
   }, 10_000);
@@ -316,30 +319,30 @@ export function createEasterEggCommands(): Command[] {
   };
 
 
-const credits: Command = {
-  name: 'credits',
-  description: 'Scroll portfolio credits roll',
-  usage: 'credits',
-  category: 'fun',
-  hidden: true,
-  execute: () => ({
-    lines: [
-      { text: '=== WINDOWS 3.1 PORTFOLIO ===' },
-      { text: 'Built with:' },
-      { text: '  - Next.js 15' },
-      { text: '  - TypeScript' },
-      { text: '  - React' },
-      { text: '  - A healthy dose of nostalgia' },
-      { text: '' },
-      { text: 'Special Thanks:' },
-      { text: '  - You, for exploring!' },
-      { text: '  - Coffee, for existing' },
-      { text: '  - Stack Overflow, for everything' },
-      { text: '' },
-      { text: '\u00a9 2025 Jean Francois Gutierrez' },
-    ],
-  }),
-};
+  const credits: Command = {
+    name: 'credits',
+    description: 'Scroll portfolio credits roll',
+    usage: 'credits',
+    category: 'fun',
+    hidden: true,
+    execute: () => ({
+      lines: [
+        { text: '=== WINDOWS 3.1 PORTFOLIO ===' },
+        { text: 'Built with:' },
+        { text: '  - Next.js 15' },
+        { text: '  - TypeScript' },
+        { text: '  - React' },
+        { text: '  - A healthy dose of nostalgia' },
+        { text: '' },
+        { text: 'Special Thanks:' },
+        { text: '  - You, for exploring!' },
+        { text: '  - Coffee, for existing' },
+        { text: '  - Stack Overflow, for everything' },
+        { text: '' },
+        { text: '\u00a9 2025 Jean Francois Gutierrez' },
+      ],
+    }),
+  };
 
   const vibe: Command = {
     name: 'vibe',
